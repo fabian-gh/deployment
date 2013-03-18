@@ -1,0 +1,17 @@
+/**
+ * Configuration / Persistence only
+ */
+plugin.tx_deployment.persistence.classes {
+    TYPO3\Deployment\Domain\Model\Log {
+        mapping.tableName = sys_log
+    }
+
+TYPO3\Deployment\Domain\Model\History {
+        mapping.tableName = sys_history
+    }
+}
+
+### Move to general config
+config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\Log < plugin.tx_deployment.persistence.classes.TYPO3\Deployment\Domain\Model\Log
+
+config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\History < plugin.tx_deployment.persistence.classes.TYPO3\Deployment\Domain\Model\History

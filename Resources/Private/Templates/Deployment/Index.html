@@ -1,0 +1,38 @@
+{namespace deployment=\TYPO3\Deployment\ViewHelpers}
+
+<f:layout name="Backend"/>
+
+<f:section name="content">
+
+    <f:form.errors>
+        <div class="error">
+            <strong>{error.propertyName}</strong>:
+            <f:for each="{error.errors}" as="errorDetail">{errorDetail.message}</f:for>
+        </div>
+    </f:form.errors>
+
+
+    <f:form action="deploy" name="deploy" object="{deploy}">
+
+        <!--<label for="date">Datum:</label>
+        <f:form.textfield property="datum" id="date"/>
+        <br/>-->
+
+        <b>Gesamtdatensätze: </b><f:count>{logEntries}</f:count><br /><br />
+        <ul>
+            <f:for each="{logEntries}" as="entry">
+                <li>   
+                    <f:form.checkbox property="logEntries" value="{entry.uid}"/>
+                    <b style="padding-left: 4px">PID:</b> {entry.pid} | <b>Action-ID:</b> {entry.action}<br />
+                    <b style="padding-left: 20px">Tablename:</b> {entry.tablename}<br />
+                    <b style="padding-left: 20px">Details:</b> {entry.details}<br />
+                    <b style="padding-left: 20px">Timestamp:</b> <f:format.date format="d.m.Y - H:i:s">{entry.tstamp}</f:format.date><br /><br />
+                </li>
+            </f:for>
+        </ul>
+
+        <f:form.submit value="Deployen"/>
+    </f:form>
+
+
+</f:section>
