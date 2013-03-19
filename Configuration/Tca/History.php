@@ -10,11 +10,10 @@ $TCA['sys_history'] = array(
 );
 
 $fields = array(
-    'uid',
-    'pid',
     'sys_log_uid',
     'history_data',
     'fieldlist',
+    'recuid',
     'tablename',
     'tstamp'
 );

@@ -24,64 +24,25 @@ class Log extends AbstractEntity{
     /**
      * @var string
      */
-    protected $action;
-    
-    /**
-     * @var string
-     */
-    protected $tablename;
-    
-    /**
-     * @var string
-     */
-    protected $details;
-    
-    /**
-     * @var \DateTime
-     */
     protected $tstamp;
     
-
     /**
-     * @return string
+     * @var string
      */
-    public function getAction() {
-        return $this->action;
-    }
-
-    /**
-     * @param string $action
-     */
-    public function setAction($action) {
-        $this->action = $action;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTablename() {
-        return $this->tablename;
-    }
-
-    /**
-     * @param string $tablename
-     */
-    public function setTablename($tablename) {
-        $this->tablename = $tablename;
-    }
+    protected $logData;
     
     /**
      * @return string
      */
-    public function getDetails() {
-        return $this->details;
+    public function getLogData() {
+        return $this->logData;
     }
-
+    
     /**
-     * @param string $details
+     * @param string $logData
      */
-    public function setDetails($details) {
-        $this->details = $details;
+    public function setLogData($logData){
+        $this->logData = $logData;
     }
 
     /**

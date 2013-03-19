@@ -13,6 +13,7 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\Deployment\Domain\Model\LogData;
 
 /**
  * XmlParserService
@@ -23,9 +24,14 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 class XmlParserService {
 
     /**
-     * @var array
+     * @var \TYPO3\Domain\Model\HistoryData
      */
     protected $historydata;
+    
+    /**
+     * @var \TYPO3\Domain\Model\LogData 
+     */
+    protected $logData;
 
     /**
      * @var array
@@ -112,22 +118,47 @@ class XmlParserService {
     }
 
     /**
-     * Deserialisiert die geänderten Datensätze und verarbeitet diese zu einzelnen Arrays
-     *
-     * @param Array $logdata
-     *
+     * @param \TYPO3\Domain\Model\Log $logData
      * @return Array $data
      */
-    private function unserializeLogData($logdata) {
-        if ($logdata != NULL) {
-            $unlogdata = unserialize($logdata);
+    public function unserializeLogData($logData) {
+        if ($logData != NULL) {
+            foreach($logData as $log){
+                $this->logData = new LogData();
+                $unlogdata = unserialize($log->getLogData());
+                
+                $tableAndId = explode(':', $unlogdata[1]);
+                $this->logData->setData($unlogdata[0]);
+                $this->logData->setTable($tableAndId[0]);
+                $this->logData->setRecId($tableAndId[1]);
+
+                $data[] = $this->logData;
+            }
             
-            $tableAndId = explode(':', $unlogdata[1]);
-            $data = array(
-                'data' => $unlogdata[0],
-                'table' => $tableAndId[0],
-                'recID' => $tableAndId[1]
-            );
+            return $data;
+        }
+        else {
+            return $data = array();
+        }
+    }
+    
+    /**
+     * 
+     * @param array|\TYPO3\Domain\Model\HistoryData $historyData
+     * @return array $data
+     */
+    public function unserializeHistoryData($historyData){
+        if ($historyData != NULL) {
+            foreach($historyData as $his){
+                $unlogdata = unserialize($his->getHistoryData());
+                DebuggerUtility::var_dump($unlogdata);die();
+                $tableAndId = explode(':', $unlogdata[1]);
+                $data[] = array(
+                    'data' => $unlogdata[0],
+                    'table' => $tableAndId[0],
+                    'recID' => $tableAndId[1]
+                );
+            }
             
             return $data;
         }

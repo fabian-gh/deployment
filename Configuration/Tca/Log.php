@@ -10,12 +10,8 @@ $TCA['sys_log'] = array(
 );
 
 $fields = array(
-    'uid',
-    'pid',
-    'action',
-    'tablename',
-    'details',
-    'tstamp'
+    'tstamp',
+    'log_data'
 );
 
 

@@ -26,11 +26,11 @@ class HistoryRepository extends AbstractRepository {
      * @param array $uids
      * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
-    public function findHistoryData($uids) {
+    public function findHistoryData($logData) {
         $query = $this->createQuery();
         
-        foreach($uids as $uid){
-            $constraint = $query->equals('sys_log_uid', $uid);
+        foreach($logData as $ldata){
+            $constraint = $query->equals('recuid', $ldata['recID']);
             $query->matching($constraint);
             $data[] = $query->execute()->toArray();
         }

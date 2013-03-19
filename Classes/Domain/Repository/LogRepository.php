@@ -11,7 +11,7 @@
 
 namespace TYPO3\Deployment\Domain\Repository;
 
-//use \TYPO3\CMS\Extbase\Persistence\Repository;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Log Repository
@@ -24,7 +24,6 @@ class LogRepository extends AbstractRepository {
 
     /**
      * @param \DateTime $dateTime
-     *
      * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function findYoungerThen(\DateTime $dateTime) {
@@ -37,21 +36,21 @@ class LogRepository extends AbstractRepository {
         $constraints[] = $query->logicalNot($query->equals('tablename', ''));
         
         $query->matching($query->logicalAnd($constraints));
-        //DebuggerUtility::var_dump($query->matching($query->logicalAnd($constraints)));die();
+        
         return $query->execute();
     }
 
     /**
      * Beispiel für individuelle Abfrage. Bitte in find* umbennnen und korrigieren
      */
-    public function customQuery() {
+    /*public function customQuery() {
         /** @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-        $query = $this->createQuery();
+        /*$query = $this->createQuery();
 
         $query->statement('SELECT sys_log.* FROM sys_log');
 
         return $query->execute();
-    }
+    }*/
 
 }
 

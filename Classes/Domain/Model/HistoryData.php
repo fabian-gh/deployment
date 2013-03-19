@@ -1,6 +1,6 @@
 <?php
 /**
- * History
+ * HistoryData
  *
  * @category   Extension
  * @package    Deployment
@@ -13,13 +13,13 @@ namespace TYPO3\Deployment\Domain\Model;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**
- * History
+ * HistoryData
  *
  * @package    Deployment
  * @subpackage Domain\Model
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class History extends AbstractEntity{
+class HistoryData extends AbstractEntity{
     
     /**
      * @var string 
@@ -39,6 +39,11 @@ class History extends AbstractEntity{
     /**
      * @var string 
      */
+    protected $recuid;
+
+    /**
+     * @var string 
+     */
     protected $tablename;
     
     /**
@@ -55,7 +60,7 @@ class History extends AbstractEntity{
     }
 
     /**
-     * @param string $sys_log_uid
+     * @param string $sysLogUid
      */
     public function setSysLogUid($sysLogUid) { 
         $this->sysLogUid = $sysLogUid;
@@ -69,7 +74,7 @@ class History extends AbstractEntity{
     }
 
     /**
-     * @param string $history_data
+     * @param string $historyData
      */
     public function setHistoryData($historyData) {
         $this->historyData = $historyData;
@@ -87,6 +92,20 @@ class History extends AbstractEntity{
      */
     public function setFieldlist($fieldlist) {
         $this->fieldlist = $fieldlist;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getRecuid() {
+        return $this->recuid;
+    }
+
+    /**
+     * @param string $recuid
+     */
+    public function setRecuid($recuid) {
+        $this->recuid = $recuid;
     }
 
     /**

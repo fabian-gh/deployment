@@ -55,6 +55,12 @@ class DeploymentController extends ActionController {
         // das übergebene Datum wird später automatisch aus der Tabelle gelesen 
         $date = new \DateTime('last week');
         $logEntries = $this->logRepository->findYoungerThen($date);
+        $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
+
+        $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
+        $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
+        DebuggerUtility::var_dump($unserializedHistoryData);
+        
         //$logEntries = $this->logRepository->customQuery();
         $this->view->assign('logEntries', $logEntries);
     }
