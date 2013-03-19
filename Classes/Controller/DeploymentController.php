@@ -14,6 +14,7 @@ namespace TYPO3\Deployment\Controller;
 
 use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
+use \TYPO3\Deployment\Domain\Model\HistoryData;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
@@ -59,9 +60,9 @@ class DeploymentController extends ActionController {
 
         $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
         $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
-        //DebuggerUtility::var_dump($unserializedHistoryData);
+        DebuggerUtility::var_dump($unserializedHistoryData);
         
-        $this->view->assign('logEntries', $logEntries);
+        $this->view->assign('historyEntries', $unserializedHistoryData);
     }
 
     /**

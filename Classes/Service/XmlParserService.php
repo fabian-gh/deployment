@@ -151,6 +151,10 @@ class XmlParserService {
         if ($historyData != NULL) {
             foreach($historyData as $his){
                 $this->historyData = new HistoryData();
+                $this->historyData->setPid($his->getPid());
+                $this->historyData->setUid($his->getUid());
+                $this->historyData->setSysLogUid($his->getSysLogUid());
+                
                 $unlogdata = unserialize($his->getHistoryData());
                 
                 foreach($unlogdata as $key => $value){
@@ -163,9 +167,12 @@ class XmlParserService {
                     }
                     $unlogdata[$key] = $data;
                 }
-
+                
                 $this->historyData->setHistoryData($unlogdata);
-
+                $this->historyData->setRecuid($his->getRecuid());
+                $this->historyData->setTablename($his->getTablename());
+                $this->historyData->setTstamp($his->getTstamp());
+                
                 $hisData[] = $this->historyData;
             }
             return $hisData;

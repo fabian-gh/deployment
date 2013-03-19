@@ -24,6 +24,11 @@ class HistoryData extends AbstractEntity{
     /**
      * @var string 
      */
+    protected $uid;
+    
+    /**
+     * @var string 
+     */
     protected $sysLogUid;
     
     /**
@@ -46,6 +51,19 @@ class HistoryData extends AbstractEntity{
      */
     protected $tstamp;
     
+    /**
+     * @return string
+     */
+    public function getUid() {
+        return $this->uid;
+    }
+
+    /**
+     * @param string $uid
+     */
+    public function setUid($uid) {
+        $this->uid = $uid;
+    }
 
     /**
      * @return string

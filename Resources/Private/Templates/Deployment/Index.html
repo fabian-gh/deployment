@@ -10,26 +10,49 @@
             <f:for each="{error.errors}" as="errorDetail">{errorDetail.message}</f:for>
         </div>
     </f:form.errors>
+    
+    <style>
+        .table{
+            border-collapse: collapse; 
+            border: 1px solid #000;
+        }
+        .column{
+            border: 1px solid #000;
+            padding: 3px;
+        }
+    </style>
 
 
     <f:form action="deploy" name="deploy" object="{deploy}">
-
-        <!--<label for="date">Datum:</label>
-        <f:form.textfield property="datum" id="date"/>
-        <br/>-->
-
-        <b>Gesamtdatensätze: </b><f:count>{logEntries}</f:count><br /><br />
-        <ul>
-            <f:for each="{logEntries}" as="entry">
-                <li>   
-                    <f:form.checkbox property="logEntries" value="{entry.uid}"/>
-                    <b style="padding-left: 4px">PID:</b> {entry.pid} | <b>Action-ID:</b> {entry.action}<br />
-                    <b style="padding-left: 20px">Tablename:</b> {entry.tablename}<br />
-                    <b style="padding-left: 20px">Details:</b> {entry.details}<br />
-                    <b style="padding-left: 20px">Timestamp:</b> <f:format.date format="d.m.Y - H:i:s">{entry.tstamp}</f:format.date><br /><br />
-                </li>
+        <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
+        
+        <table class="table">
+            <tr style="border: 1px solid #000;">
+                <th class="column">&nbsp;</th>
+                <th class="column">ID-Infos</th>
+                <th class="column">Timestamp</th>
+                <th class="column">Table</th>
+                <th class="column">Old Record</th>
+                <th class="column">New Record</th>
+            </tr>
+            <f:for each="{historyEntries}" as="entry">
+                <tr style="border: 1px solid #000;">
+                    <td class="column"><f:form.checkbox property="historyEntries" value="{entry.uid}"/></td>
+                    <td class="column">
+                        UID: {entry.uid}<br/>
+                        Log-UID: {entry.sysLogUid}<br />
+                        Rec-UID: {entry.recuid}
+                    </td>
+                    <td class="column"><f:format.date format="d.m.Y - H:i:s">{entry.tstamp}</f:format.date></td>
+                    <td class="column">{entry.tablename}</td>
+                    
+                    <!--<f:for each="{entry.historyData}" as="hData">
+                        <td class="column">{hData.bodytext}<td>
+                        <td class="column">{entry.historyData.newRecord}</td>
+                    </f:for>-->
+                </tr>
             </f:for>
-        </ul>
+        </table><br />
 
         <f:form.submit value="Deployen"/>
     </f:form>
