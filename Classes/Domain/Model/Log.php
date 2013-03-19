@@ -22,16 +22,6 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 class Log extends AbstractEntity{
     
     /**
-     * @var string 
-     */
-    protected $uid;
-    
-    /**
-     * @var string
-     */
-    protected $pid;
-    
-    /**
      * @var string
      */
     protected $action;
@@ -51,33 +41,6 @@ class Log extends AbstractEntity{
      */
     protected $tstamp;
     
-    /**
-     * @return string
-     */
-    public function getUid() {
-        return $this->uid;
-    }
-
-    /**
-     * @param string $uid
-     */
-    public function setUid($uid) {
-        $this->uid = $uid;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPid() {
-        return $this->pid;
-    }
-
-    /**
-     * @param string $pid
-     */
-    public function setPid($pid) {
-        $this->pid = $pid;
-    }
 
     /**
      * @return string

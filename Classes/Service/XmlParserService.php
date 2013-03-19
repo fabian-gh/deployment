@@ -50,9 +50,9 @@ class XmlParserService {
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
         $count = 1;
-        
-        $utility = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\GeneralUtility');
-        DebuggerUtility::var_dump($utility->array2xml($this->historydata), '', 3, '', 4);die();
+        // standalone view in template -> array übergeben -> foreach
+        // writeFile, readFile? getfilesinfolder aus GeneralUtility::
+        DebuggerUtility::var_dump(GeneralUtility::array2xml($this->historydata), '', 3, '', 4);die();
 
         // Dokumenteneigenschaften
         $this->xmlwriter->openURI('fileadmin/deployment/changes.xml');  // Pfad zur Datei

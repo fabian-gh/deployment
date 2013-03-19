@@ -24,22 +24,12 @@ class History extends AbstractEntity{
     /**
      * @var string 
      */
-    protected $uid;
+    protected $sysLogUid;
     
     /**
      * @var string 
      */
-    protected $pid;
-    
-    /**
-     * @var string 
-     */
-    protected $sys_log_uid;
-    
-    /**
-     * @var string 
-     */
-    protected $history_data;
+    protected $historyData;
     
     /**
      * @var string 
@@ -56,64 +46,33 @@ class History extends AbstractEntity{
      */
     protected $tstamp;
     
-    /**
-     * @return string
-     */
-    public function getUid() {
-        return $this->uid;
-    }
-
-    /**
-     * @param string $uid
-     */
-    public function setUid($uid) {
-        $this->uid = $uid;
-    }
-    
-    /**
-     * @return string
-     */
-    public function getPid() {
-        return $this->pid;
-    }
-
-    /**
-     * @param string $pid
-     */
-    public function setPid($pid) {
-        $this->pid = $pid;
-    }
 
     /**
      * @return string
      */
     public function getSysLogUid() {
-    //public function getSys_log_uid() {
-        return $this->sys_log_uid;
+        return $this->sysLogUid;
     }
 
     /**
      * @param string $sys_log_uid
      */
-    public function setSysLogUid($sys_log_uid) {
-    //public function setSys_log_uid($sys_log_uid) {   
-        $this->sys_log_uid = $sys_log_uid;
+    public function setSysLogUid($sysLogUid) { 
+        $this->sysLogUid = $sysLogUid;
     }
 
     /**
      * @return string
      */
     public function getHistoryData() {
-    //public function getHistory_data() {
-        return $this->history_data;
+        return $this->historyData;
     }
 
     /**
      * @param string $history_data
      */
-    public function setHistoryData($history_data) {
-    //public function setHistory_data($history_data) {
-        $this->history_data = $history_data;
+    public function setHistoryData($historyData) {
+        $this->historyData = $historyData;
     }
 
     /**

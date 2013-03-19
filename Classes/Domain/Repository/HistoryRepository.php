@@ -11,7 +11,7 @@
 
 namespace TYPO3\Deployment\Domain\Repository;
 
-use \TYPO3\CMS\Extbase\Persistence\Repository;
+//use \TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
  * History Repository
@@ -20,26 +20,7 @@ use \TYPO3\CMS\Extbase\Persistence\Repository;
  * @subpackage Domain\Repository
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class HistoryRepository extends Repository {
-    /* =======================================
-     * Repository dient als Schnittstelle zur 
-     * Datenabfrage bzw. zur Datensicherung 
-     * des Models
-     * =======================================
-     */
-  
-    
-    /**
-     * @return \TYPO3\CMS\Extbase\Persistence\QueryInterface
-     */
-    public function createQuery() {
-        // aus der Repository Klasse erben
-        $query = parent::createQuery();
-        $query
-                ->getQuerySettings()
-                ->setRespectStoragePage(FALSE);
-        return $query;
-    }
+class HistoryRepository extends AbstractRepository {
 
     /**
      * @param array $uids

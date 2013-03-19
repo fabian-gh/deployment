@@ -65,6 +65,7 @@ class DeploymentController extends ActionController {
      */
     public function deployAction(Deploy $deploy){ 
         $historyEntries = $this->historyRepository->findHistoryData($deploy->getLogEntries());
+        DebuggerUtility::var_dump($historyEntries);die();
 
         $this->xmlParserService->setHistoryData($historyEntries);
         $this->xmlParserService->writeXML();
