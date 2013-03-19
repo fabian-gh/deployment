@@ -1,6 +1,6 @@
 <?php
 /**
- * HistoryData
+ * History
  *
  * @category   Extension
  * @package    Deployment
@@ -13,13 +13,13 @@ namespace TYPO3\Deployment\Domain\Model;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**
- * HistoryData
+ * History
  *
  * @package    Deployment
  * @subpackage Domain\Model
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class HistoryData extends AbstractEntity{
+class History extends AbstractEntity{
     
     /**
      * @var string 
@@ -30,6 +30,11 @@ class HistoryData extends AbstractEntity{
      * @var string 
      */
     protected $historyData;
+    
+    /**
+     * @var string 
+     */
+    protected $fieldlist;
     
     /**
      * @var string 
@@ -73,6 +78,20 @@ class HistoryData extends AbstractEntity{
      */
     public function setHistoryData($historyData) {
         $this->historyData = $historyData;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFieldlist() {
+        return $this->fieldlist;
+    }
+
+    /**
+     * @param string $fieldlist
+     */
+    public function setFieldlist($fieldlist) {
+        $this->fieldlist = $fieldlist;
     }
     
     /**

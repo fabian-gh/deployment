@@ -59,9 +59,8 @@ class DeploymentController extends ActionController {
 
         $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
         $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
-        DebuggerUtility::var_dump($unserializedHistoryData);
+        //DebuggerUtility::var_dump($unserializedHistoryData);
         
-        //$logEntries = $this->logRepository->customQuery();
         $this->view->assign('logEntries', $logEntries);
     }
 

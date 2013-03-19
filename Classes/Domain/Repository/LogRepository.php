@@ -11,8 +11,6 @@
 
 namespace TYPO3\Deployment\Domain\Repository;
 
-use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-
 /**
  * Log Repository
  *
@@ -36,7 +34,7 @@ class LogRepository extends AbstractRepository {
         $constraints[] = $query->logicalNot($query->equals('tablename', ''));
         
         $query->matching($query->logicalAnd($constraints));
-        
+
         return $query->execute();
     }
 

@@ -12,8 +12,8 @@
 namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Model\LogData;
+use \TYPO3\Deployment\Domain\Model\HistoryData;
 
 /**
  * XmlParserService
@@ -26,7 +26,7 @@ class XmlParserService {
     /**
      * @var \TYPO3\Domain\Model\HistoryData
      */
-    protected $historydata;
+    protected $historyData;
     
     /**
      * @var \TYPO3\Domain\Model\LogData 
@@ -119,7 +119,7 @@ class XmlParserService {
 
     /**
      * @param \TYPO3\Domain\Model\Log $logData
-     * @return Array $data
+     * @return array|\TYPO3\Domain\Model\LogData $data
      */
     public function unserializeLogData($logData) {
         if ($logData != NULL) {
@@ -144,23 +144,31 @@ class XmlParserService {
     
     /**
      * 
-     * @param array|\TYPO3\Domain\Model\HistoryData $historyData
-     * @return array $data
+     * @param array|\TYPO3\Domain\Model\History $historyData
+     * @return array|\TYPO3\Domain\Model\HistoryData $data
      */
     public function unserializeHistoryData($historyData){
         if ($historyData != NULL) {
             foreach($historyData as $his){
+                $this->historyData = new HistoryData();
                 $unlogdata = unserialize($his->getHistoryData());
-                DebuggerUtility::var_dump($unlogdata);die();
-                $tableAndId = explode(':', $unlogdata[1]);
-                $data[] = array(
-                    'data' => $unlogdata[0],
-                    'table' => $tableAndId[0],
-                    'recID' => $tableAndId[1]
-                );
+                
+                foreach($unlogdata as $key => $value){
+                    foreach($value as $k => $val){
+                        if(preg_match('/[a-z]{1}:[0-9]+/', $val)){
+                            $data[$k] = unserialize($val);
+                        } else {
+                            $data[$k] = $val;
+                        }
+                    }
+                    $unlogdata[$key] = $data;
+                }
+
+                $this->historyData->setHistoryData($unlogdata);
+
+                $hisData[] = $this->historyData;
             }
-            
-            return $data;
+            return $hisData;
         }
         else {
             return $data = array();
