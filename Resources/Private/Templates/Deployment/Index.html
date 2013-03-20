@@ -25,8 +25,7 @@
             width: 90px;
         }
     </style>
-
-    <f:debug>{historyEntries}</f:debug><br />
+    
     <f:form action="deploy" name="deploy" object="{deploy}">
         <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
          <table class="table">
@@ -56,6 +55,5 @@
 
         <f:form.submit value="Deployen"/>
     </f:form>
-
-
+    
 </f:section>

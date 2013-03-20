@@ -43,6 +43,11 @@ class DeploymentController extends ActionController {
     protected $xmlParserService;
 
     /**
+     * @var \TYPO3\sysext\backend\Classes\History\RecordHistory.php 
+     */
+    protected $recordHistory;
+
+    /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
      */
@@ -59,18 +64,18 @@ class DeploymentController extends ActionController {
 
         $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
         $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
-        //DebuggerUtility::var_dump($unserializedHistoryData);die();
-        
+
         $this->view->assign('historyEntries', $unserializedHistoryData);
     }
 
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
-     * @dontvalidate $deploy
+     * @validate $deploy
      */
-    public function deployAction(Deploy $deploy){ 
+    public function deployAction(Deploy $deploy) {
+        DebuggerUtility::var_dump($deploy);
+        die();
         $historyEntries = $this->historyRepository->findHistoryData($deploy->getLogEntries());
-        DebuggerUtility::var_dump($historyEntries);die();
 
         $this->xmlParserService->setHistoryData($historyEntries);
         $this->xmlParserService->writeXML();
