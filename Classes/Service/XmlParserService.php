@@ -24,12 +24,12 @@ use \TYPO3\Deployment\Domain\Model\HistoryData;
 class XmlParserService {
 
     /**
-     * @var \TYPO3\Domain\Model\HistoryData
+     * @var \TYPO3\Deployment\Domain\Model\HistoryData
      */
     protected $historyData;
     
     /**
-     * @var \TYPO3\Domain\Model\LogData 
+     * @var \TYPO3\Deployment\Domain\Model\LogData 
      */
     protected $logData;
 
