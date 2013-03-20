@@ -143,7 +143,6 @@ class XmlParserService {
     }
     
     /**
-     * 
      * @param array|\TYPO3\Domain\Model\History $historyData
      * @return array|\TYPO3\Domain\Model\HistoryData $data
      */
@@ -157,7 +156,8 @@ class XmlParserService {
                 
                 $unlogdata = unserialize($his->getHistoryData());
                 
-                foreach($unlogdata as $key => $value){
+                // wird benötigt um das l18n_diffsource-Feld zu deserialisieren
+                /*foreach($unlogdata as $key => $value){
                     foreach($value as $k => $val){
                         if(preg_match('/[a-z]{1}:[0-9]+/', $val)){
                             $data[$k] = unserialize($val);
@@ -166,19 +166,20 @@ class XmlParserService {
                         }
                     }
                     $unlogdata[$key] = $data;
-                }
+                }*/
                 
                 $this->historyData->setHistoryData($unlogdata);
                 $this->historyData->setRecuid($his->getRecuid());
                 $this->historyData->setTablename($his->getTablename());
                 $this->historyData->setTstamp($his->getTstamp());
-                
+                unset($unlogdata);
                 $hisData[] = $this->historyData;
             }
+            
             return $hisData;
         }
         else {
-            return $data = array();
+            return $hisData = array();
         }
     }
     
