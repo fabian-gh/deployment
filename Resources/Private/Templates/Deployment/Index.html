@@ -15,6 +15,7 @@
         .table{
             border-collapse: collapse; 
             border: 1px solid #000;
+            max-width: 850px;
         }
         .column{
             border: 1px solid #000;
@@ -25,13 +26,10 @@
         }
     </style>
 
-
+    <f:debug>{historyEntries}</f:debug><br />
     <f:form action="deploy" name="deploy" object="{deploy}">
         <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
-        
-        <f:debug>{historyEntries}</f:debug>
-        
-        <table class="table">
+         <table class="table">
             <tr class="column">
                 <th class="column">&nbsp;</th>
                 <th class="column">ID-Infos</th>
@@ -48,7 +46,7 @@
                         Log-UID: {entry.sysLogUid}<br />
                         Rec-UID: {entry.recuid}
                     </td>
-                    <td class="column"><f:format.date format="d.m.Y - H:i:s">{entry.tstamp}</f:format.date></td>
+                    <td class="column"><f:format.date format="d.m.Y H:i:s">{entry.tstamp}</f:format.date></td>
                     <td class="column">{entry.tablename}</td>
                     <td class="column">{entry.historyData.oldRecord.bodytext}</td>
                     <td class="column">{entry.historyData.newRecord.bodytext}</td>

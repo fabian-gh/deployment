@@ -118,19 +118,22 @@ class XmlParserService {
     }
 
     /**
-     * @param \TYPO3\Domain\Model\Log $logData
-     * @return array|\TYPO3\Domain\Model\LogData $data
+     * @param \TYPO3\Deployment\Domain\Model\Log $logData
+     * @return array|\TYPO3\Deployment\Domain\Model\LogData $data
      */
     public function unserializeLogData($logData) {
+        $data = array();
+        
         if ($logData != NULL) {
             foreach($logData as $log){
                 $this->logData = new LogData();
+                $this->logData->setUid($log->getUid());
                 $unlogdata = unserialize($log->getLogData());
                 
                 $tableAndId = explode(':', $unlogdata[1]);
                 $this->logData->setData($unlogdata[0]);
                 $this->logData->setTable($tableAndId[0]);
-                $this->logData->setRecId($tableAndId[1]);
+                $this->logData->setRecuid($tableAndId[1]);
 
                 $data[] = $this->logData;
             }
@@ -143,37 +146,41 @@ class XmlParserService {
     }
     
     /**
-     * @param array|\TYPO3\Domain\Model\History $historyData
-     * @return array|\TYPO3\Domain\Model\HistoryData $data
+     * @param array|\TYPO3\Deployment\Domain\Model\History $historyData
+     * @return array|\TYPO3\Deployment\Domain\Model\HistoryData $data
      */
     public function unserializeHistoryData($historyData){
+        $hisData = array();
+
         if ($historyData != NULL) {
             foreach($historyData as $his){
-                $this->historyData = new HistoryData();
-                $this->historyData->setPid($his->getPid());
-                $this->historyData->setUid($his->getUid());
-                $this->historyData->setSysLogUid($his->getSysLogUid());
-                
-                $unlogdata = unserialize($his->getHistoryData());
-                
-                // wird benötigt um das l18n_diffsource-Feld zu deserialisieren
-                /*foreach($unlogdata as $key => $value){
-                    foreach($value as $k => $val){
-                        if(preg_match('/[a-z]{1}:[0-9]+/', $val)){
-                            $data[$k] = unserialize($val);
-                        } else {
-                            $data[$k] = $val;
+                if($his != null){
+                    $this->historyData = new HistoryData();
+                    $this->historyData->setPid($his->getPid());
+                    $this->historyData->setUid($his->getUid());
+                    $this->historyData->setSysLogUid($his->getSysLogUid());
+
+                    $unlogdata = unserialize($his->getHistoryData());
+
+                    // wird benötigt um das l18n_diffsource-Feld zu deserialisieren
+                    /*foreach($unlogdata as $key => $value){
+                        foreach($value as $k => $val){
+                            if(preg_match('/[a-z]{1}:[0-9]+/', $val)){
+                                $data[$k] = unserialize($val);
+                            } else {
+                                $data[$k] = $val;
+                            }
                         }
-                    }
-                    $unlogdata[$key] = $data;
-                }*/
-                
-                $this->historyData->setHistoryData($unlogdata);
-                $this->historyData->setRecuid($his->getRecuid());
-                $this->historyData->setTablename($his->getTablename());
-                $this->historyData->setTstamp($his->getTstamp());
-                unset($unlogdata);
-                $hisData[] = $this->historyData;
+                        $unlogdata[$key] = $data;
+                    }*/
+
+                    $this->historyData->setHistoryData($unlogdata);
+                    $this->historyData->setRecuid($his->getRecuid());
+                    $this->historyData->setTablename($his->getTablename());
+                    $this->historyData->setTstamp($his->getTstamp());
+                    
+                    $hisData[] = $this->historyData; 
+                }
             }
             
             return $hisData;
@@ -196,14 +203,14 @@ class XmlParserService {
      * @return Array $logdata
      */
     public function getHistoryData() {
-        return $this->historydata;
+        return $this->historyData;
     }
     
     /**
      * @param array $historyEntries
      */
     public function setHistoryData($historyEntries){
-        $this->historydata = $historyEntries;
+        $this->historyData = $historyEntries;
     }
 
     /**

@@ -24,6 +24,11 @@ class LogData extends AbstractEntity{
     /**
      * @var string
      */
+    protected $uid;
+
+    /**
+     * @var string
+     */
     protected $data;
     
     /**
@@ -34,7 +39,27 @@ class LogData extends AbstractEntity{
     /**
      * @var string
      */
-    protected $recId;
+    protected $recuid;
+    
+    /**
+     * @var \DateTime
+     */
+    protected $tstamp;
+
+
+    /**
+     * @return string
+     */
+    public function getUid() {
+        return $this->uid;
+    }
+
+    /**
+     * @param string $uid
+     */
+    public function setUid($uid) {
+        $this->uid = $uid;
+    }
     
     /**
      * @return string
@@ -67,16 +92,32 @@ class LogData extends AbstractEntity{
     /**
      * @return string
      */
-    public function getRecId() {
-        return $this->recId;
+    public function getRecuid() {
+        return $this->recuid;
     }
 
     /**
      * @param string $recId
      */
-    public function setRecid($recId) {
-        $this->recId = $recId;
+    public function setRecuid($recuid) {
+        $this->recuid = $recuid;
     }
+    
+    /**
+     * @return \DateTime
+     */
+    public function getTstamp() {
+        return $this->tstamp;
+    }
+
+    /**
+     * @param \DateTime $tstamp
+     */
+    public function setTstamp(\DateTime $tstamp) {
+        $this->tstamp = $tstamp;
+    }
+
+
 }
 
 ?>

@@ -59,7 +59,7 @@ class DeploymentController extends ActionController {
 
         $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
         $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
-        DebuggerUtility::var_dump($unserializedHistoryData);die();
+        //DebuggerUtility::var_dump($unserializedHistoryData);die();
         
         $this->view->assign('historyEntries', $unserializedHistoryData);
     }

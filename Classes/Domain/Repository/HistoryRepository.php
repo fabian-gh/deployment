@@ -11,8 +11,6 @@
 
 namespace TYPO3\Deployment\Domain\Repository;
 
-use \TYPO3\Deployment\Domain\Model\History;
-
 /**
  * History Repository
  *
@@ -23,21 +21,22 @@ use \TYPO3\Deployment\Domain\Model\History;
 class HistoryRepository extends AbstractRepository {
 
     /**
-     * @param array|\TYPO3\Domain\Model\LogData $logData
+     * @param array|\TYPO3\Deployment\Domain\Model\LogData $logData
      * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function findHistoryData($logData) {
+        $data = array();
+
         $query = $this->createQuery();
         
         foreach($logData as $ldata){
-            $constraint = $query->equals('recuid', $ldata->getRecid());
+            $constraint = $query->equals('sys_log_uid', $ldata->getUid());
             $query->matching($constraint);
             $temp = $query->execute();
-            
+
             $data[] = $temp->getFirst();
-        }
-        
-        return $this->filterDuplicateEntries($data);
+        }die();
+        return $data;
     }
 }
 
