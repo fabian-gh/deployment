@@ -28,7 +28,7 @@ class HistoryRepository extends AbstractRepository {
      */
     public function findHistoryData($logData) {
         $query = $this->createQuery();
-
+        
         foreach($logData as $ldata){
             $constraint = $query->equals('recuid', $ldata->getRecid());
             $query->matching($constraint);
@@ -36,10 +36,9 @@ class HistoryRepository extends AbstractRepository {
             
             $data[] = $temp->getFirst();
         }
-
-        return $data;
+        
+        return $this->filterDuplicateEntries($data);
     }
-
 }
 
 ?>
