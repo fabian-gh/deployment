@@ -35,7 +35,7 @@ class HistoryRepository extends AbstractRepository {
             $temp = $query->execute();
 
             $data[] = $temp->getFirst();
-        }die();
+        }
         return $data;
     }
 }
