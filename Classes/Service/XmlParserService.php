@@ -12,6 +12,7 @@
 namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Model\LogData;
 use \TYPO3\Deployment\Domain\Model\HistoryData;
 
@@ -36,7 +37,7 @@ class XmlParserService {
     /**
      * @var array
      */
-    protected $contentData;
+    protected $deployData;
 
     /**
      * @var \XmlWriter
@@ -58,38 +59,40 @@ class XmlParserService {
         $count = 1;
         // standalone view in template -> array übergeben -> foreach
         // writeFile, readFile? getfilesinfolder aus GeneralUtility::
-        DebuggerUtility::var_dump(GeneralUtility::array2xml($this->historydata), '', 3, '', 4);die();
 
         // Dokumenteneigenschaften
-        $this->xmlwriter->openURI('fileadmin/deployment/changes.xml');  // Pfad zur Datei
-        DebuggerUtility::var_dump($this->xmlwriter->openURI('fileadmin/deployment/changes.xml'));die();
-        $this->xmlwriter->setIndent(TRUE);                              // Einzug aktivieren
-        $this->xmlwriter->startDocument('1.0');                         // Document-Tag erzeugen
-        $this->xmlwriter->startElement('xml');                          // Element erzeugen
-        $this->xmlwriter->writeAttribute('version', '1.0');             // Attribute für das vorherige Element vergeben
+        $this->xmlwriter->openMemory();                         // Daten in Speicher schreiben
+        $this->xmlwriter->setIndent(TRUE);                      // Einzug aktivieren
+        $this->xmlwriter->startDocument('1.0');                 // Document-Tag erzeugen
+        $this->xmlwriter->startElement('xml');                  // Element erzeugen
+        $this->xmlwriter->writeAttribute('version', '1.0');     // Attribute für das vorherige Element vergeben
         $this->xmlwriter->writeAttribute('encoding', 'UTF_8');
         $this->xmlwriter->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
 
         // Daten schreiben
         $this->xmlwriter->startElement('changeSet');
-        foreach ($this->contentData as $cData) {
+        foreach ($this->deployData as $cData) {
             // für jeden Datensatz ein neues data-Element mit eigener ID
             $this->xmlwriter->startElement('data');
-            $this->xmlwriter->writeAttribute('id', $count);
-            foreach ($cData as $key => $value) {
-                // Datensatz schreiben
-                $this->xmlwriter->writeElement(utf8_encode($key), utf8_encode($value));
+            $this->xmlwriter->writeAttribute('uid', $cData->getUid());
+            
+            $this->xmlwriter->writeElement('uid', $cData->getUid());
+            $this->xmlwriter->writeElement('pid', $cData->getPid());
+            $this->xmlwriter->writeElement('sys_log_uid', $cData->getSysLogUid());
+            $this->xmlwriter->writeElement('history_data', $cData->getHistoryData());
+            $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
+            $this->xmlwriter->writeElement('recuid', $cData->getRecuid());
+            $this->xmlwriter->writeElement('tablename', $cData->getTablename());
+            $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
 
-                // UTF-8 prüfen. TYPO3 sollte default UTF-8 sein
-            }
             $this->xmlwriter->endElement();
             $count++;
         }
         $this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument(); // Dokument schließen
-        $this->xmlwriter->flush(); // in Ausgabedatei schreiben
-        //$count = 1; // Zähler Reset
+        $writeString = $this->xmlwriter->outputMemory();
+        GeneralUtility::writeFile('http://localhost/t3master/fileadmin/deployment/changes.txt', $writeString);
     }
 
     
@@ -214,17 +217,31 @@ class XmlParserService {
     }
 
     /**
-     * @return Array $contentData
+     * @return \TYPO3\Deployment\Domain\Model\LogData 
      */
-    public function getContentData() {
-        return $this->contentData;
+    public function getLogData() {
+        return $this->logData;
     }
-    
+
     /**
-     * @param array $contentData
+     * @param \TYPO3\Deployment\Domain\Model\LogData $logData
      */
-    public function setContentData($contentData){
-        $this->contentData = $contentData;
+    public function setLogData(\TYPO3\Deployment\Domain\Model\LogData $logData) {
+        $this->logData = $logData;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDeployData() {
+        return $this->deployData;
+    }
+
+    /**
+     * @param array $deployData
+     */
+    public function setDeployData($deployData) {
+        $this->deployData = $deployData;
     }
     
     /**
@@ -255,78 +272,5 @@ class XmlParserService {
         $this->xmlreader = $xmlreader;
     }
 }
-
-
-
-
-// ===============================================================================================
-
-/**
-     * sys_log + sys_history Tabellen abfragen auf Änderungen seit dem übergebenem Timestamp
-     *
-     * @param int $tstamp
-     */
-    /*public function queryDatabase($tstamp) {
-        $data = array();
-        /* $query = "SELECT l.tstamp, l.log_data, h.fieldlist
-          FROM sys_log as l
-          INNER JOIN sys_history as h
-          ON l.tstamp = h.tstamp
-          WHERE l.tablename != ''
-          AND l.tstamp = " . $tstamp . "
-          AND h.sys_log_uid > 0
-          GROUP BY l.log_data"; */
-
-        /*$rows = $this->getDatabase()->exec_SELECT_mm_query('l.tstamp, l.log_data, h.fieldlist', 'sys_log as l', 'sys_history as h', '', 'l.tablename != "" AND l.tstamp = ' . $tstamp . ' AND h.sys_log_uid > 0', 'l.log_data');
-
-        if (sizeof($rows)) {
-            foreach ($rows as $row) {
-                $logdata = $this->unserializeLogData($row['log_data']);
-                
-                $data[] = array(
-                    'timestamp' => $row['tstamp'],
-                    'table' => $logdata['table'],
-                    'field' => $row['fieldlist'],
-                    'recordID' => $logdata['recID'],
-                    'data' => $logdata['data']
-                );
-            }
-            $this->logdata = $data;
-        }*/
-
-        /* while ($row = $result->fetch_assoc()) {
-          $logdata = $this->unserializeLogData($row['log_data']);
-
-          $data[] = $row;
-          $data[] = array(
-          'timestamp' => $row['tstamp'],
-          'table' => $logdata['table'],
-          'field' => $row['fieldlist'],
-          'recordID' => $logdata['recID'],
-          'data' => $logdata['data']
-          );
-          } */
-
-        //$this->logdata = $data;
-    //}
-
-    /**
-     * Geänderte Datensätze seit dem letzten Timestamp abfragen
-     *
-     * @param int $tstamp
-     */
-    /*public function getDataRecordsFromTable($tstamp) {
-        $data = array();
-        foreach ($this->logdata as $log) {
-            $rows = $this->getDatabase()->exec_SELECTgetRows('*', $log['table'], 'tstamp >= ' . $tstamp . ' AND pid = ' . $log['recordID']);
-            
-            if (sizeof($rows)) {
-                foreach ($rows as $row) {
-                    $data[] = $row;
-                }
-                $this->contentData = $data;
-            }
-        }
-    }*/
 
 ?>

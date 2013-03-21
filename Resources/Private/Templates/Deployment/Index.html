@@ -39,11 +39,11 @@
             </tr>
             <f:for each="{historyEntries}" as="entry">
                 <tr class="column">
-                    <td class="column"><f:form.checkbox name="uid" value="{entry.uid}"/></td>
+                    <td class="column"><f:form.checkbox property="deployEntries" value="{entry.uid}"/></td>
                     <td class="column space">
                         UID: {entry.uid}<br/>
                         Log-UID: {entry.sysLogUid}<br />
-                        Rec-UID: {entry.recuid}
+                        <b>Rec-UID: {entry.recuid}</b>
                     </td>
                     <td class="column"><f:format.date format="d.m.Y H:i:s">{entry.tstamp}</f:format.date></td>
                     <td class="column">{entry.tablename}</td>
@@ -53,7 +53,7 @@
             </f:for>
         </table><br />
 
-        <f:form.submit value="Deployen"/>
+        <f:form.submit value="Deployen" />   
     </f:form>
     
 </f:section>

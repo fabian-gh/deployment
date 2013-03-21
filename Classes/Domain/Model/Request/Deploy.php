@@ -32,24 +32,24 @@ class Deploy extends AbstractEntity {
      * @var array
      * @validate NotEmpty
      */
-    protected $logEntries;
+    protected $deployEntries;
 
     /**
      * @return array
      */
-    public function getLogEntries() {
-        if(!is_array($this->logEntries)){
+    public function getDeployEntries() {
+        if(!is_array($this->deployEntries)){
             return array();
         }
-        return $this->logEntries;
+        return $this->deployEntries;
     }
 
     /**
      * @param array $logEntries
      */
-    public function setLogEntries($logEntries) {
-        $this->logEntries = $logEntries;
+    public function setDeployEntries($deployEntries) {
+        $this->deployEntries = $deployEntries;
     }
-    
+ 
 }
 ?>
