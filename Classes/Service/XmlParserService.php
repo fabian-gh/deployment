@@ -106,29 +106,15 @@ class XmlParserService {
 
     
     /**
-     * XML-Datei lesen und in Array abspeichern
+     * @return array
      */
-    
-    // ES GIBT EINE METHODE DIE xml2array() HEIßT, EVTL. BENUTZEN
     public function readXML() {
-        // Neues SimpleXMLElement-Objekt erzeugen
-        $this->xmlreader = new \SimpleXMLElement('changes.xml', NULL, TRUE);
-        // Referenzzähler
-        $refcount = 0;
-        $arrcount = 0;
-        // Daten unterhalb der 'data'-Ebene durchgehen
-        foreach ($this->xmlreader->changeSet->data as $dataset) {
-            //$count = $dataset->count(); // Gesamtanzahl an Daten = Tupel
-            // Kindknoten werden durchschritten und die Daten ausgelesen
-            foreach ($dataset as $key => $value) {
-                $this->contentData[$arrcount][$key] = (string) $value;
-                $refcount++;
-            }
-            $refcount = 0;
-            $arrcount++;
-        }
+        $xmlString = file_get_contents('../fileadmin/deployment/changes.xml');
+        
+        return GeneralUtility::xml2array($xmlString);
     }
 
+    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Log $logData
      * @return array|\TYPO3\Deployment\Domain\Model\LogData $data
@@ -281,5 +267,26 @@ class XmlParserService {
         $this->xmlreader = $xmlreader;
     }
 }
+
+
+
+// alter xmlreader-Code
+
+// Neues SimpleXMLElement-Objekt erzeugen
+/*$this->xmlreader = new \SimpleXMLElement('../fileadmin/deployment/changes.xml', NULL, TRUE);
+// Referenzzähler
+$refcount = 0;
+$arrcount = 0;
+// Daten unterhalb der 'data'-Ebene durchgehen
+foreach ($this->xmlreader->changeSet->data as $dataset) {
+    //$count = $dataset->count(); // Gesamtanzahl an Daten = Tupel
+    // Kindknoten werden durchschritten und die Daten ausgelesen
+    foreach ($dataset as $key => $value) {
+        $this->contentData[$arrcount][$key] = (string) $value;
+        $refcount++;
+    }
+    $refcount = 0;
+    $arrcount++;
+}*/
 
 ?>

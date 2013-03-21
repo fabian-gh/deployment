@@ -76,6 +76,9 @@ class DeploymentController extends ActionController {
         
         $this->xmlParserService->setDeployData($deployData);
         $this->xmlParserService->writeXML();
+        
+        // XML lesen
+        $xmlArray = $this->xmlParserService->readXML();
     }
     
 }
