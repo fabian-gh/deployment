@@ -54,12 +54,11 @@ class XmlParserService {
      * Geänderte Datensätze in ein XML-Dokument schreiben
      */
     public function writeXML(){
+        // Daten deserialisieren
         $this->deployData = $this->unserializeHistoryData($this->deployData);
+        
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
-        $count = 1;
-        // standalone view in template -> array übergeben -> foreach
-        // writeFile, readFile? getfilesinfolder aus GeneralUtility::
 
         // Dokumenteneigenschaften
         $this->xmlwriter->openMemory();                         // Daten in Speicher schreiben
@@ -93,7 +92,6 @@ class XmlParserService {
             }
 
             $this->xmlwriter->endElement();
-            $count++;
         }
         
         $this->xmlwriter->endElement();
