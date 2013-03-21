@@ -54,6 +54,7 @@ class XmlParserService {
      * Geänderte Datensätze in ein XML-Dokument schreiben
      */
     public function writeXML(){
+        $this->deployData = $this->unserializeHistoryData($this->deployData);
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
         $count = 1;
@@ -71,28 +72,38 @@ class XmlParserService {
 
         // Daten schreiben
         $this->xmlwriter->startElement('changeSet');
+
         foreach ($this->deployData as $cData) {
-            // für jeden Datensatz ein neues data-Element mit eigener ID
+            // für jeden Datensatz ein neues data-Element mit UID als Attribut
             $this->xmlwriter->startElement('data');
-            $this->xmlwriter->writeAttribute('uid', $cData->getUid());
+            $this->xmlwriter->writeAttribute('uid', $cData->getSysLogUid());
             
-            $this->xmlwriter->writeElement('uid', $cData->getUid());
-            $this->xmlwriter->writeElement('pid', $cData->getPid());
-            $this->xmlwriter->writeElement('sys_log_uid', $cData->getSysLogUid());
-            $this->xmlwriter->writeElement('history_data', $cData->getHistoryData());
-            $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
-            $this->xmlwriter->writeElement('recuid', $cData->getRecuid());
+            // Einzelne Feldelemente schreiben
             $this->xmlwriter->writeElement('tablename', $cData->getTablename());
+            $this->xmlwriter->writeElement('uid', $cData->getSysLogUid());
             $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
+            
+            // geänderte Historydaten durchlaufen
+            foreach($cData->getHistoryData() as $datakey => $data){
+                if($datakey == 'newRecord'){
+                    foreach($data as $key => $value){
+                        $this->xmlwriter->writeElement($key, $value);
+                    }
+                }
+            }
 
             $this->xmlwriter->endElement();
             $count++;
         }
+        
         $this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument(); // Dokument schließen
         $writeString = $this->xmlwriter->outputMemory();
-        GeneralUtility::writeFile('http://localhost/t3master/fileadmin/deployment/changes.txt', $writeString);
+        
+        $file = GeneralUtility::tempnam('deploy_');
+        GeneralUtility::writeFile($file, $writeString);
+        GeneralUtility::upload_copy_move($file, '../fileadmin/deployment/changes.xml');
     }
 
     
@@ -166,7 +177,7 @@ class XmlParserService {
                     $unlogdata = unserialize($his->getHistoryData());
 
                     // wird benötigt um das l18n_diffsource-Feld zu deserialisieren
-                    /*foreach($unlogdata as $key => $value){
+                    foreach($unlogdata as $key => $value){
                         foreach($value as $k => $val){
                             if(preg_match('/[a-z]{1}:[0-9]+/', $val)){
                                 $data[$k] = unserialize($val);
@@ -175,14 +186,14 @@ class XmlParserService {
                             }
                         }
                         $unlogdata[$key] = $data;
-                    }*/
+                    }
 
                     $this->historyData->setHistoryData($unlogdata);
                     $this->historyData->setRecuid($his->getRecuid());
                     $this->historyData->setTablename($his->getTablename());
                     $this->historyData->setTstamp($his->getTstamp());
                     
-                    $hisData[] = $this->historyData; 
+                    $hisData[] = $this->historyData;
                 }
             }
             

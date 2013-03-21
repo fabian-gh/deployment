@@ -21,11 +21,11 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  */
 class Deploy extends AbstractEntity {
     
-    /* =======================================
-     * Das Objekt dieser Klasse wird erstellt
-     * nachdem der Senden-Button im Formular
-     * abgeschickt wurde
-     * =======================================
+    /* ============================================
+     * Das Objekt dieser Klasse wird dem Formular
+     * mitgegeben. In diesen Objekt werden dann die
+     * angekreuzten Daten geschrieben
+     * ============================================
      */
     
     /**
