@@ -101,17 +101,52 @@ class XmlParserService {
         
         $file = GeneralUtility::tempnam('deploy_');
         GeneralUtility::writeFile($file, $writeString);
-        GeneralUtility::upload_copy_move($file, '../fileadmin/deployment/changes.xml');
+        GeneralUtility::mkdir('../fileadmin/deployment/'.date('Y_m_d', time()));
+        GeneralUtility::upload_copy_move($file, '../fileadmin/deployment/'.date('Y_m_d', time()).'/'.date('H-i-s', time()).'_changes.xml');
     }
 
     
     /**
      * @return array
      */
-    public function readXML() {
-        $xmlString = file_get_contents('../fileadmin/deployment/changes.xml');
+    public function readXML() { 
+        $fileArr = array();
+        $dateFolder = array();
+        $contentArr = array();
         
-        return GeneralUtility::xml2array($xmlString);
+        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, '../fileadmin/deployment/');
+        
+        if($filesAndFolders){
+            // Dateipfad ausplitten
+            foreach($filesAndFolders as $faf){
+                $exFaf[] = explode('/', $faf);
+            }
+
+            // Initialwert
+            $initDate = $exFaf[0][3];
+            // pro Ordner ein Array mit allen Dateinamen darin
+            foreach($exFaf as $item){
+                if($initDate == $item[3]){
+                    $dateFolder[$initDate][] = $item[4];
+                } else {
+                    $dateFolder[$item[3]][] = $item[4];
+                }
+            }
+        }
+        
+        //Dateien einlesen
+        foreach($dateFolder as $key => $value){
+            foreach($value as $filename){
+                $xmlString = file_get_contents('../fileadmin/deployment/'.$key.'/'.$filename);
+                DebuggerUtility::var_dump();
+                // TODO: an dieser Stelle wird bei mehreren Einträgen nur der letzte ausgelesen
+                $contentArr[] = GeneralUtility::xml2array($xmlString);
+            }
+        }die();
+        
+        DebuggerUtility::var_dump($contentArr);die();
+        
+        //return GeneralUtility::xml2array($xmlString);
     }
 
     

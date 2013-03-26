@@ -74,11 +74,11 @@ class DeploymentController extends ActionController {
             $deployData[] = $this->historyRepository->findByUid($dep);
         }
         
-        $this->xmlParserService->setDeployData($deployData);
-        $this->xmlParserService->writeXML();
+        //$this->xmlParserService->setDeployData($deployData);
+        //$this->xmlParserService->writeXML();
         
         // XML lesen
-        $xmlArray = $this->xmlParserService->readXML();
+        $this->xmlParserService->readXML();
     }
     
 }
