@@ -107,9 +107,10 @@ class XmlParserService {
 
     
     /**
+     * @param $string $timestamp
      * @return array
      */
-    public function readXML() { 
+    public function readXML($timestamp) { 
         $fileArr = array();
         $dateFolder = array();
         $contentArr = array();
@@ -142,7 +143,7 @@ class XmlParserService {
             }
         }
         
-        DebuggerUtility::var_dump($contentArr);
+        //DebuggerUtility::var_dump($contentArr);
         //return GeneralUtility::xml2array($xmlString);
     }
 

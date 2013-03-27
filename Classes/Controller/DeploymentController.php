@@ -51,57 +51,73 @@ class DeploymentController extends ActionController {
      */
     protected $registry;
  
+    
+    public function indexAction(){
+        $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
+    }
 
+    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
      */
-    public function indexAction(Deploy $deploy = null) {
-        $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
+    public function listAction(Deploy $deploy = null) {
         $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy'));
-
-        if ($deploy === null) {
-            $deploy = new Deploy();
-        }
         
-        $this->view->assign('deploy', $deploy);
-
-        // das übergebene Datum wird später automatisch aus der Tabelle gelesen 
         $date = new \DateTime($last_deploy);
         $logEntries = $this->logRepository->findYoungerThen($date);
-
-        if($logEntries){
+        
+        if($logEntries->getFirst() != null){
+            if ($deploy === null) {
+                $deploy = new Deploy();
+            }
+            $this->view->assign('deploy', $deploy);
+            
             $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
-
             $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
-
+            
             $this->view->assign('historyEntries', $unserializedHistoryData);
         } else {
             FlashMessageContainer::add('Keine Einträge gefunden', '', \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
         }
     }
 
+    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
      */
-    public function deployAction(Deploy $deploy) {
+    public function createDeployAction(Deploy $deploy) {
         $deployData = array();
         
         foreach($deploy->getDeployEntries() as $dep){
             $deployData[] = $this->historyRepository->findByUid($dep);
         }
         
-        //$this->xmlParserService->setDeployData($deployData);
-        //$this->xmlParserService->writeXML();
+        $this->xmlParserService->setDeployData($deployData);
+        $this->xmlParserService->writeXML();
+        
+        $this->redirect('index');
+    }
+    
+    
+    /**
+     * @dontvalidate $deploy
+     */
+    public function deployAction(){
+        // Stände aus Deployment-Ordner laden, die neuer sind als Datum in Registry --> readXML()
+        // evtl. ID Konflikte anzeigen
+        // Eintragen in Datenbank
         
         // XML lesen
-        $tstamp = $registry->get('deployment', 'last_deploy');
-        $this->xmlParserService->readXML();
+        $tstamp = $this->registry->get('deployment', 'last_deploy');
+        $this->xmlParserService->readXML($tstamp);
         
         // letzten Deployment-Stand registrieren
-        $registry->set('deployment', 'last_deploy', time());
+        $this->registry->set('deployment', 'last_deploy', time());
+        
+        // TODO: Weiterleitung nach Erstellung der Erstellung
     }
     
 }
