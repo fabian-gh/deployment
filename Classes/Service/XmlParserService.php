@@ -125,7 +125,7 @@ class XmlParserService {
 
             // Initialwert
             $initDate = $exFaf[0][3];
-            // pro Ordner ein Array mit allen Dateinamen darin
+            // pro Ordner/Datum ein Array mit allen Dateinamen darin
             foreach($exFaf as $item){
                 if($initDate == $item[3]){
                     $dateFolder[$initDate][] = $item[4];
@@ -136,15 +136,27 @@ class XmlParserService {
         }
         
         //Dateien einlesen
-        foreach($dateFolder as $key => $value){
-            foreach($value as $filename){
-                $xmlString = file_get_contents('../fileadmin/deployment/'.$key.'/'.$filename);
-                $contentArr[] = GeneralUtility::xml2array($xmlString);
+        foreach($dateFolder as $folder => $filename){
+            // Datum aus Ordner extrahieren
+            $expDate = explode('_', $folder);
+
+            foreach($filename as $file){
+                // für jede Datei die Uhrzeit extrahieren
+                $temp = explode('_', $file);
+                $expTime = explode('-', $temp[0]);
+                // Timestamp erstellen
+                $dateAsTstamp = mktime($expTime[0], $expTime[1], $expTime[2], $expDate[1], $expDate[2], $expDate[0]);
+
+                // wenn Datei-Timestamp später als letztes Deployment,
+                // dann die Datei lesen und umwandeln
+                if($dateAsTstamp >= $timestamp){
+                    $xmlString = file_get_contents('../fileadmin/deployment/'.$folder.'/'.$file);
+                    $contentArr[] = GeneralUtility::xml2array($xmlString);
+                }
             }
         }
         
-        //DebuggerUtility::var_dump($contentArr);
-        //return GeneralUtility::xml2array($xmlString);
+        return GeneralUtility::xml2array($contentArr);
     }
 
     

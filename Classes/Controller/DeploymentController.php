@@ -99,25 +99,30 @@ class DeploymentController extends ActionController {
         $this->xmlParserService->writeXML();
         
         $this->redirect('index');
+        
+        FlashMessageContainer::add('Daten wurden erstellt', '', \TYPO3\CMS\Core\Messaging\FlashMessage::OK);
     }
     
     
     /**
-     * @dontvalidate $deploy
+     * DeployAction
      */
     public function deployAction(){
-        // Stände aus Deployment-Ordner laden, die neuer sind als Datum in Registry --> readXML()
-        // evtl. ID Konflikte anzeigen
-        // Eintragen in Datenbank
-        
-        // XML lesen
+        // letztes Deployment-Datum lesen
         $tstamp = $this->registry->get('deployment', 'last_deploy');
-        $this->xmlParserService->readXML($tstamp);
+        // XML lesen
+        $content = $this->xmlParserService->readXML($tstamp);
+        
+        // TODO: content in DB-Felder schreiben
+        
+        // TODO: evtl. ID Konflikte anzeigen
         
         // letzten Deployment-Stand registrieren
-        $this->registry->set('deployment', 'last_deploy', time());
+        //$this->registry->set('deployment', 'last_deploy', time());
         
-        // TODO: Weiterleitung nach Erstellung der Erstellung
+        $this->redirect('index');
+        
+        FlashMessageContainer::add('Deployment wurde erfolgreich ausgeführt', '', \TYPO3\CMS\Core\Messaging\FlashMessage::OK);
     }
     
 }
