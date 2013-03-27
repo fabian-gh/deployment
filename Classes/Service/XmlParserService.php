@@ -138,14 +138,11 @@ class XmlParserService {
         foreach($dateFolder as $key => $value){
             foreach($value as $filename){
                 $xmlString = file_get_contents('../fileadmin/deployment/'.$key.'/'.$filename);
-                DebuggerUtility::var_dump();
-                // TODO: an dieser Stelle wird bei mehreren Einträgen nur der letzte ausgelesen
                 $contentArr[] = GeneralUtility::xml2array($xmlString);
             }
-        }die();
+        }
         
-        DebuggerUtility::var_dump($contentArr);die();
-        
+        DebuggerUtility::var_dump($contentArr);
         //return GeneralUtility::xml2array($xmlString);
     }
 

@@ -15,6 +15,9 @@ namespace TYPO3\Deployment\Controller;
 use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Extbase\Mvc\Controller\FlashMessageContainer;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Core\Registry;
 
 /**
  * Deployment
@@ -41,26 +44,42 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $xmlParserService;
+    
+    /**
+     * @var \TYPO3\CMS\Core\Registry
+     * @inject
+     */
+    protected $registry;
+ 
 
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
      */
     public function indexAction(Deploy $deploy = null) {
+        $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
+        $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy'));
+
         if ($deploy === null) {
             $deploy = new Deploy();
         }
+        
         $this->view->assign('deploy', $deploy);
 
         // das übergebene Datum wird später automatisch aus der Tabelle gelesen 
-        $date = new \DateTime('last week');
+        $date = new \DateTime($last_deploy);
         $logEntries = $this->logRepository->findYoungerThen($date);
-        $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
 
-        $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
-        $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
-        
-        $this->view->assign('historyEntries', $unserializedHistoryData);
+        if($logEntries){
+            $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
+
+            $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
+            $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
+
+            $this->view->assign('historyEntries', $unserializedHistoryData);
+        } else {
+            FlashMessageContainer::add('Keine Einträge gefunden', '', \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+        }
     }
 
     /**
@@ -78,7 +97,11 @@ class DeploymentController extends ActionController {
         //$this->xmlParserService->writeXML();
         
         // XML lesen
+        $tstamp = $registry->get('deployment', 'last_deploy');
         $this->xmlParserService->readXML();
+        
+        // letzten Deployment-Stand registrieren
+        $registry->set('deployment', 'last_deploy', time());
     }
     
 }
