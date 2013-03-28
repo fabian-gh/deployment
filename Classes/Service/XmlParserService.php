@@ -75,11 +75,12 @@ class XmlParserService {
         foreach ($this->deployData as $cData) {
             // für jeden Datensatz ein neues data-Element mit UID als Attribut
             $this->xmlwriter->startElement('data');
-            $this->xmlwriter->writeAttribute('uid', $cData->getSysLogUid());
+            $this->xmlwriter->writeAttribute('uid', $cData->getRecuid());
             
             // Einzelne Feldelemente schreiben
             $this->xmlwriter->writeElement('tablename', $cData->getTablename());
-            $this->xmlwriter->writeElement('uid', $cData->getSysLogUid());
+            $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
+            $this->xmlwriter->writeElement('uid', $cData->getRecuid());
             $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
             
             // geänderte Historydaten durchlaufen
@@ -152,7 +153,6 @@ class XmlParserService {
                 // dann die Datei lesen und umwandeln
                 if($dateAsTstamp >= $timestamp){
                     $xmlString = file_get_contents('../fileadmin/deployment/'.$folder.'/'.$file);
-                    //$contentArr[] = GeneralUtility::xml2array($xmlString);
                     
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->changeSet->data as $dataset) {
@@ -166,6 +166,66 @@ class XmlParserService {
         }
 
         return $contentArr;
+    }
+    
+    
+    /**
+     * @param array|\TYPO3\Deployment\Domain\Model\HistoryData $data
+     * @return array|\TYPO3\Deployment\Domain\Model\HistoryData $historyArray
+     */
+    public function splitData($data){
+        $arr = array();
+        $historyArray = array();
+
+        foreach($data as $hData){
+            foreach($hData->getHistoryData() as $recordsvalue){
+                if(count($recordsvalue) > 2){
+                    foreach($recordsvalue as $reckey => $recvalue){
+                        if(!is_array($recvalue)){
+                            $arr[$reckey][] = $recvalue;
+                        }
+                    }
+                    
+                    foreach($arr as $key => $data){
+                        if(count($data) >= 2){
+                            $temp = array(
+                                'oldRecord' => array(
+                                    $key => $data[0]
+                                ),
+                                'newRecord' => array(
+                                    $key => $data[1]
+                                )
+                            );
+
+                            $historyData = new HistoryData();
+                            $historyData->setPid($hData->getPid());
+                            $historyData->setUid($hData->getUid());
+                            $historyData->setSysLogUid($hData->getSysLogUid());
+                            $historyData->setHistoryData($temp);
+                            $historyData->setFieldlist($hData->getFieldlist());
+                            $historyData->setRecuid($hData->getRecuid());
+                            $historyData->setTablename($hData->getTablename());
+                            $historyData->setTstamp($hData->getTstamp());
+                            
+                            $historyArray[] = $historyData;
+                        }
+                    }
+                }
+            }
+            $historyData = new HistoryData();
+            $historyData->setPid($hData->getPid());
+            $historyData->setUid($hData->getUid());
+            $historyData->setSysLogUid($hData->getSysLogUid());
+            $historyData->setHistoryData($hData->getHistoryData());
+            $historyData->setFieldlist($hData->getFieldlist());
+            $historyData->setRecuid($hData->getRecuid());
+            $historyData->setTablename($hData->getTablename());
+            $historyData->setTstamp($hData->getTstamp());
+
+            $historyArray[] = $historyData;
+        }
+        //DebuggerUtility::var_dump($historyArray);die();
+        return $historyArray;
     }
 
     
@@ -227,6 +287,7 @@ class XmlParserService {
                     }
 
                     $this->historyData->setHistoryData($unlogdata);
+                    $this->historyData->setFieldlist($his->getFieldlist());
                     $this->historyData->setRecuid($his->getRecuid());
                     $this->historyData->setTablename($his->getTablename());
                     $this->historyData->setTstamp($his->getTstamp());
@@ -321,26 +382,5 @@ class XmlParserService {
         $this->xmlreader = $xmlreader;
     }
 }
-
-
-
-// alter xmlreader-Code
-
-// Neues SimpleXMLElement-Objekt erzeugen
-/*$this->xmlreader = new \SimpleXMLElement('../fileadmin/deployment/changes.xml', NULL, TRUE);
-// Referenzzähler
-$refcount = 0;
-$arrcount = 0;
-// Daten unterhalb der 'data'-Ebene durchgehen
-foreach ($this->xmlreader->changeSet->data as $dataset) {
-    //$count = $dataset->count(); // Gesamtanzahl an Daten = Tupel
-    // Kindknoten werden durchschritten und die Daten ausgelesen
-    foreach ($dataset as $key => $value) {
-        $this->contentData[$arrcount][$key] = (string) $value;
-        $refcount++;
-    }
-    $refcount = 0;
-    $arrcount++;
-}*/
 
 ?>

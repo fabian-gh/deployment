@@ -37,6 +37,11 @@ class HistoryData extends AbstractEntity{
     protected $historyData;
     
     /**
+     * @var string
+     */
+    protected $fieldlist;
+
+    /**
      * @var string 
      */
     protected $recuid;
@@ -91,6 +96,20 @@ class HistoryData extends AbstractEntity{
      */
     public function setHistoryData($historyData) {
         $this->historyData = $historyData;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getFieldlist() {
+        return $this->fieldlist;
+    }
+
+    /**
+     * @param string $fieldlist
+     */
+    public function setFieldlist($fieldlist) {
+        $this->fieldlist = $fieldlist;
     }
     
     /**

@@ -17,7 +17,6 @@ use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Extbase\Mvc\Controller\FlashMessageContainer;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
-use \TYPO3\CMS\Core\Registry;
 
 /**
  * Deployment
@@ -45,6 +44,13 @@ class DeploymentController extends ActionController {
      */
     protected $xmlParserService;
     
+    /**
+     * @var \TYPO3\Deployment\Service\InsertDataService
+     * @inject
+     */
+    protected $insertDataService;
+
+
     /**
      * @var \TYPO3\CMS\Core\Registry
      * @inject
@@ -81,8 +87,9 @@ class DeploymentController extends ActionController {
             $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
             $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
-            
-            $this->view->assign('historyEntries', $unserializedHistoryData);
+            $splittedData = $this->xmlParserService->splitData($unserializedHistoryData);
+
+            $this->view->assign('historyEntries', $splittedData);
         } else {
             FlashMessageContainer::add('Keine Einträge gefunden', '', \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
         }
@@ -95,12 +102,12 @@ class DeploymentController extends ActionController {
      */
     public function createDeployAction(Deploy $deploy) {
         $deployData = array();
-        
+
         foreach($deploy->getDeployEntries() as $dep){
             $deployData[] = $this->historyRepository->findByUid($dep);
         }
         
-        $this->xmlParserService->setDeployData($deployData);
+        $this->xmlParserService->setDeployData(array_unique($deployData));
         $this->xmlParserService->writeXML();
         
         FlashMessageContainer::add('Daten wurden erstellt.', '', \TYPO3\CMS\Core\Messaging\FlashMessage::OK);
@@ -118,12 +125,13 @@ class DeploymentController extends ActionController {
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
         
-        // content in DB-Felder schreiben
+        // content in DB-Felder der jeweiligen Tabelle schreiben
+        $this->insertDataService->insertDataIntoTable($content);
         
         // TODO: evtl. ID Konflikte anzeigen
         
         // letzten Deployment-Stand registrieren
-        //$this->registry->set('deployment', 'last_deploy', time());
+        // $this->registry->set('deployment', 'last_deploy', time());
         
         // Bestätigung ausgeben
         FlashMessageContainer::add('Deployment wurde erfolgreich ausgeführt', '', \TYPO3\CMS\Core\Messaging\FlashMessage::OK);

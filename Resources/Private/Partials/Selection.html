@@ -1,9 +1,34 @@
-<f:form action="list" name="createdeploy" object="{deploy}">
-    <f:form.submit value="Neue Deploylisten erstellen" />   
-</f:form>
+<style>
+    .table{
+        border-collapse: collapse; 
+        border: 1px solid #000;
+        max-width: 400px;
+    }
+    .column{
+        border: 1px solid #000;
+        padding: 10px;
+    }
+</style>
 
-<br />
-
-<f:form action="deploy" name="executedeploy">
-    <f:form.submit value="Deploy ausführen" />   
-</f:form>
+<table class="table">
+    <tr class="column">
+        <td class="column">
+            <p><b>Neue Deploymentlisten erstellen</b>
+                <br />Eine neue Liste beinhaltet alle ge&auml;nderten Datens&auml;tze
+                seit dem zuletzt ausgef&uuml;hrten Deployment.</p><br />
+                <f:form action="list" name="createdeploy" object="{deploy}">
+                    <f:form.submit value="Ausführen" />   
+                </f:form>
+        </td>
+    </tr>
+    <tr class="column">
+        <td class="column">
+            <p><b>Deployment ausf&uuml;hren</b> <br />Hierbei werden 
+                alle oben erzeugten Eintr&auml;ge in die entsprechende 
+                Korrespondenztabelle eingef&uuml;gt.</p><br />
+                <f:form action="deploy" name="executedeploy">
+                    <f:form.submit value="Ausführen" />   
+                </f:form>
+        </td>
+    </tr>
+</table>

@@ -14,7 +14,7 @@
 </style>
 
 <f:form action="createDeploy" name="deploy" object="{deploy}">
-    
+
     <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
      <table class="table">
         <tr class="column">
@@ -26,7 +26,7 @@
             <th class="column">New Record</th>
         </tr>
         <f:for each="{historyEntries}" as="entry">
-            <f:debug>{historyEntries}</f:debug>
+            
             <tr class="column">
                 <td class="column"><f:form.checkbox property="deployEntries" value="{entry.uid}"/></td>
                 <td class="column space">
@@ -38,7 +38,7 @@
                 <td class="column">{entry.tablename}</td>
                 <f:for each="{entry.historyData}" as="hData">
                     <f:for each="{hData}" key="key" as="value">
-                        
+
                         <f:alias map="{name: 'l18n_diffsource'}">
                             <f:if condition="{key} != {name}">
                                 <f:then>
@@ -46,7 +46,7 @@
                                 </f:then>
                             </f:if>
                         </f:alias>
-                        
+                         
                     </f:for>
                 </f:for>
             </tr>
