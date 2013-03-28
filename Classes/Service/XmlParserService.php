@@ -111,6 +111,7 @@ class XmlParserService {
      * @return array
      */
     public function readXML($timestamp) { 
+        $arrcount = 0;
         $fileArr = array();
         $dateFolder = array();
         $contentArr = array();
@@ -151,12 +152,20 @@ class XmlParserService {
                 // dann die Datei lesen und umwandeln
                 if($dateAsTstamp >= $timestamp){
                     $xmlString = file_get_contents('../fileadmin/deployment/'.$folder.'/'.$file);
-                    $contentArr[] = GeneralUtility::xml2array($xmlString);
+                    //$contentArr[] = GeneralUtility::xml2array($xmlString);
+                    
+                    $this->xmlreader = new \SimpleXMLElement($xmlString);
+                    foreach ($this->xmlreader->changeSet->data as $dataset) {
+                        foreach ($dataset as $key => $value) {
+                        $contentArr[$arrcount][$key] = (string) $value;
+                        }
+                        $arrcount++;
+                    }
                 }
             }
         }
-        
-        return GeneralUtility::xml2array($contentArr);
+
+        return $contentArr;
     }
 
     

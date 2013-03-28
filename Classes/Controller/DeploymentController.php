@@ -62,7 +62,12 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = null) {
-        $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy'));
+        if($this->registry->get('deployment', 'last_deploy') != null){
+            $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy'));
+        } else {
+            $this->registry->set('deployment', 'last_deploy', time());
+            $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy'));
+        }
         
         $date = new \DateTime($last_deploy);
         $logEntries = $this->logRepository->findYoungerThen($date);
@@ -98,9 +103,9 @@ class DeploymentController extends ActionController {
         $this->xmlParserService->setDeployData($deployData);
         $this->xmlParserService->writeXML();
         
-        $this->redirect('index');
+        FlashMessageContainer::add('Daten wurden erstellt.', '', \TYPO3\CMS\Core\Messaging\FlashMessage::OK);
         
-        FlashMessageContainer::add('Daten wurden erstellt', '', \TYPO3\CMS\Core\Messaging\FlashMessage::OK);
+        $this->redirect('index');
     }
     
     
@@ -113,16 +118,17 @@ class DeploymentController extends ActionController {
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
         
-        // TODO: content in DB-Felder schreiben
+        // content in DB-Felder schreiben
         
         // TODO: evtl. ID Konflikte anzeigen
         
         // letzten Deployment-Stand registrieren
         //$this->registry->set('deployment', 'last_deploy', time());
         
-        $this->redirect('index');
-        
+        // Bestätigung ausgeben
         FlashMessageContainer::add('Deployment wurde erfolgreich ausgeführt', '', \TYPO3\CMS\Core\Messaging\FlashMessage::OK);
+        // Redirect auf Hauptseite
+        $this->redirect('index');
     }
     
 }
