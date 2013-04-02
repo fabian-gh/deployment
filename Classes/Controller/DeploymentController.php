@@ -132,8 +132,10 @@ class DeploymentController extends ActionController {
         $this->insertDataService->insertDataIntoTable($content);
 
         // TODO: evtl. ID Konflikte anzeigen
+
         // letzten Deployment-Stand registrieren
         // $this->registry->set('deployment', 'last_deploy', time());
+
         // Bestätigung ausgeben
         $this->flashMessageContainer->add('Deployment wurde erfolgreich ausgeführt', '', FlashMessage::OK);
         // Redirect auf Hauptseite

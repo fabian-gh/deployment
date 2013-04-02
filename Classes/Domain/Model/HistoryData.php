@@ -11,7 +11,8 @@
 
 namespace TYPO3\Deployment\Domain\Model;
 
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * HistoryData
@@ -97,11 +98,9 @@ class HistoryData extends AbstractModel {
      */
     public function getHistoryDataDiff() {
         /** @var $diff \TYPO3\CMS\Core\Utility\DiffUtility */
-        $diff = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
-
+        $diff = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
 
         // todo. auf newRecord und oldRecord erstes Feld zugreifen und übergeben
-
         return $diff->makeDiffDisplay('heute bin ich im Kino', 'heute bin ich im Supermarkt');
     }
 
@@ -167,7 +166,7 @@ class HistoryData extends AbstractModel {
     public function setTstamp(\DateTime $tstamp) {
         $this->tstamp = $tstamp;
     }
-
+    
 }
 
 ?>
