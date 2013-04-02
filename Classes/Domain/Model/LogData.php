@@ -10,8 +10,6 @@
 
 namespace TYPO3\Deployment\Domain\Model;
 
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
-
 /**
  * LogData
  *
@@ -19,7 +17,7 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * @subpackage Domain\Model
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class LogData extends AbstractEntity{
+class LogData extends AbstractModel{
     
     /**
      * @var string

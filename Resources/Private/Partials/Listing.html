@@ -4,51 +4,52 @@
         border: 1px solid #000;
         max-width: 850px;
     }
-    .column{
-        border: 1px solid #000;
-        padding: 3px;
-    }
     .space{
-        width: 90px;
+        width: 95px;
+    }
+    .space2{
+        width: 250px;
     }
 </style>
 
 <f:form action="createDeploy" name="deploy" object="{deploy}">
 
     <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
-     <table class="table">
-        <tr class="column">
-            <th class="column">&nbsp;</th>
-            <th class="column">ID-Infos</th>
-            <th class="column">Timestamp</th>
-            <th class="column">Table</th>
-            <th class="column">Old Record</th>
-            <th class="column">New Record</th>
+     <table class="table typo3-dblist">
+        <tr class="t3-row-header">
+            <th>&nbsp;</th>
+            <th>ID-Infos</th>
+            <th>Timestamp</th>
+            <th>Table</th>
+            <th>Old Record</th>
+            <th>New Record</th>
+            <th>Diff</th>
         </tr>
         <f:for each="{historyEntries}" as="entry">
             
-            <tr class="column">
-                <td class="column"><f:form.checkbox property="deployEntries" value="{entry.uid}"/></td>
-                <td class="column space">
+            <tr class="db_list_normal">
+                <td><f:form.checkbox property="deployEntries" value="{entry.uid}"/></td>
+                <td class="space">
                     UID: {entry.uid}<br/>
                     Log-UID: {entry.sysLogUid}<br />
                     <b>Rec-UID: {entry.recuid}</b>
                 </td>
-                <td class="column"><f:format.date format="d.m.Y H:i:s">{entry.tstamp}</f:format.date></td>
-                <td class="column">{entry.tablename}</td>
+                <td class="space"><f:format.date format="d.m.Y H:i:s">{entry.tstamp}</f:format.date></td>
+                <td class="space">{entry.tablename}</td>
                 <f:for each="{entry.historyData}" as="hData">
-                    <f:for each="{hData}" key="key" as="value">
 
+                    <f:for each="{hData}" key="key" as="value">
                         <f:alias map="{name: 'l18n_diffsource'}">
                             <f:if condition="{key} != {name}">
                                 <f:then>
-                                    <td class="column">{value}</td>
+                                    <td class="space2">{value}</td>
                                 </f:then>
                             </f:if>
                         </f:alias>
-                         
                     </f:for>
+
                 </f:for>
+                <td><f:format.raw>{entry.historyDataDiff}</f:format.raw></td>
             </tr>
         </f:for>
     </table><br />

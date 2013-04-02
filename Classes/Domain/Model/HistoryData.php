@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HistoryData
  *
@@ -10,7 +11,7 @@
 
 namespace TYPO3\Deployment\Domain\Model;
 
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * HistoryData
@@ -19,23 +20,23 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * @subpackage Domain\Model
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class HistoryData extends AbstractEntity{
-    
+class HistoryData extends AbstractModel {
+
     /**
      * @var string 
      */
     protected $uid;
-    
+
     /**
      * @var string 
      */
     protected $sysLogUid;
-    
+
     /**
-     * @var string 
+     * @var array
      */
     protected $historyData;
-    
+
     /**
      * @var string
      */
@@ -50,12 +51,12 @@ class HistoryData extends AbstractEntity{
      * @var string 
      */
     protected $tablename;
-    
+
     /**
      * @var \DateTime
      */
     protected $tstamp;
-    
+
     /**
      * @return string
      */
@@ -80,24 +81,37 @@ class HistoryData extends AbstractEntity{
     /**
      * @param string $sysLogUid
      */
-    public function setSysLogUid($sysLogUid) { 
+    public function setSysLogUid($sysLogUid) {
         $this->sysLogUid = $sysLogUid;
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getHistoryData() {
         return $this->historyData;
     }
 
     /**
-     * @param string $historyData
+     * @return string
+     */
+    public function getHistoryDataDiff() {
+        /** @var $diff \TYPO3\CMS\Core\Utility\DiffUtility */
+        $diff = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
+
+
+        // todo. auf newRecord und oldRecord erstes Feld zugreifen und übergeben
+
+        return $diff->makeDiffDisplay('heute bin ich im Kino', 'heute bin ich im Supermarkt');
+    }
+
+    /**
+     * @param array $historyData
      */
     public function setHistoryData($historyData) {
         $this->historyData = $historyData;
     }
-    
+
     /**
      * @return string
      */
@@ -111,7 +125,7 @@ class HistoryData extends AbstractEntity{
     public function setFieldlist($fieldlist) {
         $this->fieldlist = $fieldlist;
     }
-    
+
     /**
      * @return string
      */
@@ -153,6 +167,7 @@ class HistoryData extends AbstractEntity{
     public function setTstamp(\DateTime $tstamp) {
         $this->tstamp = $tstamp;
     }
+
 }
 
 ?>

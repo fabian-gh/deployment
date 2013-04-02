@@ -13,6 +13,7 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\Deployment\Xclass\DatabaseConnection;
 
 /**
  * InsertDataService
@@ -21,21 +22,33 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
 class InsertDataService {
-    
+
     /**
      * @param array $dataArr
      */
-    public function insertDataIntoTable($dataArr){
+    public function insertDataIntoTable($dataArr) {
         // TODO: Hier muss noch andere DB-Connection initialisiert werden
-        
+        // mit Param Fremddatenbank
+        //$this->getDatabase()->connectDB(.......);
         // TODO: Gnaze Verarbeitung!!!!!!
-        foreach($dataArr as $data){
-            foreach($data as $key => $value){
+        foreach ($dataArr as $data) {
+            foreach ($data as $key => $value) {
                 DebuggerUtility::var_dump($key);
                 DebuggerUtility::var_dump($value);
             }
-        }die();
-    }
-}
+        }
 
-?>
+        // ohne Parameter (aktuelle DB)
+        // $this->getDatabase()->connectDB();
+
+        die();
+    }
+
+    /**
+     * @return DatabaseConnection
+     */
+    protected function getDatabase() {
+        return $GLOBALS['TYPO3_DB'];
+    }
+
+}

@@ -10,8 +10,6 @@
 
 namespace TYPO3\Deployment\Domain\Model;
 
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
-
 /**
  * History
  *
@@ -19,7 +17,7 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * @subpackage Domain\Model
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class History extends AbstractEntity{
+class History extends AbstractModel{
     
     /**
      * @var string 
@@ -67,6 +65,8 @@ class History extends AbstractEntity{
     }
 
     /**
+     * @todo: ist das nicht ein Array?
+     *
      * @return string
      */
     public function getHistoryData() {

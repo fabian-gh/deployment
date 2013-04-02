@@ -13,6 +13,8 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\Deployment\Domain\Model\History;
+use \TYPO3\Deployment\Domain\Model\Log;
 use \TYPO3\Deployment\Domain\Model\LogData;
 use \TYPO3\Deployment\Domain\Model\HistoryData;
 
@@ -73,6 +75,8 @@ class XmlParserService {
         $this->xmlwriter->startElement('changeSet');
 
         foreach ($this->deployData as $cData) {
+	        /** @var $cData History */
+
             // für jeden Datensatz ein neues data-Element mit UID als Attribut
             $this->xmlwriter->startElement('data');
             $this->xmlwriter->writeAttribute('uid', $cData->getRecuid());
@@ -99,11 +103,14 @@ class XmlParserService {
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument(); // Dokument schließen
         $writeString = $this->xmlwriter->outputMemory();
-        
-        $file = GeneralUtility::tempnam('deploy_');
-        GeneralUtility::writeFile($file, $writeString);
-        GeneralUtility::mkdir('../fileadmin/deployment/'.date('Y_m_d', time()));
-        GeneralUtility::upload_copy_move($file, '../fileadmin/deployment/'.date('Y_m_d', time()).'/'.date('H-i-s', time()).'_changes.xml');
+
+	    $file = GeneralUtility::tempnam('deploy_');
+	    GeneralUtility::writeFile($file, $writeString);
+
+	    $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . '/fileadmin/deployment/' . date('Y_m_d', time());
+
+	    GeneralUtility::mkdir($folder);
+	    GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_changes.xml');
     }
 
     
@@ -120,6 +127,7 @@ class XmlParserService {
         $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, '../fileadmin/deployment/');
         
         if($filesAndFolders){
+	        $exFaf = array();
             // Dateipfad ausplitten
             foreach($filesAndFolders as $faf){
                 $exFaf[] = explode('/', $faf);
@@ -170,16 +178,23 @@ class XmlParserService {
     
     
     /**
-     * @param array|\TYPO3\Deployment\Domain\Model\HistoryData $data
-     * @return array|\TYPO3\Deployment\Domain\Model\HistoryData $historyArray
+     * @param array<\TYPO3\Deployment\Domain\Model\HistoryData> $data
+     * @return array<\TYPO3\Deployment\Domain\Model\HistoryData> $historyArray
      */
     public function splitData($data){
         $arr = array();
         $historyArray = array();
 
+	    #DebuggerUtility::var_dump($data);
+
         foreach($data as $hData){
+
+	        /** @var $hData HistoryData */
+
             foreach($hData->getHistoryData() as $recordsvalue){
-                if(count($recordsvalue) > 2){
+	            if(!is_array($recordsvalue)) continue;
+#	            DebuggerUtility::var_dump($recordsvalue);
+#                if(count($recordsvalue) > 1){
                     foreach($recordsvalue as $reckey => $recvalue){
                         if(!is_array($recvalue)){
                             $arr[$reckey][] = $recvalue;
@@ -210,9 +225,10 @@ class XmlParserService {
                             $historyArray[] = $historyData;
                         }
                     }
-                }
+            #    }
             }
-            $historyData = new HistoryData();
+
+            /*$historyData = new HistoryData();
             $historyData->setPid($hData->getPid());
             $historyData->setUid($hData->getUid());
             $historyData->setSysLogUid($hData->getSysLogUid());
@@ -222,8 +238,9 @@ class XmlParserService {
             $historyData->setTablename($hData->getTablename());
             $historyData->setTstamp($hData->getTstamp());
 
-            $historyArray[] = $historyData;
+            $historyArray[] = $historyData;*/
         }
+	    #DebuggerUtility::var_dump($historyArray);
         //DebuggerUtility::var_dump($historyArray);die();
         return $historyArray;
     }
@@ -238,7 +255,8 @@ class XmlParserService {
         
         if ($logData != NULL) {
             foreach($logData as $log){
-                $this->logData = new LogData();
+	            /** @var $log Log */
+	            $this->logData = new LogData();
                 $this->logData->setUid($log->getUid());
                 $unlogdata = unserialize($log->getLogData());
                 
@@ -266,7 +284,8 @@ class XmlParserService {
 
         if ($historyData != NULL) {
             foreach($historyData as $his){
-                if($his != null){
+                if($his != NULL){
+	                /** @var $his History */
                     $this->historyData = new HistoryData();
                     $this->historyData->setPid($his->getPid());
                     $this->historyData->setUid($his->getUid());
@@ -275,7 +294,8 @@ class XmlParserService {
                     $unlogdata = unserialize($his->getHistoryData());
 
                     // wird benötigt um das l18n_diffsource-Feld zu deserialisieren
-                    foreach($unlogdata as $key => $value){
+	                foreach($unlogdata as $key => $value){
+		                $data = array();
                         foreach($value as $k => $val){
                             if(preg_match('/[a-z]{1}:[0-9]+/', $val)){
                                 $data[$k] = unserialize($val);
