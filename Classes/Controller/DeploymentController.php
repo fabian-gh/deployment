@@ -89,9 +89,13 @@ class DeploymentController extends ActionController {
             $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
             $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
-            $splittedData = $this->xmlParserService->splitData($unserializedHistoryData);
+            $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
 
-            $this->view->assign('historyEntries', $splittedData);
+            $this->view->assignMultiple(array(
+                'historyEntries'    => $unserializedHistoryData,
+                'diffData'          => $diffData
+            ));
+            
         } else {
             $this->flashMessageContainer->add('Keine Einträge gefunden', '', FlashMessage::ERROR);
         }

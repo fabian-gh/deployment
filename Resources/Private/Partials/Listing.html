@@ -1,7 +1,6 @@
 <style>
     .table{
         border-collapse: collapse; 
-        border: 1px solid #000;
         max-width: 850px;
     }
     .space{
@@ -21,8 +20,6 @@
             <th>ID-Info</th>
             <th>Timestamp</th>
             <th>Table</th>
-            <th>Old Record</th>
-            <th>New Record</th>
             <th>Difference</th>
         </tr>
         <f:for each="{historyEntries}" as="entry">
@@ -36,23 +33,38 @@
                 </td>
                 <td class="space"><f:format.date format="d.m.Y H:i:s">{entry.tstamp}</f:format.date></td>
                 <td class="space">{entry.tablename}</td>
-                <f:for each="{entry.historyData}" as="hData">
-
-                    <f:for each="{hData}" key="key" as="value">
-                        <f:alias map="{name: 'l18n_diffsource'}">
-                            <f:if condition="{key} != {name}">
-                                <f:then>
-                                    <td class="space2">{value}</td>
-                                </f:then>
-                            </f:if>
-                        </f:alias>
+                <td>
+                    <f:for each="{diffData}" key="datakey" as="data">
+                        <f:if condition="{datakey} == {entry.recuid}">
+                            <table>
+                                <f:for each="{data}" key="key" as="valueArr">
+                                    <f:for each="{valueArr}" key="valuekey" as="value">
+                                        <tr><td><f:format.raw>{value}</f:format.raw></td></tr>
+                                    </f:for>
+                                </f:for>
+                            </table>
+                        </f:if>
                     </f:for>
-
-                </f:for>
-                <td><f:format.raw>{entry.historyDataDiff}</f:format.raw></td>
+                </td>
             </tr>
         </f:for>
     </table><br />
 
     <f:form.submit value="Deployen" />   
 </f:form>
+
+
+<f:for each="{entry.historyData}" as="hData">
+    <f:for each="{hData}" key="key" as="value">
+        <table>
+        <f:alias map="{name: 'l18n_diffsource'}">
+            <f:if condition="{key} != {name}">
+                <f:then>
+                    <tr><td class="space2">{value}</td></tr>
+                </f:then>
+            </f:if>
+        </f:alias>
+        </table>
+    </f:for>
+
+</f:for>

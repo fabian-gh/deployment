@@ -172,18 +172,50 @@ class XmlParserService {
 
         return $contentArr;
     }
+    
+    
+    /**
+     * @return string
+     */
+    public function getHistoryDataDiff($historyData){
+        $data = array();
+        $differences = array();
+        /** @var $diff \TYPO3\CMS\Core\Utility\DiffUtility */
+        $diff = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
+        
+        foreach($historyData as $hisData){
+            foreach($hisData->getHistoryData() as $records){
+                foreach($records as $reckey => $recval){
+                    $data[$hisData->getRecuid()][$reckey][$hisData->getRecuid()][] = $recval;
+                }
+            }
+        }
+        
+        foreach($data as $dat){
+            foreach($dat as $columnkey => $cloumnval){
+                foreach($cloumnval as $recuid => $dataArr){
+                    if($columnkey != 'l18n_diffsource'){
+                        $differences[$recuid][$columnkey][] = $diff->makeDiffDisplay($dataArr[0], $dataArr[1]);
+                    }
+                }
+            }
+        }
+        
+        return $differences;
+    }
 
+    
     /**
      * @param array<\TYPO3\Deployment\Domain\Model\HistoryData> $data
      * @return array<\TYPO3\Deployment\Domain\Model\HistoryData> $historyArray
      */
-    public function splitData($data) {
+    /*public function splitData($data) {
         $arr = array();
         $historyArray = array();
 
         foreach ($data as $hData) {
             /** @var $hData HistoryData */
-            foreach ($hData->getHistoryData() as $recordsvalue) {
+            /*foreach ($hData->getHistoryData() as $recordsvalue) {
                 if(count($recordsvalue) >= 3) {
                     foreach($recordsvalue as $reckey => $recvalue) {
                         if(!is_array($recvalue)) {
@@ -224,7 +256,7 @@ class XmlParserService {
         }
         DebuggerUtility::var_dump($historyArray);
         return $historyArray;
-    }
+    }*/
 
     /**
      * @param \TYPO3\Deployment\Domain\Model\Log $logData
