@@ -60,22 +60,14 @@ class DeploymentController extends ActionController {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
     }
 
+    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
-        if ($this->registry->get('deployment', 'last_deploy') != NULL) {
-            $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy'));
-        } else {
-            $this->registry->set('deployment', 'last_deploy', time());
-            $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy'));
-        }
-
-        // todo: prüfen ... kürzer als die Zeilen oben
-        // $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy', time()));
-
-
+        // Wenn Eintrag nicht vorhanden, wird die aktuelle zeit genommen, neuer Eintrag wird aber dennoch nicht erstellt
+        $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy', time()));
 
         $date = new \DateTime($last_deploy);
         $logEntries = $this->logRepository->findYoungerThen($date);
@@ -101,6 +93,7 @@ class DeploymentController extends ActionController {
         }
     }
 
+    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
@@ -112,17 +105,23 @@ class DeploymentController extends ActionController {
             $deployData[] = $this->historyRepository->findByUid($dep);
         }
 
-        // is_dir(TYPO3_PATH.'fileadmin/deploypent/')
-        // todo: deployment Ordner auf existenz prüfen und ggf. Exception mit FlashMessage
+        // falls deployment-Ordner noch nicht existiert, dann erstellen
+        $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
+        $erg = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
+        if(!$erg){
+            $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/';
+            GeneralUtility::mkdir($folder);
+        }
 
+        // Deploydaten setzen und XML erstellen
         $this->xmlParserService->setDeployData(array_unique($deployData));
         $this->xmlParserService->writeXML();
 
         $this->flashMessageContainer->add('Daten wurden erstellt.', '', FlashMessage::OK);
-
         $this->redirect('index');
     }
 
+    
     /**
      * DeployAction
      */

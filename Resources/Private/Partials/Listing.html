@@ -39,7 +39,9 @@
                             <table>
                                 <f:for each="{data}" key="key" as="valueArr">
                                     <f:for each="{valueArr}" key="valuekey" as="value">
-                                        <tr><td><f:format.raw>{value}</f:format.raw></td></tr>
+                                        <tr>
+                                            <td><i>{key}:</i><br /><f:format.raw>{value}</f:format.raw></td>
+                                        </tr>
                                     </f:for>
                                 </f:for>
                             </table>

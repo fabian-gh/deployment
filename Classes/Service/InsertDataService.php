@@ -27,9 +27,9 @@ class InsertDataService {
      * @param array $dataArr
      */
     public function insertDataIntoTable($dataArr) {
-        // TODO: Hier muss noch andere DB-Connection initialisiert werden
-        // mit Param Fremddatenbank
-        //$this->getDatabase()->connectDB(.......);
+        // Fremddatenbank initialiseren
+        $this->getDatabase()->connectDB('localhost', 'root', 'root', 't3masterdeploy');
+        
         // TODO: Gnaze Verarbeitung!!!!!!
         foreach ($dataArr as $data) {
             foreach ($data as $key => $value) {
@@ -39,7 +39,7 @@ class InsertDataService {
         }
 
         // ohne Parameter (aktuelle DB)
-        // $this->getDatabase()->connectDB();
+        $this->getDatabase()->connectDB();
 
         die();
     }
