@@ -52,19 +52,3 @@
 
     <f:form.submit value="Deployen" />   
 </f:form>
-
-
-<f:for each="{entry.historyData}" as="hData">
-    <f:for each="{hData}" key="key" as="value">
-        <table>
-        <f:alias map="{name: 'l18n_diffsource'}">
-            <f:if condition="{key} != {name}">
-                <f:then>
-                    <tr><td class="space2">{value}</td></tr>
-                </f:then>
-            </f:if>
-        </f:alias>
-        </table>
-    </f:for>
-
-</f:for>
