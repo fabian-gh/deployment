@@ -36,12 +36,10 @@ class InsertDataService {
                 DebuggerUtility::var_dump($key);
                 DebuggerUtility::var_dump($value);
             }
-        }
+        }die();
 
         // ohne Parameter (aktuelle DB)
         $this->getDatabase()->connectDB();
-
-        die();
     }
 
     /**

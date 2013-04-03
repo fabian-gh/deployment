@@ -104,7 +104,7 @@ class XmlParserService {
         $file = GeneralUtility::tempnam('deploy_');
         GeneralUtility::writeFile($file, $writeString);
 
-        $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . '/fileadmin/deployment/' . date('Y_m_d', time());
+        $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
         
         GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_changes.xml');
@@ -121,23 +121,23 @@ class XmlParserService {
         $dateFolder = array();
         $contentArr = array();
 
-        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').'/fileadmin/deployment/');
-
+        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
+        
         if ($filesAndFolders) {
             $exFaf = array();
             // Dateipfad ausplitten
             foreach ($filesAndFolders as $faf) {
                 $exFaf[] = explode('/', $faf);
             }
-
+            
             // Initialwert
-            $initDate = $exFaf[0][3];
+            $initDate = $exFaf[0][6];
             // pro Ordner/Datum ein Array mit allen Dateinamen darin
             foreach ($exFaf as $item) {
-                if ($initDate == $item[3]) {
-                    $dateFolder[$initDate][] = $item[4];
+                if ($initDate == $item[6]) {
+                    $dateFolder[$initDate][] = $item[7];
                 } else {
-                    $dateFolder[$item[3]][] = $item[4];
+                    $dateFolder[$item[6]][] = $item[7];
                 }
             }
         }
@@ -157,8 +157,8 @@ class XmlParserService {
                 // wenn Datei-Timestamp später als letztes Deployment,
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
-                    $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').'/fileadmin/deployment/' . $folder . '/' . $file);
-
+                    $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$file);
+                    
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->changeSet->data as $dataset) {
                         foreach ($dataset as $key => $value) {
