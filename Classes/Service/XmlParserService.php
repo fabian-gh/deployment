@@ -82,6 +82,7 @@ class XmlParserService {
             $this->xmlwriter->writeElement('tablename', $cData->getTablename());
             $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
             $this->xmlwriter->writeElement('uid', $cData->getRecuid());
+            $this->xmlwriter->writeElement('pid', $cData->getPid());
             $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
 
             // geänderte Historydaten durchlaufen

@@ -28,35 +28,77 @@ class InsertDataService{
      * @return boolean
      */
     public function insertDataIntoTable($dataArr) {
-        $data = array();
-        $fields = $values = $insertParam = array();
+        $data = $fields = $insertParams = $updateParams = array();
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         
         // Fremddatenbank initialiseren
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
         
-        foreach ($dataArr as $data) {
-            foreach ($data as $key => $value) {
-                // alle Schlüsselfelder überprüfen
+        foreach($dataArr as $data) {
+            foreach($data as $key => $value) {
+                // Schlüsselfelder überprüfen
                 if($key === 'tablename'){
                     $table = $value;
-                } elseif($key === 'fieldlist'){
-                    $fields = explode(',', $value);
                 } elseif($key === 'uid'){
                     $uid = $value;
+                } elseif($key === 'pid'){
+                    $pid = $value;
+                } else{
+                    $contents[$key] = $value;
                 }
-                
-                // Felder mit den Schlüsseln der Daten abgleichen um diese einzufügen
-                foreach($fields as $field){
-                    if($field == $key && $field != 'l18n_diffsource'){
-                        $insertParam = array($field => $value);
-                        $con->exec_UPDATEquery($table, $uid, $insertParam);
+            }
+            
+            // Felder mit den Schlüsseln der Daten abgleichen um diese einfügen
+            foreach($contents as $contentkey => $contentvalue){
+                if($contentkey != 'fieldlist'){
+                    // prüfen ob Datensatz bereits existiert
+                    $controlResult = $con->exec_SELECTgetSingleRow('uid', $table, 'uid = '.$uid);
+
+                    // falls ja, dann update, ansonsten einfügen
+                    if($controlResult != false){
+                        $updateParams[] = array(
+                            'pid'       => ($pid == null) ? -1 : $pid,
+                            $contentkey => $contentvalue,
+                            'tstamp'    => time()
+                        );
+                        
+                        foreach($updateParams as $param){
+                            $con->exec_UPDATEquery($table, $uid, $param);
+                        }
+                    } else {
+                        // Prüfen ob Datensatz evtl. unter anderer ID existiert
+                        GeneralUtility::loadTCA($table);
+                        $label = $GLOBALS['TCA'][$table]['ctrl']['label'];
+                        if($label != $contentkey){
+                            $alreadyExists = $con->exec_SELECTgetSingleRow('uid', $table, $contentkey." LIKE '%$contentvalue%'");
+                        } else {
+                            $alreadyExists = $con->exec_SELECTgetSingleRow('uid', $table, $label." LIKE '%$contentvalue%'");
+                        }
+
+                        // falls ja, dann update, ansonsten insert
+                        if($alreadyExists == false){
+                            $insertParams = array(
+                                'uid' => $uid,
+                                'pid' => ($pid == null) ? -1 : $pid,
+                                'tstamp' => time(),
+                                'crdate' => time(),
+                                $contentkey => $contentvalue
+                            );
+
+                            $con->exec_INSERTquery($table, $insertParams);
+                        }
                     }
                 }
-                
-                // TODO: Konflikte überprüfen
             }
-        }
+
+            // Variablen zurücksetzen
+            unset($table);
+            unset($fields);
+            unset($uid);
+            unset($pid);
+            unset($contents);
+        }die();
         
         // Datenbankverbindung zurücksetzen
         $this->getDatabase()->connectDB();
