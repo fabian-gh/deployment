@@ -21,25 +21,47 @@ use \TYPO3\Deployment\Xclass\DatabaseConnection;
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class InsertDataService {
+class InsertDataService{
 
     /**
      * @param array $dataArr
+     * @return boolean
      */
     public function insertDataIntoTable($dataArr) {
-        // Fremddatenbank initialiseren
-        $this->getDatabase()->connectDB('localhost', 'root', 'root', 't3masterdeploy');
+        $data = array();
+        $fields = $values = $insertParam = array();
+        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         
-        // TODO: Gnaze Verarbeitung!!!!!!
+        // Fremddatenbank initialiseren
+        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
+        
         foreach ($dataArr as $data) {
             foreach ($data as $key => $value) {
-                DebuggerUtility::var_dump($key);
-                DebuggerUtility::var_dump($value);
+                // alle Schlüsselfelder überprüfen
+                if($key === 'tablename'){
+                    $table = $value;
+                } elseif($key === 'fieldlist'){
+                    $fields = explode(',', $value);
+                } elseif($key === 'uid'){
+                    $uid = $value;
+                }
+                
+                // Felder mit den Schlüsseln der Daten abgleichen um diese einzufügen
+                foreach($fields as $field){
+                    if($field == $key && $field != 'l18n_diffsource'){
+                        $insertParam = array($field => $value);
+                        $con->exec_UPDATEquery($table, $uid, $insertParam);
+                    }
+                }
+                
+                // TODO: Konflikte überprüfen
             }
-        }die();
-
-        // ohne Parameter (aktuelle DB)
+        }
+        
+        // Datenbankverbindung zurücksetzen
         $this->getDatabase()->connectDB();
+        
+        return true;
     }
 
     /**

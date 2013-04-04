@@ -132,17 +132,21 @@ class DeploymentController extends ActionController {
         $content = $this->xmlParserService->readXML($tstamp);
 
         // content in DB-Felder der jeweiligen Tabelle schreiben
-        $this->insertDataService->insertDataIntoTable($content);
-
-        // TODO: evtl. ID Konflikte anzeigen
+        $result = $this->insertDataService->insertDataIntoTable($content);
 
         // letzten Deployment-Stand registrieren
         // $this->registry->set('deployment', 'last_deploy', time());
 
-        // Bestätigung ausgeben
-        $this->flashMessageContainer->add('Deployment wurde erfolgreich ausgeführt', '', FlashMessage::OK);
-        // Redirect auf Hauptseite
-        $this->redirect('index');
+        if($result){
+            // Bestätigung ausgeben
+            $this->flashMessageContainer->add('Deployment wurde erfolgreich ausgeführt', '', FlashMessage::OK);
+            // Redirect auf Hauptseite
+            $this->redirect('index');
+        } else {
+            $this->flashMessageContainer->add('Es ist ein Fehler aufgetreten', 'Dei Daten konnten nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', FlashMessage::ERROR);
+            $this->redirect('index');
+        }
+        
     }
 
 }
