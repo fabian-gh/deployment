@@ -29,6 +29,8 @@ class AbstractRepository extends Repository{
      */
   
     /**
+     * Überschreiben der createQuery()-Methode
+     * 
      * @return \TYPO3\CMS\Extbase\Persistence\QueryInterface
      */
     public function createQuery() {

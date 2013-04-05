@@ -25,7 +25,7 @@ class History extends AbstractModel{
     protected $sysLogUid;
     
     /**
-     * @var string 
+     * @var array 
      */
     protected $historyData;
     
@@ -65,16 +65,14 @@ class History extends AbstractModel{
     }
 
     /**
-     * @todo: ist das nicht ein Array?
-     *
-     * @return string
+     * @return array
      */
     public function getHistoryData() {
         return $this->historyData;
     }
 
     /**
-     * @param string $historyData
+     * @param array $historyData
      */
     public function setHistoryData($historyData) {
         $this->historyData = $historyData;

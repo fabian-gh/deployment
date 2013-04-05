@@ -24,6 +24,8 @@ use \TYPO3\Deployment\Xclass\DatabaseConnection;
 class InsertDataService{
 
     /**
+     * Fügt Daten in eine Tabelle ein. Unabhängig von der Tabelle
+     * 
      * @param array $dataArr
      * @return boolean
      */
@@ -85,6 +87,7 @@ class InsertDataService{
                     }
 
                     // falls nein -> insert, falls ja -> update
+                    // neue Datensätze werden mit der pid -1 gekennzeichnet
                     if($alreadyExists == false){
                         $insertParams[] = array(
                             'uid' => $uid,
@@ -125,7 +128,8 @@ class InsertDataService{
         
         return true;
     }
-
+    
+    
     /**
      * @return DatabaseConnection
      */

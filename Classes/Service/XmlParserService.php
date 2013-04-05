@@ -51,7 +51,8 @@ class XmlParserService {
 
     
     /**
-     * Geänderte Datensätze in ein XML-Dokument schreiben
+     * Geänderte Datensätze in ein XML-Dokument schreiben.
+     * XML-Dateien sind unter fileadmin/deployment/YYYY-MM-DD/ zu finden
      */
     public function writeXML() {
         // Daten deserialisieren
@@ -82,7 +83,7 @@ class XmlParserService {
             $this->xmlwriter->writeElement('tablename', $cData->getTablename());
             $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
             $this->xmlwriter->writeElement('uid', $cData->getRecuid());
-            $this->xmlwriter->writeElement('pid', $cData->getPid());
+            $this->xmlwriter->writeElement('pid', $this->getPid($cData->getTablename(), $cData->getRecuid()));
             $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
 
             // geänderte Historydaten durchlaufen
@@ -113,6 +114,8 @@ class XmlParserService {
 
     
     /**
+     * Liest alle noch nicht deployeten XML-Datensätze
+     * 
      * @param $string $timestamp
      * @return array
      */
@@ -176,6 +179,8 @@ class XmlParserService {
     
     
     /**
+     * Gibt die Differenzen der Daten zurück
+     * 
      * @return string
      */
     public function getHistoryDataDiff($historyData){
@@ -209,6 +214,8 @@ class XmlParserService {
 
     
     /**
+     * Deserialisiert die übergebenen Log-Daten
+     * 
      * @param \TYPO3\Deployment\Domain\Model\Log $logData
      * @return array<\TYPO3\Deployment\Domain\Model\LogData> $data
      */
@@ -238,6 +245,8 @@ class XmlParserService {
 
     
     /**
+     * Deserialisiert die übergebenen History-Daten
+     * 
      * @param array<\TYPO3\Deployment\Domain\Model\History> $historyData
      * @return array<\TYPO3\Deployment\Domain\Model\HistoryData> $data
      */
@@ -283,11 +292,27 @@ class XmlParserService {
             return $hisData = array();
         }
     }
+    
+    
+    /**
+     * Gibt die pid der übergebenen uid innerhalb der übergebenen Tabelle zurück
+     * 
+     * @param string $table
+     * @param string $uid
+     * @return int
+     */
+    public function getPid($table, $uid){
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
+        $con->connectDB();
+        $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = '.$uid);
+
+        return (int)$pid['pid'];
+    }
 
     
     /**
      * Get the TYPO3 database
-     *
      * @return \TYPO3\CMS\Core\Database\DatabaseConnection
      */
     protected function getDatabase() {
@@ -365,57 +390,3 @@ class XmlParserService {
     }
 
 }
-
-
-/**
-     * @param array<\TYPO3\Deployment\Domain\Model\HistoryData> $data
-     * @return array<\TYPO3\Deployment\Domain\Model\HistoryData> $historyArray
-     */
-    /*public function splitData($data) {
-        $arr = array();
-        $historyArray = array();
-
-        foreach ($data as $hData) {
-            /** @var $hData HistoryData */
-            /*foreach ($hData->getHistoryData() as $recordsvalue) {
-                if(count($recordsvalue) >= 3) {
-                    foreach($recordsvalue as $reckey => $recvalue) {
-                        if(!is_array($recvalue)) {
-                            $arr[$reckey][] = $recvalue;
-                        }
-                    }
-
-                    foreach($arr as $key => $data) {
-                        if(count($data) >= 2) {
-                            $temp = array(
-                                'oldRecord' => array(
-                                    $key => $data[0]
-                                ),
-                                'newRecord' => array(
-                                    $key => $data[1]
-                                )
-                            );
-                            
-                            $historyData = new HistoryData();
-                            $historyData->setPid($hData->getPid());
-                            $historyData->setUid($hData->getUid());
-                            $historyData->setSysLogUid($hData->getSysLogUid());
-                            $historyData->setHistoryData($temp);
-                            $historyData->setFieldlist($hData->getFieldlist());
-                            $historyData->setRecuid($hData->getRecuid());
-                            $historyData->setTablename($hData->getTablename());
-                            $historyData->setTstamp($hData->getTstamp());
-
-                            $historyArray[] = $historyData;
-                        }
-                    }
-                }
-            }
-            // TODO Bedingung finden, dass das Ursprungsobjekt des gesplitetetn Objekts nicht hinten anhängt wird
-            if(true){
-                $historyArray[] = $hData;
-            }
-        }
-        DebuggerUtility::var_dump($historyArray);
-        return $historyArray;
-    }*/

@@ -21,8 +21,10 @@ namespace TYPO3\Deployment\Domain\Repository;
 class HistoryRepository extends AbstractRepository {
 
     /**
-     * @param array|\TYPO3\Deployment\Domain\Model\LogData $logData
-     * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
+     * Returned die benötigten Historydaten
+     * 
+     * @param array<\TYPO3\Deployment\Domain\Model\LogData> $logData
+     * @return array<\TYPO3\CMS\Extbase\Persistence\QueryResultInterface>
      */
     public function findHistoryData($logData) {
         $data = array();

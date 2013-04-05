@@ -17,13 +17,12 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * Abstract Model
  *
  * @package    Deployment
- * @subpackage ...
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
 class AbstractModel extends AbstractEntity {
 
     /**
-     * getCleanProperties-Methide aus der AbstractEntitty überschreiben,
+     * getCleanProperties-Methode aus der AbstractEntitty überschreiben,
      * da unter Umständen Warnings auftreten können.
      * 
      * @return array

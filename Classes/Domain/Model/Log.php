@@ -25,19 +25,19 @@ class Log extends AbstractModel{
     protected $tstamp;
     
     /**
-     * @var string
+     * @var array
      */
     protected $logData;
     
     /**
-     * @return string
+     * @return array
      */
     public function getLogData() {
         return $this->logData;
     }
     
     /**
-     * @param string $logData
+     * @param array $logData
      */
     public function setLogData($logData){
         $this->logData = $logData;

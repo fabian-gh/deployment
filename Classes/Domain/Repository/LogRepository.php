@@ -21,8 +21,10 @@ namespace TYPO3\Deployment\Domain\Repository;
 class LogRepository extends AbstractRepository {
 
     /**
+     * Gibt alle noch nicht deployeten Datensätze zurück
+     * 
      * @param \DateTime $dateTime
-     * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
+     * @return array<\TYPO3\CMS\Extbase\Persistence\QueryResultInterface>
      */
     public function findYoungerThen(\DateTime $dateTime) {
         $query = $this->createQuery();
