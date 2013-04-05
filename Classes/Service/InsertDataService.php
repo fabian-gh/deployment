@@ -28,18 +28,24 @@ class InsertDataService{
      * @return boolean
      */
     public function insertDataIntoTable($dataArr) {
-        $data = $fields = $insertParams = $updateParams = array();
+        $data = array();
+        $fields = array();
+        $insertParams = array();
+        $updateParams = array();
+        $updateParams2 = array();
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         
         // Fremddatenbank initialiseren
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
         
+        // Schlüsselfelder überprüfen
         foreach($dataArr as $data) {
             foreach($data as $key => $value) {
-                // Schlüsselfelder überprüfen
                 if($key === 'tablename'){
                     $table = $value;
+                } elseif($key === 'fieldlist'){
+                    unset($key);
                 } elseif($key === 'uid'){
                     $uid = $value;
                 } elseif($key === 'pid'){
@@ -49,44 +55,58 @@ class InsertDataService{
                 }
             }
             
-            // Felder mit den Schlüsseln der Daten abgleichen um diese einfügen
+            // pro Paket Felder mit den Schlüsseln der Daten abgleichen um diese einzufügen
             foreach($contents as $contentkey => $contentvalue){
-                if($contentkey != 'fieldlist'){
-                    // prüfen ob Datensatz bereits existiert
-                    $controlResult = $con->exec_SELECTgetSingleRow('uid', $table, 'uid = '.$uid);
+                // prüfen ob Datensatz bereits existiert
+                $controlResult = $con->exec_SELECTgetSingleRow('uid', $table, 'uid = '.$uid);
 
-                    // falls ja, dann update, ansonsten einfügen
-                    if($controlResult != false){
-                        $updateParams[] = array(
+                // falls ja, dann update, ansonsten einfügen
+                if($controlResult != false){
+                    $updateParams[] = array(
+                        'uid'       => $uid,
+                        'pid'       => ($pid == null) ? -1 : $pid,
+                        $contentkey => $contentvalue,
+                        'tstamp'    => time()
+                    );
+                    
+                    foreach($updateParams as $param){
+                        $con->exec_UPDATEquery($table, 'uid = '.$param['uid'], $param);
+                    }
+                } else {
+                    // Prüfen ob Datensatz evtl. unter anderer ID existiert, 
+                    // abhängig vom label-Feld des TCA
+                    GeneralUtility::loadTCA($table);
+                    $label = $GLOBALS['TCA'][$table]['ctrl']['label'];
+                    
+                    if($label != $contentkey){
+                        $alreadyExists = $con->exec_SELECTgetSingleRow('uid', $table, $contentkey." LIKE '%$contentvalue%'");
+                    } else {
+                        $alreadyExists = $con->exec_SELECTgetSingleRow('uid', $table, $label." LIKE '%$contentvalue%'");
+                    }
+
+                    // falls nein -> insert, falls ja -> update
+                    if($alreadyExists == false){
+                        $insertParams[] = array(
+                            'uid' => $uid,
+                            'pid' => ($pid == null) ? -1 : $pid,
+                            'tstamp' => time(),
+                            'crdate' => time(),
+                            $contentkey => $contentvalue
+                        );
+
+                        foreach($insertParams as $param){
+                            $con->exec_INSERTquery($table, $param);
+                        }
+                    } else {
+                        $updateParams2[] = array(
+                            'uid'       => $uid,
                             'pid'       => ($pid == null) ? -1 : $pid,
                             $contentkey => $contentvalue,
                             'tstamp'    => time()
                         );
-                        
-                        foreach($updateParams as $param){
-                            $con->exec_UPDATEquery($table, $uid, $param);
-                        }
-                    } else {
-                        // Prüfen ob Datensatz evtl. unter anderer ID existiert
-                        GeneralUtility::loadTCA($table);
-                        $label = $GLOBALS['TCA'][$table]['ctrl']['label'];
-                        if($label != $contentkey){
-                            $alreadyExists = $con->exec_SELECTgetSingleRow('uid', $table, $contentkey." LIKE '%$contentvalue%'");
-                        } else {
-                            $alreadyExists = $con->exec_SELECTgetSingleRow('uid', $table, $label." LIKE '%$contentvalue%'");
-                        }
 
-                        // falls ja, dann update, ansonsten insert
-                        if($alreadyExists == false){
-                            $insertParams = array(
-                                'uid' => $uid,
-                                'pid' => ($pid == null) ? -1 : $pid,
-                                'tstamp' => time(),
-                                'crdate' => time(),
-                                $contentkey => $contentvalue
-                            );
-
-                            $con->exec_INSERTquery($table, $insertParams);
+                        foreach($updateParams2 as $param){
+                            $con->exec_UPDATEquery($table, 'uid = '.$param['uid'], $param);
                         }
                     }
                 }
@@ -98,7 +118,7 @@ class InsertDataService{
             unset($uid);
             unset($pid);
             unset($contents);
-        }die();
+        }
         
         // Datenbankverbindung zurücksetzen
         $this->getDatabase()->connectDB();
