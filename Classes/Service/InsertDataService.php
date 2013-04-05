@@ -61,7 +61,7 @@ class InsertDataService{
             foreach($contents as $contentkey => $contentvalue){
                 // prüfen ob Datensatz bereits existiert
                 $controlResult = $con->exec_SELECTgetSingleRow('uid', $table, 'uid = '.$uid);
-
+                
                 // falls ja, dann update, ansonsten einfügen
                 if($controlResult != false){
                     $updateParams[] = array(
@@ -72,23 +72,27 @@ class InsertDataService{
                     );
                     
                     foreach($updateParams as $param){
-                        $con->exec_UPDATEquery($table, 'uid = '.$param['uid'], $param);
+                        //$con->exec_UPDATEquery($table, 'uid = '.$param['uid'], $param);
                     }
                 } else {
                     // Prüfen ob Datensatz evtl. unter anderer ID existiert, 
                     // abhängig vom label-Feld des TCA
                     GeneralUtility::loadTCA($table);
                     $label = $GLOBALS['TCA'][$table]['ctrl']['label'];
-                    
+
                     if($label != $contentkey){
-                        $alreadyExists = $con->exec_SELECTgetSingleRow('uid', $table, $contentkey." LIKE '%$contentvalue%'");
+                        $alreadyExists = $con->exec_SELECTgetSingleRow("uid, $contentkey", $table, $contentkey." LIKE '%$contentvalue%'");
                     } else {
-                        $alreadyExists = $con->exec_SELECTgetSingleRow('uid', $table, $label." LIKE '%$contentvalue%'");
+                        DebuggerUtility::var_dump($label);
+                        DebuggerUtility::var_dump($table);
+                        DebuggerUtility::var_dump($contentvalue);die();
+                        $alreadyExists = $con->exec_SELECTgetSingleRow("uid, $label", $table, $label." LIKE '%$contentvalue%'");
+                        DebuggerUtility::var_dump($alreadyExists);
                     }
 
                     // falls nein -> insert, falls ja -> update
-                    // neue Datensätze werden mit der pid -1 gekennzeichnet
                     if($alreadyExists == false){
+                        DebuggerUtility::var_dump('if');die();
                         $insertParams[] = array(
                             'uid' => $uid,
                             'pid' => ($pid == null) ? -1 : $pid,
@@ -101,10 +105,24 @@ class InsertDataService{
                             $con->exec_INSERTquery($table, $param);
                         }
                     } else {
+                        // vor dem Update verfeinerte Suche, ob der Datensatz evtl.
+                        // doch schon existiert
+                        $uidFromTable = $alreadyExists['uid'];
+                        $field = $alreadyExists[$contentkey];
+                        $count = strlen($field);
+                        $sCount = strlen($contentvalue);
+                        if($count > $sCount){
+                            $erg = strstr($count, $sCount);
+                        } elseif($count < $sCount) {
+                            $erg = strstr($sCount, $count);
+                        } else {
+                            $erg = $contentvalue;
+                        }
+
                         $updateParams2[] = array(
-                            'uid'       => $uid,
+                            'uid'       => $uidFromTable,
                             'pid'       => ($pid == null) ? -1 : $pid,
-                            $contentkey => $contentvalue,
+                            $contentkey => $erg,
                             'tstamp'    => time()
                         );
 
