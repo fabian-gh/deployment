@@ -160,7 +160,9 @@ class InsertDataService{
                             }
                         }
                         
-                    } else {
+                    } 
+                    // Falls Daten ansonsten existieren -> aktualiseren
+                    else {
                         $updateParams2[] = array(
                             'uid'       => $uid,
                             'pid'       => ($pid == null) ? -1 : $pid,
