@@ -55,8 +55,18 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $registry;
+    
+    /**
+     * @var \TYPO3\Deployment\Service\MediaDataService
+     * @inject
+     */
+    protected $media;
 
     public function indexAction() {
+        // ========================================
+        $this->media->readFilesInFileadmin();
+        $this->media->writeXmlMediaList();
+        // ========================================
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
     }
 
