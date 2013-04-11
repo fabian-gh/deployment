@@ -41,4 +41,13 @@ $TCA['sys_file'] = array(
     ),
 );
 
+$TCA['sys_file_reference'] = array(
+    'ctrl' => array(
+            'title'             => 'FileReference',
+            'adminOnly'         => 1,
+            'rootLevel'         => 1,
+            'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'Configuration/Tca/FileReference.php'
+    ),
+);
+
 ?>
