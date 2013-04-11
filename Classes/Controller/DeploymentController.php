@@ -43,6 +43,12 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $fileRepository;
+    
+    /**
+     * @var \TYPO3\Deployment\Domain\Repository\FileReferenceRepository
+     * @inject
+     */
+    protected $fileReferenceRepository;
 
     /**
      * @var \TYPO3\Deployment\Service\XmlParserService
@@ -69,11 +75,13 @@ class DeploymentController extends ActionController {
     protected $media;
 
     public function indexAction() {
+        $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         // ========================================
-        $this->media->setFileList($this->fileRepository->findAll());
+        $date = $this->registry->get('deployment', 'last_deploy', time());
+        $this->media->setFileList($this->fileRepository->findYoungerThen($date));
+        $this->media->writeXmlMediaList();
         $this->media->readXmlMediaList();
         // ========================================
-        $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
     }
 
     
@@ -82,10 +90,10 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
-        // Wenn Eintrag nicht vorhanden, wird die aktuelle zeit genommen, neuer Eintrag wird aber dennoch nicht erstellt
-        $last_deploy = date('Y-m-d', $this->registry->get('deployment', 'last_deploy', time()));
+        // Wenn Eintrag nicht vorhanden, wird die aktuelle Zeit genommen, 
+        // neuer Eintrag wird aber dennoch nicht erstellt
+        $date = $this->registry->get('deployment', 'last_deploy', time());
 
-        $date = new \DateTime($last_deploy);
         $logEntries = $this->logRepository->findYoungerThen($date);
 
         if ($logEntries->getFirst() != NULL) {
@@ -168,6 +176,7 @@ class DeploymentController extends ActionController {
         $result = $this->insertDataService->insertDataIntoTable($content);
 
         // letzten Deployment-Stand registrieren
+        // TODO: Entkommentieren
         // $this->registry->set('deployment', 'last_deploy', time());
 
         if($result){

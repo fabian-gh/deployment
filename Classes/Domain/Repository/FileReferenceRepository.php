@@ -21,5 +21,3 @@ namespace TYPO3\Deployment\Domain\Repository;
 class FileReferenceRepository extends AbstractRepository {
    
 }
-
-?>

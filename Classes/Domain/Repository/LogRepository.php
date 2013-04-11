@@ -23,14 +23,14 @@ class LogRepository extends AbstractRepository {
     /**
      * Gibt alle noch nicht deployeten Datensätze zurück
      * 
-     * @param \DateTime $dateTime
+     * @param string $timestamp
      * @return array<\TYPO3\CMS\Extbase\Persistence\QueryResultInterface>
      */
-    public function findYoungerThen(\DateTime $dateTime) {
+    public function findYoungerThen($timestamp) {
         $query = $this->createQuery();
 
         $constraints = array();
-        $constraints[] = $query->greaterThanOrEqual('tstamp', $dateTime);
+        $constraints[] = $query->greaterThanOrEqual('tstamp', $timestamp);
         $constraints[] = $query->equals('error', '0');
         $constraints[] = $query->greaterThan('action', '0');
         $constraints[] = $query->logicalNot($query->equals('tablename', ''));

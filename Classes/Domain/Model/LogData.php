@@ -40,7 +40,7 @@ class LogData extends AbstractModel{
     protected $recuid;
     
     /**
-     * @var \DateTime
+     * @var string
      */
     protected $tstamp;
 
@@ -102,16 +102,16 @@ class LogData extends AbstractModel{
     }
     
     /**
-     * @return \DateTime
+     * @return string
      */
     public function getTstamp() {
         return $this->tstamp;
     }
 
     /**
-     * @param \DateTime $tstamp
+     * @param string $tstamp
      */
-    public function setTstamp(\DateTime $tstamp) {
+    public function setTstamp($tstamp) {
         $this->tstamp = $tstamp;
     }
 
