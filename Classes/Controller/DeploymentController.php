@@ -71,7 +71,7 @@ class DeploymentController extends ActionController {
     public function indexAction() {
         // ========================================
         $this->media->setFileList($this->fileRepository->findAll());
-        $this->media->writeXmlMediaList();
+        $this->media->readXmlMediaList();
         // ========================================
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
     }

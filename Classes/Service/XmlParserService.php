@@ -121,27 +121,23 @@ class XmlParserService {
      */
     public function readXML($timestamp) {
         $arrcount = 0;
-        $fileArr = array();
-        $dateFolder = array();
-        $contentArr = array();
-
-        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
+        $fileArr = $dateFolder = $contentArr = $exFaf = array();
+        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/');
         
         if ($filesAndFolders) {
-            $exFaf = array();
             // Dateipfad ausplitten
             foreach ($filesAndFolders as $faf) {
                 $exFaf[] = explode('/', $faf);
             }
             
             // Initialwert
-            $initDate = $exFaf[0][6];
+            $initDate = $exFaf[0][7];
             // pro Ordner/Datum ein Array mit allen Dateinamen darin
             foreach ($exFaf as $item) {
-                if ($initDate == $item[6]) {
-                    $dateFolder[$initDate][] = $item[7];
+                if ($initDate == $item[7]) {
+                    $dateFolder[$initDate][] = $item[8];
                 } else {
-                    $dateFolder[$item[6]][] = $item[7];
+                    $dateFolder[$item[7]][] = $item[8];
                 }
             }
         }
@@ -161,7 +157,7 @@ class XmlParserService {
                 // wenn Datei-Timestamp später als letztes Deployment,
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
-                    $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$file);
+                    $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/'.$folder.'/'.$file);
                     
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->changeSet->data as $dataset) {
