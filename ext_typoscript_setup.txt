@@ -6,8 +6,12 @@ plugin.tx_deployment.persistence.classes {
         mapping.tableName = sys_log
     }
 
-TYPO3\Deployment\Domain\Model\History {
+    TYPO3\Deployment\Domain\Model\History {
         mapping.tableName = sys_history
+    }
+
+    TYPO3\Deployment\Domain\Model\File {
+        mapping.tableName = sys_file
     }
 }
 
@@ -15,3 +19,5 @@ TYPO3\Deployment\Domain\Model\History {
 config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\Log < plugin.tx_deployment.persistence.classes.TYPO3\Deployment\Domain\Model\Log
 
 config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\History < plugin.tx_deployment.persistence.classes.TYPO3\Deployment\Domain\Model\History
+
+config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\File < plugin.tx_deployment.persistence.classes.TYPO3\Deployment\Domain\Model\File

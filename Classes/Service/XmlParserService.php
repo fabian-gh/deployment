@@ -106,7 +106,7 @@ class XmlParserService {
         $file = GeneralUtility::tempnam('deploy_');
         GeneralUtility::writeFile($file, $writeString);
 
-        $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.date('Y_m_d', time());
+        $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/'.date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
         
         GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_changes.xml');
@@ -181,6 +181,7 @@ class XmlParserService {
     /**
      * Gibt die Differenzen der Daten zurück
      * 
+     * @param \TYPO3\Deployment\Domain\Model\HistoryData $historyData
      * @return string
      */
     public function getHistoryDataDiff($historyData){

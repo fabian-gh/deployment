@@ -37,6 +37,12 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $historyRepository;
+    
+    /**
+     * @var \TYPO3\Deployment\Domain\Repository\FileRepository
+     * @inject
+     */
+    protected $fileRepository;
 
     /**
      * @var \TYPO3\Deployment\Service\XmlParserService
@@ -64,7 +70,7 @@ class DeploymentController extends ActionController {
 
     public function indexAction() {
         // ========================================
-        $this->media->readFilesInFileadmin();
+        $this->media->setFileList($this->fileRepository->findAll());
         $this->media->writeXmlMediaList();
         // ========================================
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
@@ -109,18 +115,35 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function createDeployAction(Deploy $deploy) {
-        $deployData = array();
+        $deployData = $exFold = array();
 
         foreach ($deploy->getDeployEntries() as $dep) {
             $deployData[] = $this->historyRepository->findByUid($dep);
         }
 
         // falls deployment-Ordner noch nicht existiert, dann erstellen
+        /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
         $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
-        $erg = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
-        if(!$erg){
-            $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/';
-            GeneralUtility::mkdir($folder);
+        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
+        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/');
+        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/');
+        
+        foreach($exFold as $ergkey => $ergvalue){
+            if(!$ergvalue){
+                switch($ergkey){
+                    case 0:
+                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
+                    break;
+                
+                    case 1:
+                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/');
+                    break;
+                
+                    case 2:
+                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/');
+                    break;
+                }
+            }
         }
 
         // Deploydaten setzen und XML erstellen

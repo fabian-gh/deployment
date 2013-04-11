@@ -32,4 +32,13 @@ $TCA['sys_history'] = array (
     )
 );
 
+$TCA['sys_file'] = array(
+    'ctrl' => array(
+            'title'             => 'File',
+            'adminOnly'         => 1,
+            'rootLevel'         => 1,
+            'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'Configuration/Tca/File.php'
+    ),
+);
+
 ?>

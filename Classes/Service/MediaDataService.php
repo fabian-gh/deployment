@@ -13,6 +13,7 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
 
 /**
  * MediaDataService
@@ -20,7 +21,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class MediaDataService {
+class MediaDataService extends AbstractRepository{
     
     /**
      * @var array 
@@ -41,7 +42,7 @@ class MediaDataService {
     /**
      * Schreibt eine Dateiliste des Fileadmins zurück, ohne Deploymentdateien
      */
-    public function readFilesInFileadmin(){
+    /*public function readFilesInFileadmin(){
         $fileArr = array();
         $newArr = array();
         
@@ -58,7 +59,7 @@ class MediaDataService {
         }
         
         $this->fileList = $newArr;
-    }
+    }*/
     
     
     /**
@@ -82,8 +83,20 @@ class MediaDataService {
         $this->xmlwriter->startElement('medialist');
 
         foreach($this->fileList as $file) {
-            $this->xmlwriter->writeElement('file', $file);
-            // TODO: Dateiinformationen hinzufügen (Typ, Größe, ...)
+            $this->xmlwriter->startElement('file');
+            $this->xmlwriter->writeElement('uid', $file->getUid());
+            $this->xmlwriter->writeElement('pid', $file->getPid());
+            $this->xmlwriter->writeElement('tstamp', $file->getTstamp());
+            $this->xmlwriter->writeElement('type', $file->getType());
+            $this->xmlwriter->writeElement('storage', $file->getStorage());
+            $this->xmlwriter->writeElement('identifier', $file->getIdentifier());
+            $this->xmlwriter->writeElement('mimeType', $file->getMimeType());
+            $this->xmlwriter->writeElement('size', $file->getSize());
+            $this->xmlwriter->writeElement('creationDate', $file->getCreationDate());
+            $this->xmlwriter->writeElement('modificationDate', $file->getModificationDate());
+            $this->xmlwriter->writeElement('width', $file->getWidth());
+            $this->xmlwriter->writeElement('height', $file->getHeight());
+            $this->xmlwriter->endElement();
         }
 
         $this->xmlwriter->endElement();
@@ -148,4 +161,15 @@ class MediaDataService {
         $this->xmlreader = $xmlreader;
     }
     
+    
+    /**
+     * @return DatabaseConnection
+     */
+    protected function getDatabase() {
+        return $GLOBALS['TYPO3_DB'];
+    }
+    
 }
+
+/** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        //$con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
