@@ -81,19 +81,23 @@ class MediaDataService extends AbstractRepository{
             
             $this->fileReference = $this->getFileReferenceFromTable($file->getUid());
             if($this->fileReference != null){
+                $this->xmlwriter->startElement('filereference');
                 $this->xmlwriter->writeElement('tablenames', $this->fileReference->getTablenames());
                 $this->xmlwriter->writeElement('fieldname', $this->fileReference->getFieldname());
                 $this->xmlwriter->writeElement('title', $this->fileReference->getTitle());
                 $this->xmlwriter->writeElement('description', $this->fileReference->getDescription());
                 $this->xmlwriter->writeElement('alternative', $this->fileReference->getAlternative());
                 $this->xmlwriter->writeElement('link', $this->fileReference->getLink());
+                $this->xmlwriter->endElement();
             } else {
+                $this->xmlwriter->startElement('filereference');
                 $this->xmlwriter->writeElement('tablenames');
                 $this->xmlwriter->writeElement('fieldname');
                 $this->xmlwriter->writeElement('title');
                 $this->xmlwriter->writeElement('description');
                 $this->xmlwriter->writeElement('alternative');
                 $this->xmlwriter->writeElement('link');
+                $this->xmlwriter->endElement();
             }
             $this->xmlwriter->endElement();
         }
