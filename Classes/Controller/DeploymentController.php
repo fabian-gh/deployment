@@ -80,7 +80,7 @@ class DeploymentController extends ActionController {
         $date = $this->registry->get('deployment', 'last_deploy', time());
         $this->media->setFileList($this->fileRepository->findYoungerThen($date));
         $this->media->writeXmlMediaList();
-        $this->media->readXmlMediaList();
+        //$this->media->readXmlMediaList();
         // ========================================
     }
 

@@ -22,22 +22,12 @@ class FileReference extends AbstractModel {
     /**
      * @var string 
      */
-    protected $uid;
-    
-    /**
-     * @var string 
-     */
     protected $pid;
     
     /**
      * @var string 
      */
     protected $tstamp;
-    
-    /**
-     * @var string 
-     */
-    protected $crdate;
     
     /**
      * @var string 
@@ -62,11 +52,6 @@ class FileReference extends AbstractModel {
     /**
      * @var string 
      */
-    protected $tableLocal;
-    
-    /**
-     * @var string 
-     */
     protected $title;
     
     /**
@@ -83,21 +68,7 @@ class FileReference extends AbstractModel {
      * @var string 
      */
     protected $link;
-    
-    
-    /**
-     * @return string
-     */
-    public function getUid() {
-        return $this->uid;
-    }
 
-    /**
-     * @param string $uid
-     */
-    public function setUid($uid) {
-        $this->uid = $uid;
-    }
 
     /**
      * @return string
@@ -125,20 +96,6 @@ class FileReference extends AbstractModel {
      */
     public function setTstamp($tstamp) {
         $this->tstamp = $tstamp;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCrdate() {
-        return $this->crdate;
-    }
-
-    /**
-     * @param string $crdate
-     */
-    public function setCrdate($crdate) {
-        $this->crdate = $crdate;
     }
 
     /**
@@ -195,20 +152,6 @@ class FileReference extends AbstractModel {
      */
     public function setFieldname($fieldname) {
         $this->fieldname = $fieldname;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableLocal() {
-        return $this->tableLocal;
-    }
-
-    /**
-     * @param string $tableLocal
-     */
-    public function setTableLocal($tableLocal) {
-        $this->tableLocal = $tableLocal;
     }
 
     /**

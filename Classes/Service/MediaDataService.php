@@ -29,6 +29,11 @@ class MediaDataService extends AbstractRepository{
     protected $fileList;
     
     /**
+     * @var \TYPO3\Deployment\Domain\Model\FileReference
+     */
+    protected $fileReference;
+    
+    /**
      * @var \XmlWriter
      */
     protected $xmlwriter;
@@ -73,6 +78,23 @@ class MediaDataService extends AbstractRepository{
             $this->xmlwriter->writeElement('modificationDate', $file->getModificationDate());
             $this->xmlwriter->writeElement('width', $file->getWidth());
             $this->xmlwriter->writeElement('height', $file->getHeight());
+            
+            $this->fileReference = $this->getFileReferenceFromTable($file->getUid());
+            if($this->fileReference != null){
+                $this->xmlwriter->writeElement('tablenames', $this->fileReference->getTablenames());
+                $this->xmlwriter->writeElement('fieldname', $this->fileReference->getFieldname());
+                $this->xmlwriter->writeElement('title', $this->fileReference->getTitle());
+                $this->xmlwriter->writeElement('description', $this->fileReference->getDescription());
+                $this->xmlwriter->writeElement('alternative', $this->fileReference->getAlternative());
+                $this->xmlwriter->writeElement('link', $this->fileReference->getLink());
+            } else {
+                $this->xmlwriter->writeElement('tablenames');
+                $this->xmlwriter->writeElement('fieldname');
+                $this->xmlwriter->writeElement('title');
+                $this->xmlwriter->writeElement('description');
+                $this->xmlwriter->writeElement('alternative');
+                $this->xmlwriter->writeElement('link');
+            }
             $this->xmlwriter->endElement();
         }
 
@@ -155,6 +177,22 @@ class MediaDataService extends AbstractRepository{
     
     
     /**
+     * Gibt die referenzierten Daten für den übergebenen Datensatz zurück
+     * 
+     * @param string $uid
+     * @return \TYPO3\Deployment\Domain\Model\FileReference
+     */
+    protected function getFileReferenceFromTable($uid){
+        /** @var \TYPO3\Deployment\Domain\Repository\FileReferenceRepository $fileRefObj */
+        $fileRefObj = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileReferenceRepository');
+        
+        $res = $fileRefObj->findByUidForeign($uid);
+        
+        return ($res != null) ? $res[0] : null;
+    }
+    
+    
+    /**
      * Schreibt eine Dateiliste des Fileadmins, ohne Deploymentdateien
      * @deprecated
      */
@@ -191,6 +229,22 @@ class MediaDataService extends AbstractRepository{
      */
     public function setFileList($fileList) {
         $this->fileList = $fileList;
+    }
+    
+    
+    /**
+     * @return \TYPO3\Deployment\Domain\Model\FileReference
+     */
+    public function getFileReference() {
+        return $this->fileReference;
+    }
+
+    
+    /**
+     * @param \TYPO3\Deployment\Domain\Model\FileReference $fileReference
+     */
+    public function setFileReference($fileReference) {
+        $this->fileReference = $fileReference;
     }
     
     
