@@ -77,10 +77,10 @@ class DeploymentController extends ActionController {
     public function indexAction() {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         // ========================================
-        $date = $this->registry->get('deployment', 'last_deploy', time());
-        $this->media->setFileList($this->fileRepository->findYoungerThen($date));
-        $this->media->writeXmlMediaList();
-        //$this->media->readXmlMediaList();
+        //$date = $this->registry->get('deployment', 'last_deploy', time());
+        //$this->media->setFileList($this->fileRepository->findYoungerThen($date));
+        //$this->media->writeXmlMediaList();
+        $this->insertDataService->insertMediaDataIntoTable($this->media->readXmlMediaList());
         // ========================================
     }
 
