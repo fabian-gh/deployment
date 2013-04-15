@@ -203,6 +203,8 @@ class InsertDataService{
         $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
+        $con->debugOutput = true;
+        $con->debug_lastBuiltQuery;
         
         if($con->isConnected()){
             foreach($dataArr as $data){
@@ -215,23 +217,25 @@ class InsertDataService{
                         // leere fileReference Einträge entfernen
                         if(strlen($data['fileReference']) <= 34){
                             unset($data['fileReference']);
+                        } else {
+                            // TODO: File Reference Handling
                         }
                         // und dann aktuslisieren
-                        DebuggerUtility::var_dump($data);
                         $con->exec_UPDATEquery($table, 'uid = '.$data['uid'], $data);
                     }
                 } else {
                     // ansonsten neuen Datensatz einfügen
                     if(strlen($data['fileReference']) <= 34){
                         unset($data['fileReference']);
+                    } else {
+                        // TODO: File Reference Handling
                     }
                     // dabei die uid entfernen, da dies noch die alte ist
                     unset($data['uid']);
-                    DebuggerUtility::var_dump($data);
                     $con->exec_INSERTquery($table, $data);
                 }
             }
-        }
+        }die();
     }
     
     

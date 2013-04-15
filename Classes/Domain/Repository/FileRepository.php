@@ -33,6 +33,7 @@ class FileRepository extends AbstractRepository {
         $query = $this->createQuery();
         
         $constraints[] = $query->greaterThanOrEqual('tstamp', $timestamp);
+        $constraints[] = $query->logicalNot($query->like('identifier', '/deployment%'));
         $constraints[] = $query->equals('deleted', '0');
         
         $query->matching($query->logicalAnd($constraints));

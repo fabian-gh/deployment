@@ -50,9 +50,19 @@ class File extends AbstractModel {
     protected $identifier;
     
     /**
+     * @var string
+     */
+    protected $extension;
+    
+    /**
      * @var string 
      */
     protected $mimeType;
+    
+    /**
+     * @var string 
+     */
+    protected $name;
     
     /**
      * @var string 
@@ -163,6 +173,20 @@ class File extends AbstractModel {
     public function setIdentifier($identifier) {
         $this->identifier = $identifier;
     }
+    
+    /**
+     * @return string
+     */
+    public function getExtension() {
+        return $this->extension;
+    }
+
+    /**
+     * @param string $extension
+     */
+    public function setExtension($extension) {
+        $this->extension = $extension;
+    }
 
     /**
      * @return string
@@ -170,7 +194,6 @@ class File extends AbstractModel {
     public function getMimeType() {
         return $this->mimeType;
     }
-
     
     /**
      * @param string $mimeType
@@ -179,6 +202,20 @@ class File extends AbstractModel {
         $this->mimeType = $mimeType;
     }
     
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name) {
+        $this->name = $name;
+    }
+   
     /**
      * @return string
      */

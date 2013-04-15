@@ -72,7 +72,9 @@ class MediaDataService extends AbstractRepository{
             $this->xmlwriter->writeElement('type', $file->getType());
             $this->xmlwriter->writeElement('storage', $file->getStorage());
             $this->xmlwriter->writeElement('identifier', $file->getIdentifier());
+            $this->xmlwriter->writeElement('extension', $file->getExtension());
             $this->xmlwriter->writeElement('mimeType', $file->getMimeType());
+            $this->xmlwriter->writeElement('name', $file->getName());
             $this->xmlwriter->writeElement('size', $file->getSize());
             $this->xmlwriter->writeElement('creationDate', $file->getCreationDate());
             $this->xmlwriter->writeElement('modificationDate', $file->getModificationDate());
@@ -191,7 +193,7 @@ class MediaDataService extends AbstractRepository{
         $fileRefObj = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileReferenceRepository');
         
         $res = $fileRefObj->findByUidForeign($uid);
-        
+
         return ($res != null) ? $res[0] : null;
     }
     
