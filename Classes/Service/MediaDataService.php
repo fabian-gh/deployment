@@ -14,6 +14,7 @@ namespace TYPO3\Deployment\Service;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
+use \TYPO3\CMS\Core\Resource\File;
 
 /**
  * MediaDataService
@@ -200,11 +201,9 @@ class MediaDataService extends AbstractRepository{
     
     /**
      * Schreibt eine Dateiliste des Fileadmins, ohne Deploymentdateien
-     * @deprecated
      */
     public function readFilesInFileadmin(){
-        $fileArr = array();
-        $newArr = array();
+        $fileArr = $newArr = array();
         
         // direktes auslesen des Ordners, da evtl. nicht alle Dateien in Tabellen indexiert sind
         $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/';
@@ -218,7 +217,44 @@ class MediaDataService extends AbstractRepository{
             }
         }
         
-        $this->fileList = $newArr;
+        return $newArr;
+    }
+    
+    
+    /**
+     * Filtert alle nicht indizierten Dateien und fügt diese in die sys-file Tabelle ein
+     * 
+     * @return array 
+     */
+    public function getNotIndexedFiles(){
+        $fileArr = $newFileArr = $notIndexedFiles = $filesInFileadmin = array();
+        
+        $filesInFileadmin = $this->readFilesInFileadmin();
+
+        // processed Data raus
+        foreach($filesInFileadmin as $filevalue){
+            if(strstr($filevalue, '_processed_/') == false){
+                $fileArr[] = $filevalue;
+            }
+        }
+        
+        // temp Data raus
+        foreach($fileArr as $filevalue){
+            if(strstr($filevalue, '_temp_/') == false){
+                $newFileArr[] = $filevalue;
+            }
+        }
+        
+        foreach($newFileArr as $file){
+            $fileRef = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
+            $result = $fileRef->findByIdentifier($file);
+            
+            if($result->getFirst() == null){
+                $notIndexedFiles[] = $file;
+            }
+        }
+        
+        return $notIndexedFiles;
     }
     
     

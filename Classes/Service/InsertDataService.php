@@ -14,6 +14,7 @@ namespace TYPO3\Deployment\Service;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Xclass\DatabaseConnection;
+use \TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /**
  * InsertDataService
@@ -239,6 +240,42 @@ class InsertDataService{
     }
     
     
+    
+    public function processNotIndexedFiles($fileArr){
+        $con = $this->getDatabase();
+        $con->debugOutput = true;
+        $con->debug_lastBuiltQuery;
+        
+        foreach($fileArr as $file){
+            $resFact = ResourceFactory::getInstance();
+            $res = $resFact->getFileObjectFromCombinedIdentifier('/fileadmin/'.$file);
+            // hier werden die Daten selbststädnig indexiert, 
+            // unabhängig davon welche Methode aufgerufen wird
+            $res->isIndexed();
+            
+            // '/fileadmin' aus dem identifier entfernen --> funktioniert nicht
+            /*if($res->isIndexed()){
+                $identifier = $res->getProperty('identifier');
+                $croppedIdentifier = substr($identifier, 10);
+                $res->updateProperties(array('identifier' => $croppedIdentifier));
+            }*/
+        }
+        
+        if($con->isConnected()){
+            $fileRep = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
+            $res = $fileRep->findByIdentifierWithoutHeadingSlash('/fileadmin/');
+            
+            foreach($res as $file){
+                $identifier = $file->getIdentifier();
+                $croppedIdentifier = substr($identifier, 10);
+                
+                $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $croppedIdentifier));
+            }
+        }
+    }
+
+    
+
     /**
      * @return DatabaseConnection
      */

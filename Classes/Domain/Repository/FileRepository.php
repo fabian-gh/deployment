@@ -40,4 +40,37 @@ class FileRepository extends AbstractRepository {
         
         return $query->execute();
     }
+    
+    
+    /**
+     * Gibt alle Datensätze zurück, die zum $identifier passen
+     * 
+     * @param string $identifier
+     * @return array<\TYPO3\CMS\Extbase\Persistence\QueryResultInterface>
+     */
+    public function findByIdentifier($identifier){
+        $constraints = array();
+        $query = $this->createQuery();
+        
+        $constraints[] = $query->like('identifier', '/'.$identifier.'%');
+        $constraints[] = $query->equals('deleted', '0');
+        
+        $query->matching($query->logicalAnd($constraints));
+        
+        return $query->execute();
+    }
+    
+    
+    
+    public function findByIdentifierWithoutHeadingSlash($identifier){
+        $constraints = array();
+        $query = $this->createQuery();
+        
+        $constraints[] = $query->like('identifier', '%'.$identifier.'%');
+        $constraints[] = $query->equals('deleted', '0');
+        
+        $query->matching($query->logicalAnd($constraints));
+        
+        return $query->execute();
+    }
 }
