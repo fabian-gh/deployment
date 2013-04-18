@@ -26,7 +26,7 @@ class FileRepository extends AbstractRepository {
      * Gibt alle noch nicht deployten Datensätze zurück
      * 
      * @param string $timestamp
-     * @return array<\TYPO3\CMS\Extbase\Persistence\QueryResultInterface>
+     * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function findYoungerThen($timestamp){
         $constraints = array();
@@ -37,7 +37,7 @@ class FileRepository extends AbstractRepository {
         $constraints[] = $query->equals('deleted', '0');
         
         $query->matching($query->logicalAnd($constraints));
-        
+        DebuggerUtility::var_dump($query->execute());die();
         return $query->execute();
     }
     
@@ -46,7 +46,7 @@ class FileRepository extends AbstractRepository {
      * Gibt alle Datensätze zurück, die zum $identifier passen
      * 
      * @param string $identifier
-     * @return array<\TYPO3\CMS\Extbase\Persistence\QueryResultInterface>
+     * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function findByIdentifier($identifier){
         $constraints = array();
@@ -61,7 +61,13 @@ class FileRepository extends AbstractRepository {
     }
     
     
-    
+    /**
+     * Gibt alle Datensätze zurück, die zum $identifier passen, allerdings
+     * ohen führendes Slash
+     * 
+     * @param string $identifier
+     * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface
+     */
     public function findByIdentifierWithoutHeadingSlash($identifier){
         $constraints = array();
         $query = $this->createQuery();

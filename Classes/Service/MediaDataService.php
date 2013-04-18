@@ -25,7 +25,7 @@ use \TYPO3\CMS\Core\Resource\File;
 class MediaDataService extends AbstractRepository{
     
     /**
-     * @var array 
+     * @var \TYPO3\Deployment\Domain\Model\File
      */
     protected $fileList;
     
@@ -70,36 +70,31 @@ class MediaDataService extends AbstractRepository{
             $this->xmlwriter->writeElement('uid', $file->getUid());
             $this->xmlwriter->writeElement('pid', $file->getPid());
             $this->xmlwriter->writeElement('tstamp', $file->getTstamp());
+            $this->xmlwriter->writeElement('crdate', $file->getCrdate());
             $this->xmlwriter->writeElement('type', $file->getType());
             $this->xmlwriter->writeElement('storage', $file->getStorage());
             $this->xmlwriter->writeElement('identifier', $file->getIdentifier());
             $this->xmlwriter->writeElement('extension', $file->getExtension());
-            $this->xmlwriter->writeElement('mimeType', $file->getMimeType());
+            $this->xmlwriter->writeElement('mime_type', $file->getMimeType());
             $this->xmlwriter->writeElement('name', $file->getName());
+            $this->xmlwriter->writeElement('title', $file->getTitle());
+            $this->xmlwriter->writeElement('sha1', $file->getSha1());
             $this->xmlwriter->writeElement('size', $file->getSize());
-            $this->xmlwriter->writeElement('creationDate', $file->getCreationDate());
-            $this->xmlwriter->writeElement('modificationDate', $file->getModificationDate());
+            $this->xmlwriter->writeElement('creation_date', $file->getCreationDate());
+            $this->xmlwriter->writeElement('modification_date', $file->getModificationDate());
             $this->xmlwriter->writeElement('width', $file->getWidth());
             $this->xmlwriter->writeElement('height', $file->getHeight());
             
+            // FileRefenrece einfügen
             $this->fileReference = $this->getFileReferenceFromTable($file->getUid());
             if($this->fileReference != null){
                 $this->xmlwriter->startElement('fileReference');
-                $this->xmlwriter->writeElement('tablenames', $this->fileReference->getTablenames());
-                $this->xmlwriter->writeElement('fieldname', $this->fileReference->getFieldname());
-                $this->xmlwriter->writeElement('title', $this->fileReference->getTitle());
-                $this->xmlwriter->writeElement('description', $this->fileReference->getDescription());
-                $this->xmlwriter->writeElement('alternative', $this->fileReference->getAlternative());
-                $this->xmlwriter->writeElement('link', $this->fileReference->getLink());
-                $this->xmlwriter->endElement();
-            } else {
-                $this->xmlwriter->startElement('filereference');
-                $this->xmlwriter->writeElement('tablenames');
-                $this->xmlwriter->writeElement('fieldname');
-                $this->xmlwriter->writeElement('title');
-                $this->xmlwriter->writeElement('description');
-                $this->xmlwriter->writeElement('alternative');
-                $this->xmlwriter->writeElement('link');
+                $this->xmlwriter->writeElement('tablenames', ($this->fileReference->getTablenames() == null) ? '' :  $this->fileReference->getTablenames());
+                $this->xmlwriter->writeElement('fieldname', ($this->fileReference->getFieldname() == null) ? '' :  $this->fileReference->getFieldname());
+                $this->xmlwriter->writeElement('title', ($this->fileReference->getTitle() == null) ? null :  $this->fileReference->getTitle());
+                $this->xmlwriter->writeElement('description', ($this->fileReference->getDescription() == null) ? '' :  $this->fileReference->getDescription());
+                $this->xmlwriter->writeElement('alternative', ($this->fileReference->getAlternative() == null) ? '' :  $this->fileReference->getAlternative());
+                $this->xmlwriter->writeElement('link', ($this->fileReference->getLink() == null) ? '' :  $this->fileReference->getLink());
                 $this->xmlwriter->endElement();
             }
             $this->xmlwriter->endElement();

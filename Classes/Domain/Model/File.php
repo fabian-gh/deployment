@@ -17,35 +17,40 @@ namespace TYPO3\Deployment\Domain\Model;
  * @subpackage Domain\Model
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class File extends AbstractModel {
+class File extends AbstractModel {   
     
     /**
-     * @var string 
+     * @var string
      */
     protected $uid;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $pid;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $tstamp;
     
     /**
-     * @var string 
+     * @var string
+     */
+    protected $crdate;
+    
+    /**
+     * @var string
      */
     protected $type;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $storage;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $identifier;
     
@@ -55,40 +60,59 @@ class File extends AbstractModel {
     protected $extension;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $mimeType;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $name;
     
     /**
-     * @var string 
+     * @var string
+     */
+    protected $title;
+    
+    /**
+     * @var string
+     */
+    protected $sha1;
+    
+    /**
+     * @var string
      */
     protected $size;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $creationDate;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $modificationDate;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $width;
     
     /**
-     * @var string 
+     * @var string
      */
-    protected $height; 
+    protected $height;
     
+    /**
+     * @var string
+     */
+    protected $description;
+    
+    /**
+     * @var string
+     */
+    protected $alternative;
     
     /**
      * @return string
@@ -135,6 +159,20 @@ class File extends AbstractModel {
     /**
      * @return string
      */
+    public function getCrdate() {
+        return $this->crdate;
+    }
+
+    /**
+     * @param string $crdate
+     */
+    public function setCrdate($crdate) {
+        $this->crdate = $crdate;
+    }
+
+    /**
+     * @return string
+     */
     public function getType() {
         return $this->type;
     }
@@ -173,7 +211,7 @@ class File extends AbstractModel {
     public function setIdentifier($identifier) {
         $this->identifier = $identifier;
     }
-    
+
     /**
      * @return string
      */
@@ -194,14 +232,14 @@ class File extends AbstractModel {
     public function getMimeType() {
         return $this->mimeType;
     }
-    
+
     /**
      * @param string $mimeType
      */
     public function setMimeType($mimeType) {
         $this->mimeType = $mimeType;
     }
-    
+
     /**
      * @return string
      */
@@ -215,7 +253,35 @@ class File extends AbstractModel {
     public function setName($name) {
         $this->name = $name;
     }
-   
+
+    /**
+     * @return string
+     */
+    public function getTitle() {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title) {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSha1() {
+        return $this->sha1;
+    }
+
+    /**
+     * @param string $sha1
+     */
+    public function setSha1($sha1) {
+        $this->sha1 = $sha1;
+    }
+
     /**
      * @return string
      */
@@ -238,7 +304,7 @@ class File extends AbstractModel {
     }
 
     /**
-     * @param string $creation_date
+     * @param string $creationDate
      */
     public function setCreationDate($creationDate) {
         $this->creationDate = $creationDate;
@@ -252,7 +318,7 @@ class File extends AbstractModel {
     }
 
     /**
-     * @param string $modification_date
+     * @param string $modificationDate
      */
     public function setModificationDate($modificationDate) {
         $this->modificationDate = $modificationDate;
@@ -266,7 +332,6 @@ class File extends AbstractModel {
     }
 
     /**
-     * 
      * @param string $width
      */
     public function setWidth($width) {
@@ -281,11 +346,37 @@ class File extends AbstractModel {
     }
 
     /**
-     * 
      * @param string $height
      */
     public function setHeight($height) {
         $this->height = $height;
     }
-    
+
+    /**
+     * @return string
+     */
+    public function getDescription() {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description) {
+        $this->description = $description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlternative() {
+        return $this->alternative;
+    }
+
+    /**
+     * @param string $alternative
+     */
+    public function setAlternative($alternative) {
+        $this->alternative = $alternative;
+    }
 }

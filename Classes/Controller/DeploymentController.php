@@ -77,13 +77,18 @@ class DeploymentController extends ActionController {
     public function indexAction() {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         
+        // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->media->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
+        
         // ========================================
-        //$date = $this->registry->get('deployment', 'last_deploy', time());
-        //$this->media->setFileList($this->fileRepository->findYoungerThen($date));
-        //$this->media->writeXmlMediaList();
-        //$this->insertDataService->insertMediaDataIntoTable($this->media->readXmlMediaList());
+        // Wenn fertig, dann in deployAction rein
+        // ========================================
+        $date = $this->registry->get('deployment', 'last_deploy', time());
+        $this->media->setFileList($this->fileRepository->findYoungerThen($date));
+        $this->media->writeXmlMediaList();
+        DebuggerUtility::var_dump($this->media->readXmlMediaList());die();
+        $this->insertDataService->insertMediaDataIntoTable($this->media->readXmlMediaList());
         // ========================================
     }
 
@@ -195,5 +200,3 @@ class DeploymentController extends ActionController {
     }
 
 }
-
-?>
