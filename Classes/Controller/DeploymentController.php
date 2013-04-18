@@ -74,8 +74,14 @@ class DeploymentController extends ActionController {
      */
     protected $media;
 
+    
+    /**
+     * IndexAction
+     */
     public function indexAction() {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
+        
+        $this->media->deployResources();
         
         // XML-Dateien die älter als 0.5 Jahre sind löschen
         $this->xmlParserService->deleteOlderFiles();
@@ -83,15 +89,6 @@ class DeploymentController extends ActionController {
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->media->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
-        
-        // ========================================
-        // Wenn fertig, dann in deployAction rein
-        // ========================================
-        $date = $this->registry->get('deployment', 'last_deploy', time());
-        $this->media->setFileList($this->fileRepository->findYoungerThen($date));
-        $this->media->writeXmlMediaList();
-        $this->insertDataService->insertMediaDataIntoTable($this->media->readXmlMediaList());
-        // ========================================
     }
 
     
@@ -145,6 +142,7 @@ class DeploymentController extends ActionController {
         $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
         $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/');
         $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/');
+        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource/');
         
         foreach($exFold as $ergkey => $ergvalue){
             if(!$ergvalue){
@@ -160,13 +158,24 @@ class DeploymentController extends ActionController {
                     case 2:
                         GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/');
                     break;
+                
+                    case 3:
+                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource/');
+                    break;
                 }
             }
         }
+        
+        // Mediendaten erstellen
+        $date = $this->registry->get('deployment', 'last_deploy', time());
+        $mediaData = $this->fileRepository->findYoungerThen($date);
+        $this->media->setFileList($mediaData);
+        $this->media->writeXmlMediaList();
 
         // Deploydaten setzen und XML erstellen
         $this->xmlParserService->setDeployData(array_unique($deployData));
         $this->xmlParserService->writeXML();
+        //$this->media->deployResources();
 
         $this->flashMessageContainer->add('Daten wurden erstellt.', '', FlashMessage::OK);
         $this->redirect('index');
@@ -179,6 +188,11 @@ class DeploymentController extends ActionController {
     public function deployAction() {
         // letztes Deployment-Datum lesen
         $tstamp = $this->registry->get('deployment', 'last_deploy');
+        
+        //Mediendaten lesen
+        $mediaData = $this->media->readXmlMediaList();
+        $this->insertDataService->insertMediaDataIntoTable($mediaData);
+        
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
 
@@ -198,7 +212,6 @@ class DeploymentController extends ActionController {
             $this->flashMessageContainer->add('Es ist ein Fehler aufgetreten', 'Dei Daten konnten nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', FlashMessage::ERROR);
             $this->redirect('index');
         }
-        
     }
-
+    
 }

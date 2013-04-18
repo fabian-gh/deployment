@@ -236,7 +236,7 @@ class InsertDataService{
                     $con->exec_INSERTquery($table, $data);
                 }
             }
-        }die();
+        }
     }
     
     

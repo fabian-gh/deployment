@@ -253,6 +253,35 @@ class MediaDataService extends AbstractRepository{
     }
     
     
+    
+    public function deployResources(){
+        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
+        
+        $data = $this->readXmlMediaList();
+        
+        foreach($data as $resource){
+            $split = explode('/', $resource['identifier']);
+            $file = array_pop($split);
+
+            // Pfad wieder zusammensetzen
+            $folder = '';
+            foreach($split as $sp){
+                if($sp != '' && $sp != 'fileadmin'){
+                    $folder = $folder.'/'.$sp;
+                }
+            }
+            
+            // erste Slash entfernen
+            $fold = substr($folder, 1);
+            DebuggerUtility::var_dump($fold);
+            GeneralUtility::mkdir_deep($path.'/'.$fold);
+            
+            // TODO: Dateien einfügen
+        }
+        die();
+    }
+    
+    
     /**
      * @return array
      */
