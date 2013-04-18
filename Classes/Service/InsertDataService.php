@@ -233,7 +233,6 @@ class InsertDataService{
                     }
                     // dabei die uid entfernen, da dies noch die alte ist
                     unset($data['uid']);
-                    DebuggerUtility::var_dump($data);
                     $con->exec_INSERTquery($table, $data);
                 }
             }

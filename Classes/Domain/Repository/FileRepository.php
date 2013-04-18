@@ -37,7 +37,7 @@ class FileRepository extends AbstractRepository {
         $constraints[] = $query->equals('deleted', '0');
         
         $query->matching($query->logicalAnd($constraints));
-        DebuggerUtility::var_dump($query->execute());die();
+        
         return $query->execute();
     }
     

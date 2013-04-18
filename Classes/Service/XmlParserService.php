@@ -306,6 +306,49 @@ class XmlParserService {
 
         return (int)$pid['pid'];
     }
+    
+    
+    /**
+     * Löscht alle XML-Dateien und Ordner, die älter als ein halbes Jahr sind
+     */
+    public function deleteOlderFiles(){
+        $fileArr = $split = $dateFolder = array();
+
+        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/', '', true);
+        
+        if ($filesAndFolders) {
+            // Dateipfad ausplitten
+            foreach ($filesAndFolders as $faf) {
+                $exFaf[] = explode('/', $faf);
+            }
+            
+            // pro Ordner/Datum ein Array mit allen Dateinamen darin
+            foreach ($exFaf as $item) {
+                if ($item[7] != '' && $item[8] != '') {
+                    $dateFolder[$item[7]][] = $item[8];
+                }
+            }
+            
+            // Datum splitten und löschen
+            foreach($dateFolder as $datekey => $files){
+                $split = explode('_', $datekey);
+                $splitdate = mktime(0, 0, 0, $split[1], $split[2], $split[0]);
+                
+                // falls Ordner älter als halbes Jahr
+                if($splitdate+(6*30*24*60*60) < time()){
+                    // dann Dateien in Ordner löschen
+                    foreach($files as $filevalue){
+                        $splitFile = explode('_', $filevalue);
+                        $folder = ($splitFile[1] == 'changes.xml') ? 'database' : 'media';
+                        
+                        unlink(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$datekey.'/'.$filevalue);
+                    }
+                    // Ordner selbst löschen
+                    rmdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$datekey);
+                }
+            }
+        }
+    }
 
     
     /**

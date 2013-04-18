@@ -77,6 +77,9 @@ class DeploymentController extends ActionController {
     public function indexAction() {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         
+        // XML-Dateien die älter als 0.5 Jahre sind löschen
+        $this->xmlParserService->deleteOlderFiles();
+        
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->media->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
@@ -87,7 +90,6 @@ class DeploymentController extends ActionController {
         $date = $this->registry->get('deployment', 'last_deploy', time());
         $this->media->setFileList($this->fileRepository->findYoungerThen($date));
         $this->media->writeXmlMediaList();
-        DebuggerUtility::var_dump($this->media->readXmlMediaList());die();
         $this->insertDataService->insertMediaDataIntoTable($this->media->readXmlMediaList());
         // ========================================
     }
