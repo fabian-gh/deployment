@@ -256,7 +256,10 @@ class MediaDataService extends AbstractRepository{
     }
     
     
-    
+    /**
+     * Dateien aus der sys_file-Tabelle in den Deployment-Ordner kopieren.
+     * Falls nötig, dann vorher die Ordnerstruktur erstellen.
+     */
     public function deployResources(){
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
