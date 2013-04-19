@@ -14,7 +14,7 @@ namespace TYPO3\Deployment\Service;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
-use \TYPO3\CMS\Core\Resource\File;
+use \TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /**
  * MediaDataService
@@ -124,6 +124,7 @@ class MediaDataService extends AbstractRepository{
     public function readXmlMediaList(){
         $arrcount = 0;
         $fileArr = $dateFolder = $contentArr = $exFaf = array();
+        /** @var \TYPO3\CMS\Core\Registry $registry */
         $registry = GeneralUtility::makeInstance('t3lib_Registry');
         $timestamp = $registry->get('deployment', 'last_deploy', time());
         $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/');
@@ -187,7 +188,7 @@ class MediaDataService extends AbstractRepository{
     protected function getFileReferenceFromTable($uid){
         /** @var \TYPO3\Deployment\Domain\Repository\FileReferenceRepository $fileRefObj */
         $fileRefObj = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileReferenceRepository');
-        
+        /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $res */
         $res = $fileRefObj->findByUidForeign($uid);
 
         return ($res != null) ? $res[0] : null;
@@ -241,7 +242,9 @@ class MediaDataService extends AbstractRepository{
         }
         
         foreach($newFileArr as $file){
+            /** @var \TYPO3\Deployment\Domain\Repository\FileRepository $fileRef */
             $fileRef = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
+            /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $result */
             $result = $fileRef->findByIdentifier($file);
             
             if($result->getFirst() == null){
@@ -255,13 +258,17 @@ class MediaDataService extends AbstractRepository{
     
     
     public function deployResources(){
+        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
+        $resFact = ResourceFactory::getInstance();
         $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
         
         $data = $this->readXmlMediaList();
         
         foreach($data as $resource){
-            $split = explode('/', $resource['identifier']);
-            $file = array_pop($split);
+            /** @var \TYPO3\CMS\Core\Resource\File $file */
+            $file = $resFact->getFileObject($resource['uid']);
+            $split = explode('/', $file->getIdentifier());
+            array_pop($split);
 
             // Pfad wieder zusammensetzen
             $folder = '';
@@ -271,12 +278,22 @@ class MediaDataService extends AbstractRepository{
                 }
             }
             
-            // erste Slash entfernen
+            // erste Slash entfernen und Ordnerstruktur erstellen
             $fold = substr($folder, 1);
-            DebuggerUtility::var_dump($fold);
-            GeneralUtility::mkdir_deep($path.'/'.$fold);
+            if(!is_dir($path.'/'.$fold)){
+                GeneralUtility::mkdir_deep($path.'/'.$fold);
+            }
             
-            // TODO: Dateien einfügen
+            // Nur Dateien <= 10 MB kopieren 
+            if($file->getSize() <= 10000000){
+                /** @var \TYPO3\CMS\Core\Resource\Folder $folderObj */
+                $folderObj = $resFact->getObjectFromCombinedIdentifier('0:/fileadmin/'.$fold);
+                
+                if(is_object($folderObj)){
+                    // TODO: Permission Fehler beseitigen
+                    $file->copyTo($folderObj, null, 'overrideExistingFile');
+                }
+            }
         }
         die();
     }
