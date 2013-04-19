@@ -297,10 +297,49 @@ class MediaDataService extends AbstractRepository{
                     $file->copyTo($folderObj, null, 'overrideExistingFile');
                 }
             }
+        }die();
+    }
+    
+    
+    /**
+     * Prüft ob die mediendaten schon existieren, falls nicht dann werden Sie 
+     * an die richtige Stelle eingefügt
+     */
+    public function checkIfFileExists(){
+        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
+        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
+        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
+        $resFact = ResourceFactory::getInstance();
+        /** @var \TYPO3\Deployment\Domain\Repository\FileRepository $fileRep */
+        $fileRep = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
+        /** @var \TYPO3\CMS\Extbase\Persistence\Generic\QueryResult $result */
+        $result = $fileRep->findAll();
+        
+        foreach($result as $res){
+            /** @var \TYPO3\CMS\Core\Resource\File $file */
+            $file = $resFact->getFileObject($res->getUid());
+            $identifier = $file->getIdentifier();
+            
+            if(!file_exists($path.$identifier)){
+                if(file_exists($resPath.$identifier)){
+                    $split = explode('/', $identifier);
+                    array_pop($split);
+                    $folder = '';
+                    foreach($split as $sp){
+                        if($sp != '' && $sp != 'fileadmin'){
+                            $folder = $folder.'/'.$sp;
+                        }
+                    }
+                    $fold = substr($folder, 1);
+                    $folderObj = $resFact->getObjectFromCombinedIdentifier('0:/fileadmin'.$fold);
+                    $file->copyTo($folderObj, null, 'overrideExistingFile');
+                }
+            }
         }
         die();
     }
-    
+
+
     
     /**
      * @return array
