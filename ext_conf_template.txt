@@ -1,0 +1,2 @@
+# cat=Backend; type=text; label=Deployment Tables: The list of deplyoment tables
+deploymentTables = pages,tt_content,sys_file,sys_file_reference

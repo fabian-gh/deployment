@@ -257,12 +257,13 @@ class MediaDataService extends AbstractRepository{
     
     
     /**
-     * Dateien aus der sys_file-Tabelle in den Deployment-Ordner kopieren.
-     * Falls nötig, dann vorher die Ordnerstruktur erstellen.
+     * Dateien aus der sys_file-Tabelle holen und in den Deployment-Ordner kopieren.
+     * Falls nötig wird vorher die Ordnerstruktur erstellen.
      */
     public function deployResources(){
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
+        $fileAdminPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
         $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
         
         $data = $this->readXmlMediaList();
@@ -271,7 +272,7 @@ class MediaDataService extends AbstractRepository{
             /** @var \TYPO3\CMS\Core\Resource\File $file */
             $file = $resFact->getFileObject($resource['uid']);
             $split = explode('/', $file->getIdentifier());
-            array_pop($split);
+            $filename = array_pop($split);
 
             // Pfad wieder zusammensetzen
             $folder = '';
@@ -289,63 +290,31 @@ class MediaDataService extends AbstractRepository{
             
             // Nur Dateien <= 10 MB kopieren 
             if($file->getSize() <= 10000000){
-                /** @var \TYPO3\CMS\Core\Resource\Folder $folderObj */
-                $folderObj = $resFact->getObjectFromCombinedIdentifier('0:/fileadmin/'.$fold);
-                
-                if(is_object($folderObj)){
-                    // TODO: Permission Fehler beseitigen
-                    $file->copyTo($folderObj, null, 'overrideExistingFile');
-                }
+                // Dateien auf Dateiebene kopieren
+                copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
             }
         }
     }
     
     
-    /**
-     * Prüft ob die mediendaten schon existieren, falls nicht dann werden Sie 
-     * an die richtige Stelle eingefügt
-     */
     public function checkIfFileExists(){
-        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
-        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
-        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
-        $resFact = ResourceFactory::getInstance();
-        /** @var \TYPO3\Deployment\Domain\Repository\FileRepository $fileRep */
-        $fileRep = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
-        /** @var \TYPO3\CMS\Extbase\Persistence\Generic\QueryResult $result */
-        $result = $fileRep->findAll();
+        /**
+         * + Dateien aus deplyoment/resources holen und mit Dateien im fileadmin (readFilesInFileadmin) vgl.
+         * - Wenn diese nicht existieren dann kopieren (evtl. mit rsync, ohne File-Obj.)
+         * - Diese Methode vor der Indizierung in der indexAction ausführen lassen
+         */
+        $resourceFiles = $newArr = array();
+        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/';
+        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource/';
         
-        foreach($result as $res){
-            /** @var \TYPO3\CMS\Core\Resource\File $file */
-            $file = $resFact->getFileObject($res->getUid());
-            $identifier = $file->getIdentifier();
-            
-            if(!file_exists($path.$identifier)){
-                if(file_exists($resPath.$identifier)){
-                    $split = explode('/', $identifier);
-                    array_pop($split);
-                    $folder = '';
-                    foreach($split as $sp){
-                        if($sp != '' && $sp != 'fileadmin'){
-                            $folder = $folder.'/'.$sp;
-                        }
-                    }
-                    $fold = substr($folder, 1);
-                    $folderObj = $resFact->getObjectFromCombinedIdentifier('0:/fileadmin'.$fold);
-                    $file->copyTo($folderObj, null, 'overrideExistingFile');
-                }
-            }
-        }
+        // Dateilisten 
+        $fileadminFiles = $this->readFilesInFileadmin();
+        $fileList = GeneralUtility::getAllFilesAndFoldersInPath($resourceFiles, $resPath);
+        
+        // TODO: Dateien vergleichen, evtl. vorher kürzen
+        
     }
     
-    
-    
-    public function checkIfFileExists2(){
-        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
-        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
-    }
-
-
     
     /**
      * @return array
@@ -419,3 +388,45 @@ class MediaDataService extends AbstractRepository{
     }
     
 }
+
+
+
+
+
+
+    /**
+     * Prüft ob die mediendaten schon existieren, falls nicht dann werden Sie 
+     * an die richtige Stelle eingefügt
+     */
+//    public function checkIfFileExists(){
+//        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
+//        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
+//        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
+//        $resFact = ResourceFactory::getInstance();
+//        /** @var \TYPO3\Deployment\Domain\Repository\FileRepository $fileRep */
+//        $fileRep = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
+//        /** @var \TYPO3\CMS\Extbase\Persistence\Generic\QueryResult $result */
+//        $result = $fileRep->findAll();
+//        
+//        foreach($result as $res){
+//            /** @var \TYPO3\CMS\Core\Resource\File $file */
+//            $file = $resFact->getFileObject($res->getUid());
+//            $identifier = $file->getIdentifier();
+//            
+//            if(!file_exists($path.$identifier)){
+//                if(file_exists($resPath.$identifier)){
+//                    $split = explode('/', $identifier);
+//                    array_pop($split);
+//                    $folder = '';
+//                    foreach($split as $sp){
+//                        if($sp != '' && $sp != 'fileadmin'){
+//                            $folder = $folder.'/'.$sp;
+//                        }
+//                    }
+//                    $fold = substr($folder, 1);
+//                    $folderObj = $resFact->getObjectFromCombinedIdentifier('0:/fileadmin'.$fold);
+//                    $file->copyTo($folderObj, null, 'overrideExistingFile');
+//                }
+//            }
+//        }
+//   }
