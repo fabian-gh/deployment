@@ -84,7 +84,7 @@ class DeploymentController extends ActionController {
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->media->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
-        $this->media->checkIfFileExists();
+        $this->media->checkIfFileExists2();
         
         // XML-Dateien die älter als 0.5 Jahre sind löschen
         //$this->xmlParserService->deleteOlderFiles();

@@ -297,7 +297,7 @@ class MediaDataService extends AbstractRepository{
                     $file->copyTo($folderObj, null, 'overrideExistingFile');
                 }
             }
-        }die();
+        }
     }
     
     
@@ -336,6 +336,13 @@ class MediaDataService extends AbstractRepository{
                 }
             }
         }
+    }
+    
+    
+    
+    public function checkIfFileExists2(){
+        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
+        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
     }
 
 
