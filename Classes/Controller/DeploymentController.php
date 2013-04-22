@@ -87,7 +87,7 @@ class DeploymentController extends ActionController {
         $this->media->checkIfFileExists();
         
         // XML-Dateien die älter als 0.5 Jahre sind löschen
-        $this->xmlParserService->deleteOlderFiles();
+        //$this->xmlParserService->deleteOlderFiles();
         
         // =================================
         // Später an richtige Stelle verschieben

@@ -1,47 +1,21 @@
 /**
  * Configuration / Persistence only
  */
-plugin.tx_deployment.persistence{
-    classes{
-        TYPO3\Deployment\Domain\Model\Log{
-            mapping{
-                tableName = sys_log
-            }
-        }
+plugin.tx_deployment.persistence.classes{
+    TYPO3\Deployment\Domain\Model\Log{
+        mapping.tableName = sys_log
+    }
 
-        TYPO3\Deployment\Domain\Model\History{
-           mapping{
-                tableName = sys_history
-            } 
-        }
+    TYPO3\Deployment\Domain\Model\History{
+       mapping.tableName = sys_history
+    }
 
-        TYPO3\Deployment\Domain\Model\File{
-            mapping{
-                tableName = sys_file
-                columns{
-                    uid.mapOnProperty = uid
-                    pid.mapOnProperty = pid
-                    tstamp.mapOnProperty = tstamp
-                    type.mapOnProperty = type
-                    storage.mapOnProperty = storage
-                    identifier.mapOnProperty = identifier
-                    extension.mapOnProperty = extension
-                    mime_type.mapOnProperty = mimeType
-                    name.mapOnProperty = name
-                    size.mapOnProperty = size
-                    creation_date.mapOnProperty = creationDate
-                    modification_date.mapOnProperty = modificationDate
-                    width.mapOnProperty = width
-                    height.mapOnProperty = height
-                }
-            }
-        }
+    TYPO3\Deployment\Domain\Model\File{
+        mapping.tableName = sys_file
+    }
 
-        TYPO3\Deployment\Domain\Model\FileReference{
-            mapping{
-                tableName = sys_file_reference
-            }
-        }
+    TYPO3\Deployment\Domain\Model\FileReference{
+        mapping.tableName = sys_file_reference
     }
 }
 

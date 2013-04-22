@@ -336,7 +336,6 @@ class MediaDataService extends AbstractRepository{
                 }
             }
         }
-        die();
     }
 
 

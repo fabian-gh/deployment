@@ -20,6 +20,7 @@ $fields = array(
     'mime_type',
     'name',
     'size',
+    'sha1',
     'creation_date',
     'modification_date',
     'width',
