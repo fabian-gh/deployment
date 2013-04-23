@@ -129,7 +129,7 @@ class MediaDataService extends AbstractRepository{
      */
     public function readXmlMediaList(){
         $arrcount = 0;
-        $fileArr = $dateFolder = $contentArr = $exFaf = array();
+        $fileArr = $dateFolder = $contentArr = $exFaf = $splittedDateTime = array();
         /** @var \TYPO3\CMS\Core\Registry $registry */
         $registry = GeneralUtility::makeInstance('t3lib_Registry');
         $timestamp = $registry->get('deployment', 'last_deploy', time());
@@ -138,18 +138,17 @@ class MediaDataService extends AbstractRepository{
         if ($filesAndFolders) {
             // Dateipfad ausplitten
             foreach ($filesAndFolders as $faf) {
-                $exFaf[] = explode('/', $faf);
+                $exFaf[] = str_replace('media/', '', strstr($faf, 'media'));
             }
             
-            // Initialwert
-            $initDate = $exFaf[0][7];
+            // Datum und Uhrzeit splitten
+            foreach($exFaf as $dateTime){
+                $splittedDateTime[] = explode('/', $dateTime);
+            }
+            
             // pro Ordner/Datum ein Array mit allen Dateinamen darin
-            foreach ($exFaf as $item) {
-                if ($initDate == $item[7]) {
-                    $dateFolder[$initDate][] = $item[8];
-                } else {
-                    $dateFolder[$item[7]][] = $item[8];
-                }
+            foreach($splittedDateTime as $dateTime){
+                $dateFolder[$dateTime[0]][] = $dateTime[1];
             }
         }
         

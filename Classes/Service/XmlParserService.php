@@ -127,18 +127,17 @@ class XmlParserService {
         if ($filesAndFolders) {
             // Dateipfad ausplitten
             foreach ($filesAndFolders as $faf) {
-                $exFaf[] = explode('/', $faf);
+                $exFaf[] = str_replace('database/', '', strstr($faf, 'database'));
             }
             
-            // Initialwert
-            $initDate = $exFaf[0][7];
+            // Datum und Uhrzeit splitten
+            foreach($exFaf as $dateTime){
+                $splittedDateTime[] = explode('/', $dateTime);
+            }
+            
             // pro Ordner/Datum ein Array mit allen Dateinamen darin
-            foreach ($exFaf as $item) {
-                if ($initDate == $item[7]) {
-                    $dateFolder[$initDate][] = $item[8];
-                } else {
-                    $dateFolder[$item[7]][] = $item[8];
-                }
+            foreach($splittedDateTime as $dateTime){
+                $dateFolder[$dateTime[0]][] = $dateTime[1];
             }
         }
 
