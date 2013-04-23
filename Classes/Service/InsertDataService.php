@@ -24,7 +24,24 @@ use \TYPO3\CMS\Core\Database\DatabaseConnection;
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
 class InsertDataService{
+    
+    /**
+     * Diese Methode vergleicht die UUID's der Datensätze und modifiziert die
+     * Datensätze anhand dieser.
+     * 
+     * @param array $dataArr
+     */
+    public function newInsertDataIntoTable($dataArr){
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        
+        if($con->isConnected()){
+            DebuggerUtility::var_dump($dataArr);
+        }
+        die();
+    }
 
+    
     /**
      * Fügt Daten in eine Tabelle ein. Unabhängig von der Tabelle.
      * Falls ein Datensatz unter einder anderen ID eingetragen sein 
@@ -35,6 +52,7 @@ class InsertDataService{
      * 
      * @param array $dataArr
      * @return boolean
+     * @depracated
      */
     public function insertDataIntoTable($dataArr) {
         $data = $fields = $insertParams = $updateParams = $updateParams2 = $alreadyExists = $assump = array();
@@ -198,6 +216,7 @@ class InsertDataService{
      * Fügt die gelesenen XML-Daten in die sys_file-Tabelle der Fremddatenbank ein
      * 
      * @param array $dataArr
+     * @depracated
      */
     public function insertMediaDataIntoTable($dataArr) {
         $table = 'sys_file';

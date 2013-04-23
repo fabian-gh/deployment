@@ -279,6 +279,7 @@ class XmlParserService {
                     $this->historyData->setRecuid($his->getRecuid());
                     $this->historyData->setTablename($his->getTablename());
                     $this->historyData->setTstamp($his->getTstamp());
+                    $this->historyData->setUuid('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 
                     $hisData[] = $this->historyData;
                 }
