@@ -33,7 +33,7 @@ class DatabaseFields implements CheckTheDatabaseHookInterface {
     protected $sqlUuidTemplate = '
 
 CREATE TABLE ###TABLE### (
-	uuid text(40) DEFAULT \'0\' NOT NULL
+	uuid text(40) NOT NULL
 );
 
 ';
@@ -74,7 +74,7 @@ CREATE TABLE ###TABLE### (
         foreach ($tables as $table) {
             $return .= str_replace('###TABLE###', $table, $this->sqlUuidTemplate);
         }
-
+        
         return $return;
     }
 }

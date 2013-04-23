@@ -13,8 +13,9 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
-use \TYPO3\Deployment\Xclass\DatabaseConnection;
+//use \TYPO3\Deployment\Xclass\DatabaseConnection;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
+use \TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
  * InsertDataService
@@ -240,11 +241,13 @@ class InsertDataService{
     }
     
     
-    
+    /**
+     * Nicht indizierte Daten in Tabelle eintragen
+     * 
+     * @param array $fileArr
+     */
     public function processNotIndexedFiles($fileArr){
         $con = $this->getDatabase();
-        $con->debugOutput = true;
-        $con->debug_lastBuiltQuery;
         
         foreach($fileArr as $file){
             $resFact = ResourceFactory::getInstance();
@@ -252,13 +255,6 @@ class InsertDataService{
             // hier werden die Daten selbststädnig indexiert, 
             // unabhängig davon welche Methode aufgerufen wird
             $res->isIndexed();
-            
-            // '/fileadmin' aus dem identifier entfernen --> funktioniert nicht
-            /*if($res->isIndexed()){
-                $identifier = $res->getProperty('identifier');
-                $croppedIdentifier = substr($identifier, 10);
-                $res->updateProperties(array('identifier' => $croppedIdentifier));
-            }*/
         }
         
         if($con->isConnected()){
@@ -275,9 +271,58 @@ class InsertDataService{
     }
 
     
-
     /**
-     * @return DatabaseConnection
+     * Prüft ob die Spalte UUID existiert. Wenn dies der Fall ist, dann überprüfen
+     * ob hier Werte gesetzt sind. Falls nein, dann Werte generieren.
+     */
+    public function checkIfUuidExists(){
+        $tablefields = $results = $tables = $inputArr = array();
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        
+        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
+        $tables = GeneralUtility::trimExplode(',', $configuration['deploymentTables'], TRUE);
+        
+        if($con->isConnected()){
+            foreach($tables as $table){
+                $tablefields[$table] = $con->admin_get_fields($table);
+            }
+        } else {
+            $tablefields = null;
+        }
+        
+        if($tablefields != null){
+            foreach($tablefields as $tablekey => $fields){
+                if(array_key_exists('uuid', $fields)){
+                    /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $result */
+                    $results[$tablekey] = $con->exec_SELECTgetRows('uid, uuid', $tablekey, "uuid=''");
+                }
+            }
+            
+            foreach($results as $tabkey => $tabval){
+                foreach($tabval as $value){
+                    $inputArr = array('uuid' => $this->generateUuid());
+                    $con->exec_UPDATEquery($tabkey, 'uid='.$value['uid'], $inputArr);
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * Generiert eine UUID
+     *
+     * @return string
+     */
+    private function generateUuid() {
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
+                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, 
+                mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
+    }
+
+
+        /**
+     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
      */
     protected function getDatabase() {
         return $GLOBALS['TYPO3_DB'];

@@ -81,14 +81,14 @@ class DeploymentController extends ActionController {
     public function indexAction() {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         
-        $this->media->readXmlMediaList();
+        $this->insertDataService->checkIfUuidExists();
         
         // Noch nicht indizierte Dateien indizieren
-        $notIndexed = $this->media->getNotIndexedFiles();
+        /*$notIndexed = $this->media->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
         
         // XML-Dateien die älter als 0.5 Jahre sind löschen
-        $this->xmlParserService->deleteOlderFiles();
+        $this->xmlParserService->deleteOlderFiles();*/
     }
 
     
