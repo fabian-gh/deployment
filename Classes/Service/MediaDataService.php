@@ -25,6 +25,12 @@ use \TYPO3\CMS\Core\Resource\ResourceFactory;
 class MediaDataService extends AbstractRepository{
     
     /**
+     * max file size in Bytes
+     * @var int 
+     */
+    protected $maxFileSize = 10000000;
+    
+    /**
      * @var \TYPO3\Deployment\Domain\Model\File
      */
     protected $fileList;
@@ -258,7 +264,7 @@ class MediaDataService extends AbstractRepository{
     
     /**
      * Dateien aus der sys_file-Tabelle holen und in den Deployment-Ordner kopieren.
-     * Falls nötig wird vorher die Ordnerstruktur erstellen.
+     * Falls nötig, vorher die Ordnerstruktur erstellen.
      */
     public function deployResources(){
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
@@ -288,22 +294,20 @@ class MediaDataService extends AbstractRepository{
                 GeneralUtility::mkdir_deep($path.'/'.$fold);
             }
             
-            // Nur Dateien <= 10 MB kopieren 
-            if($file->getSize() <= 10000000){
-                // Dateien auf Dateiebene kopieren
+            // Nur Dateien <= 10 MB auf Dateiebene kopieren 
+            if($file->getSize() <= $this->maxFileSize){
                 copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
             }
         }
     }
     
     
+    /**
+     * Prüft ob die Dateien im resource-Ordner innerhalb des fileadmins vorhanden
+     * sind. Falls nein werden diese kopiert.
+     */
     public function checkIfFileExists(){
-        /**
-         * + Dateien aus deplyoment/resources holen und mit Dateien im fileadmin (readFilesInFileadmin) vgl.
-         * - Wenn diese nicht existieren dann kopieren (evtl. mit rsync, ohne File-Obj.)
-         * - Diese Methode vor der Indizierung in der indexAction ausführen lassen
-         */
-        $resourceFiles = $newArr = array();
+        $resourceFiles = $newArr = $newFileList = array();
         $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/';
         $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource/';
         
@@ -311,10 +315,23 @@ class MediaDataService extends AbstractRepository{
         $fileadminFiles = $this->readFilesInFileadmin();
         $fileList = GeneralUtility::getAllFilesAndFoldersInPath($resourceFiles, $resPath);
         
-        // TODO: Dateien vergleichen, evtl. vorher kürzen
+        // Pfade kürzen und in Array abspeichern
+        foreach($fileList as $paths){
+            $newFileList[] = str_replace('resource/', '', strstr($paths, 'resource'));
+        }
         
+        // Unterschiede ermitteln
+        $diffFiles = array_diff($newFileList, $fileadminFiles);
+        
+        // Dateien aus resource ind fileadmin kopieren
+        foreach($diffFiles as $file){
+            if(!file_exists($path.'/'.$file)){
+                copy($resPath.$file, $path.'/'.$file);
+            }
+        }
     }
     
+    // ============================ Getter & Setter ================================
     
     /**
      * @return array
@@ -323,15 +340,13 @@ class MediaDataService extends AbstractRepository{
         return $this->fileList;
     }
 
-    
     /**
      * @param array $fileList
      */
     public function setFileList($fileList) {
         $this->fileList = $fileList;
     }
-    
-    
+
     /**
      * @return \TYPO3\Deployment\Domain\Model\FileReference
      */
@@ -339,14 +354,12 @@ class MediaDataService extends AbstractRepository{
         return $this->fileReference;
     }
 
-    
     /**
      * @param \TYPO3\Deployment\Domain\Model\FileReference $fileReference
      */
     public function setFileReference($fileReference) {
         $this->fileReference = $fileReference;
     }
-    
     
     /**
      * @return \XMLWriter
@@ -355,7 +368,6 @@ class MediaDataService extends AbstractRepository{
         return $this->xmlwriter;
     }
 
-    
     /**
      * @param \XmlWriter $xmlwriter
      */
@@ -363,7 +375,6 @@ class MediaDataService extends AbstractRepository{
         $this->xmlwriter = $xmlwriter;
     }
 
-    
     /**
      * @return \SimpleXml
      */
@@ -371,7 +382,6 @@ class MediaDataService extends AbstractRepository{
         return $this->xmlreader;
     }
 
-    
     /**
      * @param \SimpleXml $xmlreader
      */
@@ -379,6 +389,19 @@ class MediaDataService extends AbstractRepository{
         $this->xmlreader = $xmlreader;
     }
     
+    /**
+     * @return int
+     */
+    public function getMaxFileSize() {
+        return $this->maxFileSize;
+    }
+
+    /**
+     * @param int $maxFileSize
+     */
+    public function setMaxFileSize($maxFileSize) {
+        $this->maxFileSize = $maxFileSize;
+    }
     
     /**
      * @return DatabaseConnection
@@ -386,47 +409,4 @@ class MediaDataService extends AbstractRepository{
     protected function getDatabase() {
         return $GLOBALS['TYPO3_DB'];
     }
-    
 }
-
-
-
-
-
-
-    /**
-     * Prüft ob die mediendaten schon existieren, falls nicht dann werden Sie 
-     * an die richtige Stelle eingefügt
-     */
-//    public function checkIfFileExists(){
-//        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
-//        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
-//        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
-//        $resFact = ResourceFactory::getInstance();
-//        /** @var \TYPO3\Deployment\Domain\Repository\FileRepository $fileRep */
-//        $fileRep = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
-//        /** @var \TYPO3\CMS\Extbase\Persistence\Generic\QueryResult $result */
-//        $result = $fileRep->findAll();
-//        
-//        foreach($result as $res){
-//            /** @var \TYPO3\CMS\Core\Resource\File $file */
-//            $file = $resFact->getFileObject($res->getUid());
-//            $identifier = $file->getIdentifier();
-//            
-//            if(!file_exists($path.$identifier)){
-//                if(file_exists($resPath.$identifier)){
-//                    $split = explode('/', $identifier);
-//                    array_pop($split);
-//                    $folder = '';
-//                    foreach($split as $sp){
-//                        if($sp != '' && $sp != 'fileadmin'){
-//                            $folder = $folder.'/'.$sp;
-//                        }
-//                    }
-//                    $fold = substr($folder, 1);
-//                    $folderObj = $resFact->getObjectFromCombinedIdentifier('0:/fileadmin'.$fold);
-//                    $file->copyTo($folderObj, null, 'overrideExistingFile');
-//                }
-//            }
-//        }
-//   }
