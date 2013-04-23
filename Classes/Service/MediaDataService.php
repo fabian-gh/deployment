@@ -50,14 +50,6 @@ class MediaDataService extends AbstractRepository{
      */
     protected $xmlreader;
     
-    
-    /**
-     * Constructor
-     */
-    protected function __construct() {
-        $this->setMaxFileSize();
-    }
-    
 
     /**
      * Schreibt eine XML-Datei mit allen im Fileadmin befindlichen Dateien, 
@@ -408,7 +400,7 @@ class MediaDataService extends AbstractRepository{
      */
     public function setMaxFileSize() {
         $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-        $this->maxFileSize = $configuration['maxFileSize'];
+        (!empty($configuration)) ? $this->maxFileSize = $configuration['maxFileSize'] : $this->maxFileSize = 10000000;
     }
     
     /**
