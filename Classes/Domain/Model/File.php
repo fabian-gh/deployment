@@ -115,6 +115,12 @@ class File extends AbstractModel {
     protected $alternative;
     
     /**
+     * @var string
+     */
+    protected $uuid;
+    
+    
+    /**
      * @return string
      */
     public function getUid() {
@@ -378,5 +384,19 @@ class File extends AbstractModel {
      */
     public function setAlternative($alternative) {
         $this->alternative = $alternative;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getUuid() {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uuid
+     */
+    public function setUuid($uuid) {
+        $this->uuid = $uuid;
     }
 }

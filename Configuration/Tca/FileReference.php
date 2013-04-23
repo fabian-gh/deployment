@@ -22,7 +22,8 @@ $fields = array(
     'title',
     'description',
     'alternative',
-    'link'
+    'link',
+    'uuid'
 );
 
 

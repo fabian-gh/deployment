@@ -54,7 +54,13 @@ class HistoryData extends AbstractModel {
      * @var \DateTime
      */
     protected $tstamp;
+    
+    /**
+     * @var string
+     */
+    protected $uuid;
 
+    
     /**
      * @return string
      */
@@ -153,6 +159,17 @@ class HistoryData extends AbstractModel {
         $this->tstamp = $tstamp;
     }
     
-}
+    /**
+     * @return string
+     */
+    public function getUuid() {
+        return $this->uuid;
+    }
 
-?>
+    /**
+     * @param string $uuid
+     */
+    public function setUuid($uuid) {
+        $this->uuid = $uuid;
+    }    
+}

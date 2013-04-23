@@ -68,6 +68,11 @@ class FileReference extends AbstractModel {
      * @var string 
      */
     protected $link;
+    
+    /**
+     * @var string
+     */
+    protected $uuid;
 
 
     /**
@@ -208,5 +213,19 @@ class FileReference extends AbstractModel {
      */
     public function setLink($link) {
         $this->link = $link;
-    }   
+    }
+    
+    /**
+     * @return string
+     */
+    public function getUuid() {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uuid
+     */
+    public function setUuid($uuid) {
+        $this->uuid = $uuid;
+    }
 }

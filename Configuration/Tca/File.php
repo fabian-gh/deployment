@@ -24,7 +24,8 @@ $fields = array(
     'creation_date',
     'modification_date',
     'width',
-    'height'
+    'height',
+    'uuid'
 );
 
 

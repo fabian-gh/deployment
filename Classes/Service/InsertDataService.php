@@ -321,7 +321,7 @@ class InsertDataService{
     }
 
 
-        /**
+    /**
      * @return \TYPO3\CMS\Core\Database\DatabaseConnection
      */
     protected function getDatabase() {
