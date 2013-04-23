@@ -84,16 +84,9 @@ class DeploymentController extends ActionController {
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->media->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
-        $this->media->checkIfFileExists();
         
         // XML-Dateien die älter als 0.5 Jahre sind löschen
-        //$this->xmlParserService->deleteOlderFiles();
-        
-        // =================================
-        // Später an richtige Stelle verschieben
-        // =================================
-        $this->media->deployResources();
-        // =================================
+        $this->xmlParserService->deleteOlderFiles();
     }
 
     
@@ -180,7 +173,7 @@ class DeploymentController extends ActionController {
         // Deploydaten setzen und XML erstellen
         $this->xmlParserService->setDeployData(array_unique($deployData));
         $this->xmlParserService->writeXML();
-        //$this->media->deployResources();
+        $this->media->deployResources();
 
         $this->flashMessageContainer->add('Daten wurden erstellt.', '', FlashMessage::OK);
         $this->redirect('index');
@@ -203,10 +196,12 @@ class DeploymentController extends ActionController {
 
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result = $this->insertDataService->insertDataIntoTable($content);
+        
+        // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
+        $this->media->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
-        // TODO: Entkommentieren
-        // $this->registry->set('deployment', 'last_deploy', time());
+        $this->registry->set('deployment', 'last_deploy', time());
 
         if($result){
             // Bestätigung ausgeben
