@@ -22,7 +22,7 @@ use \TYPO3\Deployment\Domain\Model\HistoryData;
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class XmlParserService {
+class XmlParserService extends AbstractDataService{
 
     /**
      * @var \TYPO3\Deployment\Domain\Model\HistoryData
@@ -85,8 +85,8 @@ class XmlParserService {
             $this->xmlwriter->writeElement('uid', $cData->getRecuid());
             $this->xmlwriter->writeElement('pid', $this->getPid($cData->getTablename(), $cData->getRecuid()));
             $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
-            $this->xmlwriter->writeElement('uuid', $cData->getUuid());
-
+            $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
+            
             // geänderte Historydaten durchlaufen
             foreach ($cData->getHistoryData() as $datakey => $data) {
                 if ($datakey == 'newRecord') {
@@ -98,12 +98,12 @@ class XmlParserService {
 
             $this->xmlwriter->endElement();
         }
-
+        
         $this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument(); // Dokument schließen
         $writeString = $this->xmlwriter->outputMemory();
-
+        
         $file = GeneralUtility::tempnam('deploy_');
         GeneralUtility::writeFile($file, $writeString);
 
@@ -279,7 +279,6 @@ class XmlParserService {
                     $this->historyData->setRecuid($his->getRecuid());
                     $this->historyData->setTablename($his->getTablename());
                     $this->historyData->setTstamp($his->getTstamp());
-                    $this->historyData->setUuid('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 
                     $hisData[] = $this->historyData;
                 }
@@ -301,10 +300,9 @@ class XmlParserService {
      */
     public function getPid($table, $uid){
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
-        $con->connectDB();
+        $con = $this->getDatabase();
         $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = '.$uid);
-
+        
         return (int)$pid['pid'];
     }
     
@@ -349,15 +347,6 @@ class XmlParserService {
                 }
             }
         }
-    }
-
-    
-    /**
-     * Get the TYPO3 database
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabase() {
-        return $GLOBALS['TYPO3_DB'];
     }
 
     /**
@@ -429,5 +418,5 @@ class XmlParserService {
     public function setXmlreader(\SimpleXml $xmlreader) {
         $this->xmlreader = $xmlreader;
     }
-
+    
 }

@@ -90,6 +90,7 @@ class MediaDataService extends AbstractRepository{
             $this->xmlwriter->writeElement('modification_date', $file->getModificationDate());
             $this->xmlwriter->writeElement('width', $file->getWidth());
             $this->xmlwriter->writeElement('height', $file->getHeight());
+            $this->xmlwriter->writeElement('uuid', $this->getUuid($file->getUid(), 'sys_file'));
             
             // FileRefenrece einfügen
             $this->fileReference = $this->getFileReferenceFromTable($file->getUid());
@@ -329,6 +330,24 @@ class MediaDataService extends AbstractRepository{
             }
         }
     }
+    
+    
+    /**
+     * Gibt die entsprechende UUID passend zum Datensatz zurück
+     * 
+     * @param string $uid
+     * @param string $table
+     * @return string
+     */
+    protected function getUuid($uid, $table){
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = '.$uid);
+        
+        return $uuid['uuid'];
+    }
+    
+    
     
     // ============================ Getter & Setter ================================
     

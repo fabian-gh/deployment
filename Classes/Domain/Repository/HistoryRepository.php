@@ -41,5 +41,3 @@ class HistoryRepository extends AbstractRepository {
         return $data;
     }
 }
-
-?>

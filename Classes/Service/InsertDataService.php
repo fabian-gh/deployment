@@ -15,7 +15,6 @@ use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 //use \TYPO3\Deployment\Xclass\DatabaseConnection;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
-use \TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
  * InsertDataService
@@ -23,7 +22,7 @@ use \TYPO3\CMS\Core\Database\DatabaseConnection;
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class InsertDataService{
+class InsertDataService extends AbstractDataService{
     
     /**
      * Diese Methode vergleicht die UUID's der Datensätze und modifiziert die
@@ -56,8 +55,8 @@ class InsertDataService{
      */
     public function insertDataIntoTable($dataArr) {
         $data = $fields = $insertParams = $updateParams = $updateParams2 = $alreadyExists = $assump = array();
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
         // Fremddatenbank initialiseren
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
         
@@ -220,8 +219,8 @@ class InsertDataService{
      */
     public function insertMediaDataIntoTable($dataArr) {
         $table = 'sys_file';
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
         // Fremddatenbank initialiseren
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
         $con->debugOutput = true;
@@ -266,6 +265,7 @@ class InsertDataService{
      * @param array $fileArr
      */
     public function processNotIndexedFiles($fileArr){
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         
         foreach($fileArr as $file){
@@ -337,14 +337,6 @@ class InsertDataService{
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
                 mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, 
                 mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
-    }
-
-
-    /**
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabase() {
-        return $GLOBALS['TYPO3_DB'];
     }
     
 }
