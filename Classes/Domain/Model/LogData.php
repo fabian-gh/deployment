@@ -114,8 +114,5 @@ class LogData extends AbstractModel{
     public function setTstamp($tstamp) {
         $this->tstamp = $tstamp;
     }
-
-
+    
 }
-
-?>

@@ -81,6 +81,8 @@ class DeploymentController extends ActionController {
     public function indexAction() {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         
+        //$this->insertDataService->newInsertDataIntoTable($this->xmlParserService->readXML('1366796334'));die();
+        
         // prüft ob die Spalte UUID & der Wert existieren
         $this->insertDataService->checkIfUuidExists();
         
@@ -101,9 +103,9 @@ class DeploymentController extends ActionController {
         // Wenn Eintrag nicht vorhanden, wird die aktuelle Zeit genommen, 
         // neuer Eintrag wird aber dennoch nicht erstellt
         $date = $this->registry->get('deployment', 'last_deploy', time());
-
+        
         $logEntries = $this->logRepository->findYoungerThen($date);
-
+        
         if ($logEntries->getFirst() != NULL) {
             if ($deploy === NULL) {
                 $deploy = new Deploy();
@@ -114,7 +116,7 @@ class DeploymentController extends ActionController {
             $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
             $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
-
+            
             $this->view->assignMultiple(array(
                 'historyEntries'    => $unserializedHistoryData,
                 'diffData'          => $diffData
@@ -202,9 +204,6 @@ class DeploymentController extends ActionController {
 
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result = $this->insertDataService->insertDataIntoTable($content);
-        
-        // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
-        $this->media->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
         $this->registry->set('deployment', 'last_deploy', time());

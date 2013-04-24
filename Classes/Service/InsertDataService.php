@@ -33,9 +33,11 @@ class InsertDataService extends AbstractDataService{
     public function newInsertDataIntoTable($dataArr){
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
+        // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
+        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
         
         if($con->isConnected()){
-            DebuggerUtility::var_dump($dataArr);
+            
         }
         die();
     }

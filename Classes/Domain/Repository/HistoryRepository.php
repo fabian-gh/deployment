@@ -28,7 +28,7 @@ class HistoryRepository extends AbstractRepository {
      */
     public function findHistoryData($logData) {
         $data = array();
-
+        
         $query = $this->createQuery();
         
         foreach($logData as $ldata){
@@ -38,6 +38,7 @@ class HistoryRepository extends AbstractRepository {
 
             $data[] = $temp->getFirst();
         }
+
         return $data;
     }
 }

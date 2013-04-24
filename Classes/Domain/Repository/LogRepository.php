@@ -36,7 +36,7 @@ class LogRepository extends AbstractRepository {
         $constraints[] = $query->logicalNot($query->equals('tablename', ''));
         
         $query->matching($query->logicalAnd($constraints));
-
+        
         return $query->execute();
     }
 
@@ -53,5 +53,3 @@ class LogRepository extends AbstractRepository {
     }*/
 
 }
-
-?>
