@@ -31,15 +31,51 @@ class InsertDataService extends AbstractDataService{
      * @param array $dataArr
      */
     public function newInsertDataIntoTable($dataArr){
+        $updateEntries = $insertEntries = array();
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
         
         if($con->isConnected()){
-            
+            foreach($dataArr as $entry){
+                if($entry['fieldlist'] !== 'l10n_diffsource'){
+                    $controlResult = $con->exec_SELECTgetSingleRow('uid', $entry['tablename'], "uuid = '".$entry['uuid']."'");
+                    
+                    if($controlResult != null){
+                        // Verarbeitung der einzufügenden Daten
+                        $keys = array_keys($entry);
+                        foreach($keys as $key){
+                            if($key !== 'tablename' && $key !== 'fieldlist' && $key !== 'uid' && $key !== 'pid' && $key !== 'uuid'){
+                                $updateKey = $key;
+                            }
+                        }
+                        $updateEntries = array($updateKey => $entry[$key]);
+                        
+                        // Daten updaten
+                        $con->exec_UPDATEquery($entry['tablename'], 'uid='.$controlResult['uid'], $updateEntries);
+                    } else {
+                        // Verarbeitung der einzufügenden Daten
+                        $keys = array_keys($entry);
+                        foreach($keys as $key){
+                            if($key !== 'tablename' && $key !== 'fieldlist' && $key !== 'uid' && $key !== 'pid' && $key !== 'uuid'){
+                                $updateKey = $key;
+                            }
+                        }
+                        $insertEntries = array(
+                            'tstamp'    => time(),
+                            'crdate'    => time(),
+                            $updateKey  => $entry[$key],
+                            'pid'       => $entry['pid'],
+                            'uuid'      => $entry['uuid'],
+                        );
+                        
+                        // Daten einfügen
+                        $con->exec_INSERTquery($entry['tablename'], $insertEntries);
+                    }
+                }
+            }
         }
-        die();
     }
 
     

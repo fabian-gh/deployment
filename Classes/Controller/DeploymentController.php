@@ -81,7 +81,7 @@ class DeploymentController extends ActionController {
     public function indexAction() {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         
-        //$this->insertDataService->newInsertDataIntoTable($this->xmlParserService->readXML('1366796334'));die();
+        $this->insertDataService->newInsertDataIntoTable($this->xmlParserService->readXML('1366796334'));die();
         
         // prüft ob die Spalte UUID & der Wert existieren
         $this->insertDataService->checkIfUuidExists();
