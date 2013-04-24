@@ -81,14 +81,12 @@ class DeploymentController extends ActionController {
     public function indexAction() {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         
-        $this->insertDataService->newInsertDataIntoTable($this->xmlParserService->readXML('1366796334'));die();
-        
-        // prüft ob die Spalte UUID & der Wert existieren
-        $this->insertDataService->checkIfUuidExists();
-        
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->media->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
+        
+        // prüft ob die Spalte UUID & der Wert existieren
+        $this->insertDataService->checkIfUuidExists();
         
         // XML-Dateien die älter als 0.5 Jahre sind löschen
         $this->xmlParserService->deleteOlderFiles();
@@ -197,7 +195,7 @@ class DeploymentController extends ActionController {
         
         //Mediendaten lesen
         $mediaData = $this->media->readXmlMediaList();
-        $this->insertDataService->insertMediaDataIntoTable($mediaData);
+        $this->insertDataService->insertResourceDataIntoTable($mediaData);
         
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
