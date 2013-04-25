@@ -102,6 +102,7 @@ class ResourceDataService extends AbstractRepository{
                 $this->xmlwriter->writeElement('description', ($this->fileReference->getDescription() == null) ? '' :  $this->fileReference->getDescription());
                 $this->xmlwriter->writeElement('alternative', ($this->fileReference->getAlternative() == null) ? '' :  $this->fileReference->getAlternative());
                 $this->xmlwriter->writeElement('link', ($this->fileReference->getLink() == null) ? '' :  $this->fileReference->getLink());
+                $this->xmlwriter->writeElement('uuid', ($this->fileReference->getUuid() == null) ? '' :  $this->fileReference->getUuid());
                 $this->xmlwriter->endElement();
             }
             $this->xmlwriter->endElement();

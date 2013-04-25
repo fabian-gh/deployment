@@ -87,7 +87,6 @@ class InsertDataService extends AbstractDataService{
      * @param array $dataArr
      */
     public function insertResourceDataIntoTable($dataArr){
-        $table = 'sys_file';
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
@@ -95,16 +94,23 @@ class InsertDataService extends AbstractDataService{
         
         if($con->isConnected()){
             foreach($dataArr as $entry){
-                $controlResult = $con->exec_SELECTgetSingleRow('uid', $table, "uuid = '".$entry['uuid']."'");
-                
+                $controlResult = $con->exec_SELECTgetSingleRow('uid, uuid', 'sys_file', "uuid = '".$entry['uuid']."'");
+
                 if($controlResult != null){
                     // Daten updaten
-                    $con->exec_UPDATEquery($table, 'uid='.$controlResult['uid'], $entry);
+                    if(isset($entry['fileReference']) && $entry['fileReference'] != null){
+                        $con->exec_UPDATEquery('sys_file_reference', 'uuid='.$controlResult['uuid'], $entry['fileReference']);
+                    } else {
+                        $con->exec_UPDATEquery('sys_file', 'uid='.$controlResult['uid'], $entry);
+                    }
                 } else {
                     unset($entry['uid']);
-                    DebuggerUtility::var_dump($entry);
                     // Daten einfügen
-                    $con->exec_INSERTquery($table, $entry);
+                    if(isset($entry['fileReference']) && $entry['fileReference'] != null){
+                        $con->exec_INSERTquery('sys_file_reference', $entry['fileReference']);
+                    } else {
+                        $con->exec_INSERTquery('sys_file', $entry);
+                    }
                 }
             }
         }

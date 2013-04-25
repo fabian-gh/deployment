@@ -25,11 +25,13 @@ class FileReferenceRepository extends AbstractRepository {
      * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function findByUidForeign($uid) {
+        $constraints = array();
         $query = $this->createQuery();
 
-        $constraint = $query->equals('uid_foreign', $uid);
+        $constraints[] = $query->equals('uid_foreign', $uid);
+        $constraints[] = $query->equals('table_local', 'sys_file');
 
-        $query->matching($constraint);
+        $query->matching($query->logicalAnd($constraints));
 
         return $query->execute();
     }
