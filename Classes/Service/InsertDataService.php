@@ -141,7 +141,7 @@ class InsertDataService extends AbstractDataService{
                     $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $identifier));
                 }
             }
-        }die();
+        }
     }
 
     

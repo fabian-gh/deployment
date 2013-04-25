@@ -79,7 +79,9 @@ class DeploymentController extends ActionController {
      * IndexAction
      */
     public function indexAction() {
+        // Registry-Objekt erstellen und prüfen
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
+        $this->checkForRegistryEntry();
         
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->resource->getNotIndexedFiles();
@@ -99,7 +101,6 @@ class DeploymentController extends ActionController {
      */
     public function listAction(Deploy $deploy = NULL) {
         // Wenn Eintrag nicht vorhanden, wird die aktuelle Zeit genommen, 
-        // neuer Eintrag wird aber dennoch nicht erstellt
         $date = $this->registry->get('deployment', 'last_deploy', time());
         
         $logEntries = $this->logRepository->findYoungerThen($date);
@@ -214,6 +215,19 @@ class DeploymentController extends ActionController {
         } else {
             $this->flashMessageContainer->add('Es ist ein Fehler aufgetreten', 'Dei Daten konnten nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', FlashMessage::ERROR);
             $this->redirect('index');
+        }
+    }
+    
+    
+    /**
+     * Prüft die Registry nach dem Eintrag. Falls nicht vorhanden wird dieser
+     * erstellt
+     */
+    protected function checkForRegistryEntry(){
+        $deploy = $this->registry->get('deployment', 'last_deploy');
+        
+        if($deploy == false){
+            $this->registry->set('deployment', 'last_deploy', time());
         }
     }
     
