@@ -134,11 +134,14 @@ class InsertDataService extends AbstractDataService{
             
             foreach($res as $file){
                 $identifier = $file->getIdentifier();
-                $croppedIdentifier = substr($identifier, 10);
-                
-                $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $croppedIdentifier));
+                if(strstr($identifier, '/fileadmin') != false){
+                    $croppedIdentifier = substr($identifier, 10);
+                    $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $croppedIdentifier));
+                } else {
+                    $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $identifier));
+                }
             }
-        }
+        }die();
     }
 
     
