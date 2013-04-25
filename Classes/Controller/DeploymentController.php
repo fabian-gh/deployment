@@ -69,10 +69,10 @@ class DeploymentController extends ActionController {
     protected $registry;
     
     /**
-     * @var \TYPO3\Deployment\Service\MediaDataService
+     * @var \TYPO3\Deployment\Service\ResourceDataService
      * @inject
      */
-    protected $media;
+    protected $resource;
 
     
     /**
@@ -82,7 +82,7 @@ class DeploymentController extends ActionController {
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         
         // Noch nicht indizierte Dateien indizieren
-        $notIndexed = $this->media->getNotIndexedFiles();
+        $notIndexed = $this->resource->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
         
         // prüft ob die Spalte UUID & der Wert existieren
@@ -172,14 +172,14 @@ class DeploymentController extends ActionController {
         
         // Mediendaten erstellen
         $date = $this->registry->get('deployment', 'last_deploy', time());
-        $mediaData = $this->fileRepository->findYoungerThen($date);
-        $this->media->setFileList($mediaData);
-        $this->media->writeXmlMediaList();
+        $resourceData = $this->fileRepository->findYoungerThen($date);
+        $this->resource->setFileList($resourceData);
+        $this->resource->writeXmlResourceList();
 
         // Deploydaten setzen und XML erstellen
         $this->xmlParserService->setDeployData(array_unique($deployData));
         $this->xmlParserService->writeXML();
-        $this->media->deployResources();
+        $this->resource->deployResources();
 
         $this->flashMessageContainer->add('Daten wurden erstellt.', '', FlashMessage::OK);
         $this->redirect('index');
@@ -194,8 +194,8 @@ class DeploymentController extends ActionController {
         $tstamp = $this->registry->get('deployment', 'last_deploy');
         
         //Mediendaten lesen
-        $mediaData = $this->media->readXmlMediaList();
-        $this->insertDataService->insertResourceDataIntoTable($mediaData);
+        $resourceData = $this->resource->readXmlResourceList();
+        $this->insertDataService->insertResourceDataIntoTable($resourceData);
         
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MediaDataService
+ * ResourceDataService
  *
  * @category   Extension
  * @package    Deployment
@@ -17,12 +17,12 @@ use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /**
- * MediaDataService
+ * ResourceDataService
  *
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class MediaDataService extends AbstractRepository{
+class ResourceDataService extends AbstractRepository{
     
     /**
      * max file size in Bytes
@@ -55,7 +55,7 @@ class MediaDataService extends AbstractRepository{
      * Schreibt eine XML-Datei mit allen im Fileadmin befindlichen Dateien, 
      * ohne Pfadangabe zum Fileadmin
      */
-    public function writeXmlMediaList(){
+    public function writeXmlResourceList(){
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
 
@@ -69,7 +69,7 @@ class MediaDataService extends AbstractRepository{
         $this->xmlwriter->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
 
         // Daten schreiben
-        $this->xmlwriter->startElement('medialist');
+        $this->xmlwriter->startElement('resourcelist');
 
         foreach($this->fileList as $file) {
             $this->xmlwriter->startElement('file');
@@ -112,23 +112,23 @@ class MediaDataService extends AbstractRepository{
         $this->xmlwriter->endDocument();
         $writeString = $this->xmlwriter->outputMemory();
 
-        $file = GeneralUtility::tempnam('media_');
+        $file = GeneralUtility::tempnam('resource_');
         GeneralUtility::writeFile($file, $writeString);
 
         $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/'.date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
         
-        GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_media.xml');
+        GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_resource.xml');
     }
     
     
     /**
-     * Liest alle noch nicht deployten Datensätze aus der Media-XML Datei 
+     * Liest alle noch nicht deployten Datensätze aus der Resource-XML Datei 
      * und gibt diese als Array zurück.
      * 
      * @return array
      */
-    public function readXmlMediaList(){
+    public function readXmlResourceList(){
         $arrcount = 0;
         $fileArr = $dateFolder = $contentArr = $exFaf = $splittedDateTime = array();
         /** @var \TYPO3\CMS\Core\Registry $registry */
@@ -171,7 +171,7 @@ class MediaDataService extends AbstractRepository{
                     $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/'.$folder.'/'.$file);
                     
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
-                    foreach ($this->xmlreader->medialist->file as $fileset) {
+                    foreach ($this->xmlreader->resourcelist->file as $fileset) {
                         foreach ($fileset as $key => $value) {
                             $contentArr[$arrcount][$key] = (string) $value;
                         }
@@ -272,7 +272,7 @@ class MediaDataService extends AbstractRepository{
         $fileAdminPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
         $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
         
-        $data = $this->readXmlMediaList();
+        $data = $this->readXmlResourceList();
         
         foreach($data as $resource){
             /** @var \TYPO3\CMS\Core\Resource\File $file */
