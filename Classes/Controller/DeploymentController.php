@@ -100,8 +100,8 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
-        // Wenn Eintrag nicht vorhanden, wird die aktuelle Zeit genommen, 
-        $date = $this->registry->get('deployment', 'last_deploy', time());
+        // Registry Eintrag holen
+        $date = $this->registry->get('deployment', 'last_deploy');
         
         $logEntries = $this->logRepository->findYoungerThen($date);
         
@@ -168,9 +168,6 @@ class DeploymentController extends ActionController {
             }
         }
         
-        // prüft ob die Spalte UUID & der Wert existieren
-        $this->insertDataService->checkIfUuidExists();
-        
         // Mediendaten erstellen
         $date = $this->registry->get('deployment', 'last_deploy', time());
         $resourceData = $this->fileRepository->findYoungerThen($date);
@@ -203,6 +200,9 @@ class DeploymentController extends ActionController {
 
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result = $this->insertDataService->insertDataIntoTable($content);
+        
+        // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
+        $this->media->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
         $this->registry->set('deployment', 'last_deploy', time());
