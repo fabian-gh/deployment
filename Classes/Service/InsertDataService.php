@@ -75,6 +75,7 @@ class InsertDataService extends AbstractDataService{
                     }
                 }
             }
+            return true;
         }
     }
     
@@ -95,7 +96,7 @@ class InsertDataService extends AbstractDataService{
         if($con->isConnected()){
             foreach($dataArr as $entry){
                 $controlResult = $con->exec_SELECTgetSingleRow('uid, uuid', 'sys_file', "uuid = '".$entry['uuid']."'");
-
+                
                 if($controlResult != null){
                     // Daten updaten
                     if(isset($entry['fileReference']) && $entry['fileReference'] != null){
@@ -113,6 +114,7 @@ class InsertDataService extends AbstractDataService{
                     }
                 }
             }
+            return true;
         }
     }
     

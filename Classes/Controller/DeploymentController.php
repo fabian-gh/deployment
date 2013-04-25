@@ -193,21 +193,21 @@ class DeploymentController extends ActionController {
         
         //Mediendaten lesen
         $resourceData = $this->resource->readXmlResourceList();
-        $this->insertDataService->insertResourceDataIntoTable($resourceData);
+        $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
         
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
 
         // content in DB-Felder der jeweiligen Tabelle schreiben
-        $result = $this->insertDataService->insertDataIntoTable($content);
+        $result2 = $this->insertDataService->insertDataIntoTable($content);
         
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
-        $this->media->checkIfFileExists();
+        $this->resource->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
         $this->registry->set('deployment', 'last_deploy', time());
-
-        if($result){
+        
+        if($result1 == true && $result2 == true){
             // Bestätigung ausgeben
             $this->flashMessageContainer->add('Deployment wurde erfolgreich ausgeführt', '', FlashMessage::OK);
             // Redirect auf Hauptseite
