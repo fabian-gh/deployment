@@ -127,12 +127,12 @@ class InsertDataService extends AbstractDataService{
     public function processNotIndexedFiles($fileArr){
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
+        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
+        $resFact = ResourceFactory::getInstance();
         
         foreach($fileArr as $file){
-            $resFact = ResourceFactory::getInstance();
             $res = $resFact->getFileObjectFromCombinedIdentifier('/fileadmin/'.$file);
-            // hier werden die Daten selbststädnig indexiert, 
-            // unabhängig davon welche Methode aufgerufen wird
+            // selbstständige Indizierung wenn etwas mit $res gemacht wird
             $res->isIndexed();
         }
 
