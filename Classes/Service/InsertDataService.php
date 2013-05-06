@@ -132,8 +132,6 @@ class InsertDataService extends AbstractDataService{
      * @param array $fileArr
      */
     public function processNotIndexedFiles($fileArr){
-        /** @var TYPO3\CMS\Extbase\Persistence\Generic\Storage\Typo3DbBackend $typo3DbBackend */
-        $typo3DbBackend = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\Storage\\Typo3DbBackend');
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
@@ -157,8 +155,6 @@ class InsertDataService extends AbstractDataService{
                 } else {
                     $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $identifier));
                 }
-                // clear the cache
-                $typo3DbBackend->clearPageCache('sys_file', $file->getUid());
             }
         }
     }
@@ -170,8 +166,6 @@ class InsertDataService extends AbstractDataService{
      */
     public function checkIfUuidExists(){
         $tablefields = $results = $tables = $inputArr = array();
-        /** @var TYPO3\CMS\Extbase\Persistence\Generic\Storage\Typo3DbBackend $typo3DbBackend */
-        $typo3DbBackend = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\Storage\\Typo3DbBackend');
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         
@@ -198,7 +192,6 @@ class InsertDataService extends AbstractDataService{
                 foreach($tabval as $value){
                     $inputArr = array('uuid' => $this->generateUuid());
                     $con->exec_UPDATEquery($tabkey, 'uid='.$value['uid'], $inputArr);
-                    $typo3DbBackend->clearPageCache($tabkey, $value['uid']);
                 }
             }
         }
@@ -212,8 +205,8 @@ class InsertDataService extends AbstractDataService{
      */
     private function generateUuid() {
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, 
-                mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, 
+            mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
     }
     
 }
