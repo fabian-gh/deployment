@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule('TYPO3.' . $_EXTKEY, 'tools', 'DeploymentAdmin', '', array(
-                                                                                                                      'Deployment' => 'index,deploy,createDeploy,list',
+                                                                                                                      'Deployment' => 'index,deploy,createDeploy,list,clearPageCache',
                                                                                                                  ), array(
                                                                                                                          'access' => 'user,group',
                                                                                                                          'icon'   => 'EXT:' . $_EXTKEY . '/ext_icon.png',

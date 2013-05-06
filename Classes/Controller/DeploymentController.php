@@ -17,6 +17,7 @@ use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Extbase\Service\CacheService;
 
 /**
  * Deployment
@@ -229,6 +230,17 @@ class DeploymentController extends ActionController {
         if($deploy == false){
             $this->registry->set('deployment', 'last_deploy', time());
         }
+    }
+    
+    
+    /**
+     * Leert den Cache aller registrierten Seiten
+     */
+    public function clearPageCacheAction(){
+        /** @var \TYPO3\CMS\Extbase\Service\CacheService $cacheService */
+        $cacheService = new CacheService();
+        $cacheService->clearCachesOfRegisteredPageIds();
+        $this->redirect('index');
     }
     
 }
