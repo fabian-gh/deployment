@@ -32,6 +32,8 @@ class InsertDataService extends AbstractDataService{
      */
     public function insertDataIntoTable($dataArr){
         $updateEntries = $insertEntries = array();
+        /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
@@ -54,6 +56,7 @@ class InsertDataService extends AbstractDataService{
                         
                         // Daten updaten
                         $con->exec_UPDATEquery($entry['tablename'], 'uid='.$controlResult['uid'], $updateEntries);
+                        $dataHandler->clear_cache($entry['tablename'], $controlResult['uid']);
                     } else {
                         // Verarbeitung der einzufügenden Daten
                         $keys = array_keys($entry);
@@ -88,6 +91,8 @@ class InsertDataService extends AbstractDataService{
      * @param array $dataArr
      */
     public function insertResourceDataIntoTable($dataArr){
+        /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
@@ -101,8 +106,10 @@ class InsertDataService extends AbstractDataService{
                     // Daten updaten
                     if(isset($entry['fileReference']) && $entry['fileReference'] != null){
                         $con->exec_UPDATEquery('sys_file_reference', 'uuid='.$controlResult['uuid'], $entry['fileReference']);
+                        $dataHandler->clear_cache('sys_file_reference', $controlResult['uid']);
                     } else {
                         $con->exec_UPDATEquery('sys_file', 'uid='.$controlResult['uid'], $entry);
+                        $dataHandler->clear_cache('sys_file', $controlResult['uid']);
                     }
                 } else {
                     unset($entry['uid']);
@@ -125,6 +132,8 @@ class InsertDataService extends AbstractDataService{
      * @param array $fileArr
      */
     public function processNotIndexedFiles($fileArr){
+        /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
@@ -148,6 +157,8 @@ class InsertDataService extends AbstractDataService{
                 } else {
                     $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $identifier));
                 }
+                // clear the cache
+                $dataHandler->clear_cache('sys_file', $file->getUid());
             }
         }
     }
@@ -158,6 +169,8 @@ class InsertDataService extends AbstractDataService{
      * ob hier Werte gesetzt sind. Falls nein, dann Werte generieren.
      */
     public function checkIfUuidExists(){
+        /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
         $tablefields = $results = $tables = $inputArr = array();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
@@ -185,6 +198,7 @@ class InsertDataService extends AbstractDataService{
                 foreach($tabval as $value){
                     $inputArr = array('uuid' => $this->generateUuid());
                     $con->exec_UPDATEquery($tabkey, 'uid='.$value['uid'], $inputArr);
+                    $dataHandler->clear_cache($tabkey, $value['uid']);
                 }
             }
         }
