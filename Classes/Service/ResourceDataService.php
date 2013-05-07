@@ -266,8 +266,12 @@ class ResourceDataService extends AbstractRepository{
     /**
      * Dateien aus der sys_file-Tabelle holen und in den Deployment-Ordner kopieren.
      * Falls nötig, vorher die Ordnerstruktur erstellen.
+     * Wenn $filesOverLimit = true dann werden Dateien über der Grenze deployed.
+     * Nur für Scheduler Task wichtig
+     * 
+     * @param boolean $filesOverLimit
      */
-    public function deployResources(){
+    public function deployResources($filesOverLimit = false){
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
         $fileAdminPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
@@ -295,10 +299,18 @@ class ResourceDataService extends AbstractRepository{
                 GeneralUtility::mkdir_deep($path.'/'.$fold);
             }
             
-            // Nur Dateien <= 10 MB auf Dateiebene kopieren 
-            if($file->getSize() <= $this->maxFileSize){
-                copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
+            if($filesOverLimit === false){
+                // Nur Dateien <= 10 MB auf Dateiebene kopieren 
+                if($file->getSize() <= $this->maxFileSize){
+                    copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
+                }
+            } else {
+                // Nur Dateien >= 10 MB auf Dateiebene kopieren 
+                if($file->getSize() >= $this->maxFileSize){
+                    copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
+                }
             }
+            
         }
     }
     

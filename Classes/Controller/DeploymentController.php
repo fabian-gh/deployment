@@ -74,6 +74,12 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $resource;
+    
+    /**
+     * @var \TYPO3\Deployment\Scheduler\Task
+     * @inject
+     */
+    protected $schedulerTask;
 
     
     /**
@@ -83,6 +89,13 @@ class DeploymentController extends ActionController {
         // Registry-Objekt erstellen und prüfen
         $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
         $this->checkForRegistryEntry();
+        
+        // prüfen ob Scheduler Task registiert ist
+        $reg = $this->schedulerTask->checkIfTaskIsRegistered();
+        
+        if($reg === false){
+            $this->flashMessageContainer->add('Scheduler Task fehlt', 'Bitte erstellen Sie einen Scheduler Task.', FlashMessage::ERROR);
+        }
         
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->resource->getNotIndexedFiles();
