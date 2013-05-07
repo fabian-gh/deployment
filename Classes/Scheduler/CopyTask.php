@@ -13,7 +13,7 @@ namespace TYPO3\Deployment\Scheduler;
 
 use \TYPO3\CMS\Scheduler\Task\AbstractTask;
 
-class Task extends AbstractTask{
+class CopyTask extends AbstractTask{
     
     /**
      * @var \TYPO3\Deployment\Service\ResourceDataService
@@ -40,17 +40,16 @@ class Task extends AbstractTask{
     public function checkIfTaskIsRegistered(){
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
-        $res = $con->exec_SELECTgetRows('uid, serialized_task_object', 'tx_scheduler_task');
+        $res = $con->exec_SELECTgetRows('serialized_task_object', 'tx_scheduler_task');
         
         foreach($res as $result){
             $object = unserialize($result['serialized_task_object']);
-            
-            if(is_a($object, '\TYPO3\Deployment\Scheduler\Task')){
-                return true;
-            } else {
-                return false;
+            if(is_a($object, 'TYPO3\Deployment\Scheduler\CopyTask')){
+                $obj = true;
             }
         }
+        
+        return ($obj === true) ? true : false;
     }
     
     

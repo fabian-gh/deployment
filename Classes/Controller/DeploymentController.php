@@ -76,7 +76,7 @@ class DeploymentController extends ActionController {
     protected $resource;
     
     /**
-     * @var \TYPO3\Deployment\Scheduler\Task
+     * @var \TYPO3\Deployment\Scheduler\CopyTask
      * @inject
      */
     protected $schedulerTask;
@@ -94,7 +94,7 @@ class DeploymentController extends ActionController {
         $reg = $this->schedulerTask->checkIfTaskIsRegistered();
         
         if($reg === false){
-            $this->flashMessageContainer->add('Scheduler Task fehlt', 'Bitte erstellen Sie einen Scheduler Task.', FlashMessage::ERROR);
+            $this->flashMessageContainer->add('Bitte erstellen Sie einen Scheduler Task', 'Scheduler Task fehlt.', FlashMessage::ERROR);
         }
         
         // Noch nicht indizierte Dateien indizieren
