@@ -210,7 +210,7 @@ class DeploymentController extends ActionController {
         
         if($result1 == true && $result2 == true){
             // Bestätigung ausgeben
-            $this->flashMessageContainer->add('Deployment wurde erfolgreich ausgeführt', '', FlashMessage::OK);
+            $this->flashMessageContainer->add('Deployment wurde erfolgreich ausgeführt', 'Bitte leeren Sie nun noch den Cache.', FlashMessage::OK);
             // Redirect auf Hauptseite
             $this->redirect('index');
         } else {
