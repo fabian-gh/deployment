@@ -223,11 +223,11 @@ class DeploymentController extends ActionController {
         
         if($result1 == true && $result2 == true){
             // Bestätigung ausgeben
-            $this->flashMessageContainer->add('Deployment wurde erfolgreich ausgeführt', 'Bitte leeren Sie nun noch den Cache.', FlashMessage::OK);
+            $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
             // Redirect auf Hauptseite
             $this->redirect('index');
         } else {
-            $this->flashMessageContainer->add('Es ist ein Fehler aufgetreten', 'Dei Daten konnten nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', FlashMessage::ERROR);
+            $this->flashMessageContainer->add('Die Daten konnten nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es ist ein Fehler aufgetreten', FlashMessage::ERROR);
             $this->redirect('index');
         }
     }
