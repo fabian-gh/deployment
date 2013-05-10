@@ -224,12 +224,18 @@ class XmlParserService extends AbstractDataService{
                 /** @var $log Log */
                 $this->logData = new LogData();
                 $this->logData->setUid($log->getUid());
+                $this->logData->setAction($log->getAction());
                 $unlogdata = unserialize($log->getLogData());
-
+                
                 $tableAndId = explode(':', $unlogdata[1]);
                 $this->logData->setData($unlogdata[0]);
                 $this->logData->setTable($tableAndId[0]);
                 $this->logData->setRecuid($tableAndId[1]);
+                $this->logData->setTstamp($log->getTstamp());
+                
+               if($log->getAction() == '1'){
+                    $this->logData->setPid($unlogdata[3]);
+                }
 
                 $data[] = $this->logData;
             }

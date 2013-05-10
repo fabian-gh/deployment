@@ -11,7 +11,8 @@ $TCA['sys_log'] = array(
 
 $fields = array(
     'tstamp',
-    'log_data'
+    'log_data',
+    'action'
 );
 
 

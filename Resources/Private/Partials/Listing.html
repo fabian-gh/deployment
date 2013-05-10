@@ -13,44 +13,44 @@
 
 <f:form action="createDeploy" name="deploy" object="{deploy}">
 
-    <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
-     <table class="table typo3-dblist">
-        <tr class="t3-row-header">
-            <th>&nbsp;</th>
-            <th>ID-Info</th>
-            <th>Timestamp</th>
-            <th>Table</th>
-            <th>Difference</th>
-        </tr>
-        <f:for each="{historyEntries}" as="entry">
-            
-            <tr class="db_list_normal">
-                <td><f:form.checkbox property="deployEntries" value="{entry.uid}"/></td>
-                <td class="space">
-                    UID: {entry.uid}<br/>
-                    Log-UID: {entry.sysLogUid}<br />
-                    <b>Rec-UID: {entry.recuid}</b>
-                </td>
-                <td class="space"><f:format.date format="d.m.Y H:i:s">{entry.tstamp}</f:format.date></td>
-                <td class="space">{entry.tablename}</td>
-                <td>
-                    <f:for each="{diffData}" key="datakey" as="data">
-                        <f:if condition="{datakey} == {entry.recuid}">
-                            <table>
-                                <f:for each="{data}" key="key" as="valueArr">
-                                    <f:for each="{valueArr}" key="valuekey" as="value">
-                                        <tr>
-                                            <td><i>{key}:</i><br /><f:format.raw>{value}</f:format.raw></td>
-                                        </tr>
-                                    </f:for>
-                                </f:for>
-                            </table>
-                        </f:if>
-                    </f:for>
-                </td>
-            </tr>
-        </f:for>
-    </table><br />
+<b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
+ <table class="table typo3-dblist">
+    <tr class="t3-row-header">
+        <th>&nbsp;</th>
+        <th>ID-Info</th>
+        <th>Timestamp</th>
+        <th>Table</th>
+        <th>Difference</th>
+    </tr>
+    <f:for each="{historyEntries}" as="entry">
 
-    <f:form.submit value="Liste erstellen" />   
+        <tr class="db_list_normal">
+            <td><f:form.checkbox property="deployEntries" value="{entry.uid}"/></td>
+            <td class="space">
+                UID: {entry.uid}<br/>
+                Log-UID: {entry.sysLogUid}<br />
+                <b>Rec-UID: {entry.recuid}</b>
+            </td>
+            <td class="space"><f:format.date format="d.m.Y H:i:s">{entry.tstamp}</f:format.date></td>
+            <td class="space">{entry.tablename}</td>
+            <td>
+                <f:for each="{diffData}" key="datakey" as="data">
+                    <f:if condition="{datakey} == {entry.recuid}">
+                        <table>
+                            <f:for each="{data}" key="key" as="valueArr">
+                                <f:for each="{valueArr}" key="valuekey" as="value">
+                                    <tr>
+                                        <td><i>{key}:</i><br /><f:format.raw>{value}</f:format.raw></td>
+                                    </tr>
+                                </f:for>
+                            </f:for>
+                        </table>
+                    </f:if>
+                </f:for>
+            </td>
+        </tr>
+    </f:for>
+</table><br />
+
+<f:form.submit value="Liste erstellen" />   
 </f:form>

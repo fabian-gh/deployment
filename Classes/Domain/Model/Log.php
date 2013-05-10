@@ -30,6 +30,12 @@ class Log extends AbstractModel{
     protected $logData;
     
     /**
+     * @var string
+     */
+    protected $action;
+    
+    
+    /**
      * @return string
      */
     public function getLogData() {
@@ -57,4 +63,17 @@ class Log extends AbstractModel{
         $this->tstamp = $tstamp;
     }
     
+    /**
+     * @return string
+     */
+    public function getAction() {
+        return $this->action;
+    }
+
+    /**
+     * @param string $action
+     */
+    public function setAction($action) {
+        $this->action = $action;
+    }  
 }

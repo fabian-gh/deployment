@@ -127,6 +127,7 @@ class DeploymentController extends ActionController {
 
             $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
             $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
+            // TODO: $historyEntries auf Richtigkeit überprüfen und  mit den Log daten abgleichen
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
             $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
             

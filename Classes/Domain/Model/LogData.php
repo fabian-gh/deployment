@@ -23,6 +23,11 @@ class LogData extends AbstractModel{
      * @var string
      */
     protected $uid;
+    
+    /**
+     * @var string 
+     */
+    protected $pid;
 
     /**
      * @var string
@@ -43,6 +48,11 @@ class LogData extends AbstractModel{
      * @var string
      */
     protected $tstamp;
+    
+    /**
+     * @var string
+     */
+    protected $action;
 
 
     /**
@@ -113,6 +123,34 @@ class LogData extends AbstractModel{
      */
     public function setTstamp($tstamp) {
         $this->tstamp = $tstamp;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getAction() {
+        return $this->action;
+    }
+
+    /**
+     * @param string $action
+     */
+    public function setAction($action) {
+        $this->action = $action;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getPid() {
+        return $this->pid;
+    }
+
+    /**
+     * @param string $pid
+     */
+    public function setPid($pid) {
+        $this->pid = $pid;
     }
     
 }
