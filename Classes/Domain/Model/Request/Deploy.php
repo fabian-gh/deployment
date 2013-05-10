@@ -4,7 +4,7 @@
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Model
+ * @subpackage Domain\Model\Request
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
 
@@ -16,11 +16,10 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * Deploy
  *
  * @package    Deployment
- * @subpackage Domain\Model
+ * @subpackage Domain\Model\Request
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
 class Deploy extends AbstractEntity {
-    
     /* ============================================
      * Das Objekt dieser Klasse wird dem Formular
      * mitgegeben. In diesen Objekt werden dann die
@@ -50,6 +49,5 @@ class Deploy extends AbstractEntity {
     public function setDeployEntries($deployEntries) {
         $this->deployEntries = $deployEntries;
     }
- 
+
 }
-?>
