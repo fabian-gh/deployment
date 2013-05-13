@@ -114,8 +114,6 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
-        /** @var \DateTime $date */
-        $dateTime = new \DateTime();
         $newHistoryEntries = $allHistoryEintries = array();
         
         // Registry Eintrag holen
@@ -140,9 +138,9 @@ class DeploymentController extends ActionController {
                 } else {
                     /** @var \TYPO3\Deployment\Domain\Model\History $result */
                     $result = $this->historyRepository->findHistoryData($entry);
-
-                    if($result != null){
-                        $result->setTstamp($dateTime->setTimestamp($result->getTstamp()));
+                    
+                    if($result !== null){
+                        $result->setTstamp($result->getTstamp());
                         $historyEntries[] = $result;
                     }
                 }
@@ -234,7 +232,11 @@ class DeploymentController extends ActionController {
         
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
-
+        
+        
+        // TODO: Lesen der neuen XML Dateien und schließlich das Einfügen in die Tabellen
+        // TODO: Prüfen ob FileReference Model weg kann, da dies auch in den normalen Änderungen erfasst wird
+        
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result2 = $this->insertDataService->insertDataIntoTable($content);
         

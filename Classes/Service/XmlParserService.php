@@ -53,12 +53,13 @@ class XmlParserService extends AbstractDataService{
     
     /**
      * Geänderte Datensätze in ein XML-Dokument schreiben.
-     * XML-Dateien sind unter fileadmin/deployment/YYYY-MM-DD/ zu finden
+     * XML-Dateien sind unter fileadmin/deployment/database/YYYY-MM-DD/ zu finden
      */
     public function writeXML() {
-        // Daten deserialisieren
-        $this->deployData = $this->unserializeHistoryData($this->deployData);
-
+        $newInsert = array();
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
 
@@ -75,29 +76,51 @@ class XmlParserService extends AbstractDataService{
         $this->xmlwriter->startElement('changeSet');
 
         foreach ($this->deployData as $cData) {
-            /** @var $cData History */
-            // für jeden Datensatz ein neues data-Element mit UID als Attribut
-            $this->xmlwriter->startElement('data');
-            $this->xmlwriter->writeAttribute('uid', $cData->getRecuid());
-
-            // Einzelne Feldelemente schreiben
-            $this->xmlwriter->writeElement('tablename', $cData->getTablename());
-            $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
-            $this->xmlwriter->writeElement('uid', $cData->getRecuid());
-            $this->xmlwriter->writeElement('pid', $this->getPid($cData->getTablename(), $cData->getRecuid()));
-            $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
-            $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
-            
-            // geänderte Historydaten durchlaufen
-            foreach ($cData->getHistoryData() as $datakey => $data) {
-                if ($datakey == 'newRecord') {
-                    foreach ($data as $key => $value) {
-                        $this->xmlwriter->writeElement($key, $value);
+            // Alle neuen Datensätze abfragen
+            if($cData->getSysLogUid() == 'NEW' && $cData->getFieldlist() == '*'){
+                $newInsert = $con->exec_SELECTgetSingleRow('*', $cData->getTablename(), 'uid='.$cData->getUid());
+                
+                // für jeden Datensatz ein neues data-Element mit UID als Attribut
+                $this->xmlwriter->startElement('data');
+                $this->xmlwriter->writeAttribute('uid', $cData->getUid());
+                $this->xmlwriter->writeElement('tablename', $cData->getTablename());
+                $this->xmlwriter->writeElement('fieldlist', $this->listArrayKeys($newInsert));
+                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
+                $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
+                
+                foreach($newInsert as $newkey => $newval){
+                    if($newkey != 'l18n_diffsource'){
+                        $this->xmlwriter->writeElement($newkey, $newval);
                     }
                 }
-            }
+                
+                $this->xmlwriter->endElement();
+            } 
+            // Veränderte Datensätze erstellen
+            else {
+                // für jeden Datensatz ein neues data-Element mit UID als Attribut
+                $this->xmlwriter->startElement('data');
+                $this->xmlwriter->writeAttribute('uid', $cData->getRecuid());
 
-            $this->xmlwriter->endElement();
+                // Einzelne Feldelemente schreiben
+                $this->xmlwriter->writeElement('tablename', $cData->getTablename());
+                $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
+                $this->xmlwriter->writeElement('uid', $cData->getRecuid());
+                $this->xmlwriter->writeElement('pid', $this->getPid($cData->getTablename(), $cData->getRecuid()));
+                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
+                $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
+
+                // geänderte Historydaten durchlaufen
+                foreach ($cData->getHistoryData() as $datakey => $data) {
+                    if ($datakey == 'newRecord') {
+                        foreach ($data as $key => $value) {
+                            $this->xmlwriter->writeElement($key, $value);
+                        }
+                    }
+                }
+
+                $this->xmlwriter->endElement();
+            }
         }
         
         $this->xmlwriter->endElement();
@@ -218,6 +241,7 @@ class XmlParserService extends AbstractDataService{
      * @return array<\TYPO3\Deployment\Domain\Model\LogData> $data
      */
     public function unserializeLogData($logData) {
+        $date = new \DateTime();
         $data = array();
 
         if ($logData != NULL) {
@@ -232,7 +256,7 @@ class XmlParserService extends AbstractDataService{
                 $this->logData->setData($unlogdata[0]);
                 $this->logData->setTable($tableAndId[0]);
                 $this->logData->setRecuid($tableAndId[1]);
-                $this->logData->setTstamp($log->getTstamp());
+                $this->logData->setTstamp($date->setTimestamp($log->getTstamp()));
                 
                if($log->getAction() == '1'){
                     $this->logData->setPid($unlogdata[3]);
@@ -314,6 +338,25 @@ class XmlParserService extends AbstractDataService{
     
     
     /**
+     * Generiert eine Liste aus den Arrayschlüsseln
+     * 
+     * @param array $newInsert
+     * @return string
+     */
+    public function listArrayKeys($newInsert){
+        $list = '';
+        $keysAsArray = array_keys($newInsert);
+        
+        foreach($keysAsArray as $key){
+            $list .= $key.',';
+        }
+        
+        return $list;
+    }
+
+
+    
+    /**
      * Löscht alle XML-Dateien und Ordner, die älter als ein halbes Jahr sind
      */
     public function deleteOlderFiles(){
@@ -364,8 +407,6 @@ class XmlParserService extends AbstractDataService{
      * @return \TYPO3\Deployment\Domain\Model\History
      */
     public function convertFromLogDataToHistory($entry){
-        /** @var \DateTime $date */
-        $date = new \DateTime;
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         $res = $con->exec_SELECTgetSingleRow('*', $entry->getTable(), 'uid='.$entry->getRecuid());
@@ -373,13 +414,13 @@ class XmlParserService extends AbstractDataService{
         
         /** @var \TYPO3\Deployment\Domain\Model\History $history */
         $history = new History();
-        $history->setUid($entry->getUid());
+        $history->setUid($entry->getRecuid());
         $history->setSysLogUid('NEW');
         $history->setHistoryData($sRes);
         $history->setFieldlist('*');
         $history->setRecuid($entry->getRecuid());
         $history->setTablename($entry->getTable());
-        $history->setTstamp($date->setTimestamp($entry->getTstamp()));
+        $history->setTstamp($entry->getTstamp());
         $history->setPid($res['pid']);
         
         return $history;
