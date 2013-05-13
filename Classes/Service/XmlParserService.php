@@ -373,6 +373,7 @@ class XmlParserService extends AbstractDataService{
         
         /** @var \TYPO3\Deployment\Domain\Model\History $history */
         $history = new History();
+        $history->setUid($entry->getUid());
         $history->setSysLogUid('NEW');
         $history->setHistoryData($sRes);
         $history->setFieldlist('*');
@@ -385,6 +386,25 @@ class XmlParserService extends AbstractDataService{
     }
     
     
+    /**
+     * Sucht die übergebene UID innerhalb der in der Registry gespeicherten History Daten
+     * 
+     * @param string $uid
+     * @return \TYPO3\Deployment\Domain\Model\HistoryData
+     */
+    public function compareDataWithRegistry($uid){
+        /** @var \TYPO3\CMS\Core\Registry $registry */
+        $registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
+        $data = unserialize($registry->get('deployment', 'storedHistoryData'));
+        
+        foreach($data as $hisdata){
+            if($hisdata->getUid() == $uid){
+                return $hisdata;
+            }
+        }
+    }
+
+
     /**
      * @return Array $logdata
      */

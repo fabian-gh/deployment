@@ -22,6 +22,11 @@ class History extends AbstractModel{
     /**
      * @var string 
      */
+    protected $uid;
+    
+    /**
+     * @var string 
+     */
     protected $sysLogUid;
     
     /**
@@ -49,6 +54,20 @@ class History extends AbstractModel{
      */
     protected $tstamp;
     
+    
+    /**
+     * @return string
+     */
+    public function getUid() {
+        return $this->uid;
+    }
+
+    /**
+     * @param string $uid
+     */
+    public function setUid($uid) {
+        $this->uid = $uid;
+    }
 
     /**
      * @return string

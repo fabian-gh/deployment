@@ -87,12 +87,12 @@ class DeploymentController extends ActionController {
      */
     public function indexAction() {
         // Registry-Objekt erstellen und prüfen
-        $this->registry = GeneralUtility::makeInstance('t3lib_Registry');
+        /** @var \TYPO3\CMS\Core\Registry $registry */
+        $this->registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
         $this->checkForRegistryEntry();
         
         // prüfen ob Scheduler Task registiert ist
         $reg = $this->schedulerTask->checkIfTaskIsRegistered();
-        
         if($reg === false){
             $this->flashMessageContainer->add('Bitte erstellen Sie einen Scheduler Task', 'Scheduler Task fehlt.', FlashMessage::ERROR);
         }
@@ -151,6 +151,7 @@ class DeploymentController extends ActionController {
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($allHistoryEintries);
             $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
+            $this->storeHistoryDataInRegistry($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
                 'historyEntries'    => $unserializedHistoryData,
@@ -170,17 +171,10 @@ class DeploymentController extends ActionController {
     public function createDeployAction(Deploy $deploy) {
         $deployData = $exFold = $newArr = array();
         
-//        if(is_string($deploy)){
-//            /** @var TYPO3\CMS\Extbase\Property\TypeConverter\ArrayConverter $$ArrayConverter */
-//            $ArrayConverter = new ArrayConverter();
-//            $newArr = $ArrayConverter->convertFrom($deploy, 'Array');
-//            DebuggerUtility::var_dump($newArr);die();
-//        }
-
-        foreach ($deploy->getDeployEntries() as $dep) {
-            $deployData[] = $this->historyRepository->findByUid($dep);
+        foreach ($deploy->getDeployEntries() as $uid) {
+            $deployData[] = $this->xmlParserService->compareDataWithRegistry($uid);
         }
-
+        
         // falls deployment-Ordner noch nicht existiert, dann erstellen
         /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
         $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
@@ -272,6 +266,17 @@ class DeploymentController extends ActionController {
         if($deploy == false){
             $this->registry->set('deployment', 'last_deploy', time());
         }
+    }
+    
+    
+    /**
+     * Speichert die erfragten Historyeinträge als serialisiertes Objekt in der Registry
+     * 
+     * @param \TYPO3\Deployment\Domain\Model\HistoryData $hisData
+     */
+    protected function storeHistoryDataInRegistry($hisData){
+        $storableHisData = serialize($hisData);
+        $this->registry->set('deployment', 'storedHistoryData', $storableHisData);
     }
     
     
