@@ -23,22 +23,16 @@ class HistoryRepository extends AbstractRepository {
     /**
      * Returned die benötigten Historydaten
      * 
-     * @param array<\TYPO3\Deployment\Domain\Model\LogData> $logData
-     * @return array<\TYPO3\CMS\Extbase\Persistence\QueryResultInterface>
+     * @param \TYPO3\Deployment\Domain\Model\LogData $logData
+     * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function findHistoryData($logData) {
-        $data = array();
-        
         $query = $this->createQuery();
         
-        foreach($logData as $ldata){
-            $constraint = $query->equals('sys_log_uid', $ldata->getUid());
-            $query->matching($constraint);
-            $temp = $query->execute();
-
-            $data[] = $temp->getFirst();
-        }
-
-        return $data;
+        $constraint = $query->equals('sys_log_uid', $logData->getUid());
+        $query->matching($constraint);
+        $data = $query->execute();
+        
+        return $data->getFirst();
     }
 }

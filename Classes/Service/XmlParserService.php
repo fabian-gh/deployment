@@ -15,6 +15,7 @@ use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Model\LogData;
 use \TYPO3\Deployment\Domain\Model\HistoryData;
+use \TYPO3\Deployment\Domain\Model\History;
 
 /**
  * XmlParserService
@@ -259,14 +260,13 @@ class XmlParserService extends AbstractDataService{
         if ($historyData != NULL) {
             foreach ($historyData as $his) {
                 if ($his != NULL) {
-                    /** @var $his History */
                     $this->historyData = new HistoryData();
                     $this->historyData->setPid($his->getPid());
                     $this->historyData->setUid($his->getUid());
                     $this->historyData->setSysLogUid($his->getSysLogUid());
-
+                    
                     $unlogdata = unserialize($his->getHistoryData());
-
+                    
                     // wird benötigt um das l18n_diffsource-Feld zu deserialisieren
                     foreach ($unlogdata as $key => $value) {
                         $data = array();
@@ -354,7 +354,37 @@ class XmlParserService extends AbstractDataService{
             }
         }
     }
-
+    
+    
+    /**
+     * Konvertiert neue Logeinträge, die noch nicht in der History Tabelle erfasst sind, 
+     * zu HistoryData-Objekten
+     * 
+     * @param \TYPO3\Deployment\Domain\Model\LogData $entry
+     * @return \TYPO3\Deployment\Domain\Model\History
+     */
+    public function convertFromLogDataToHistory($entry){
+        /** @var \DateTime $date */
+        $date = new \DateTime;
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        $res = $con->exec_SELECTgetSingleRow('*', $entry->getTable(), 'uid='.$entry->getRecuid());
+        $sRes = serialize($res);
+        
+        /** @var \TYPO3\Deployment\Domain\Model\History $history */
+        $history = new History();
+        $history->setSysLogUid('NEW');
+        $history->setHistoryData($sRes);
+        $history->setFieldlist('*');
+        $history->setRecuid($entry->getRecuid());
+        $history->setTablename($entry->getTable());
+        $history->setTstamp($date->setTimestamp($entry->getTstamp()));
+        $history->setPid($res['pid']);
+        
+        return $history;
+    }
+    
+    
     /**
      * @return Array $logdata
      */

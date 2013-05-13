@@ -17,7 +17,7 @@ use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
-use \TYPO3\CMS\Core\DataHandling\DataHandler;
+use \TYPO3\CMS\Extbase\Property\TypeConverter\ArrayConverter;
 
 /**
  * Deployment
@@ -114,6 +114,10 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
+        /** @var \DateTime $date */
+        $dateTime = new \DateTime();
+        $newHistoryEntries = $allHistoryEintries = array();
+        
         // Registry Eintrag holen
         $date = $this->registry->get('deployment', 'last_deploy');
         
@@ -124,11 +128,28 @@ class DeploymentController extends ActionController {
                 $deploy = new Deploy();
             }
             $this->view->assign('deploy', $deploy);
-
+            
             $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
-            $historyEntries = $this->historyRepository->findHistoryData($unserializedLogData);
-            // TODO: $historyEntries auf Richtigkeit überprüfen und  mit den Log daten abgleichen
-            $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($historyEntries);
+            
+            // Einträge durchlaufen, falls Action == 1 dann handelt es sich um einen komplett 
+            // neuen Datensatz, der zu einem Historyeintrag umgewandelt wird, damit dieser 
+            // widerum dargestellt werden kann
+            foreach($unserializedLogData as $entry){
+                if($entry->getAction() == '1'){
+                    $newHistoryEntries[] = $this->xmlParserService->convertFromLogDataToHistory($entry);
+                } else {
+                    /** @var \TYPO3\Deployment\Domain\Model\History $result */
+                    $result = $this->historyRepository->findHistoryData($entry);
+
+                    if($result != null){
+                        $result->setTstamp($dateTime->setTimestamp($result->getTstamp()));
+                        $historyEntries[] = $result;
+                    }
+                }
+            }
+            
+            $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
+            $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($allHistoryEintries);
             $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
@@ -147,7 +168,14 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function createDeployAction(Deploy $deploy) {
-        $deployData = $exFold = array();
+        $deployData = $exFold = $newArr = array();
+        
+//        if(is_string($deploy)){
+//            /** @var TYPO3\CMS\Extbase\Property\TypeConverter\ArrayConverter $$ArrayConverter */
+//            $ArrayConverter = new ArrayConverter();
+//            $newArr = $ArrayConverter->convertFrom($deploy, 'Array');
+//            DebuggerUtility::var_dump($newArr);die();
+//        }
 
         foreach ($deploy->getDeployEntries() as $dep) {
             $deployData[] = $this->historyRepository->findByUid($dep);
