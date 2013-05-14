@@ -36,11 +36,6 @@ class ResourceDataService extends AbstractRepository{
     protected $fileList;
     
     /**
-     * @var \TYPO3\Deployment\Domain\Model\FileReference
-     */
-    //protected $fileReference;
-    
-    /**
      * @var \XmlWriter
      */
     protected $xmlwriter;

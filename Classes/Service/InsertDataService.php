@@ -96,19 +96,11 @@ class InsertDataService extends AbstractDataService{
                 
                 if($controlResult != null){
                     // Daten updaten
-                    if(isset($entry['fileReference']) && $entry['fileReference'] != null){
-                        $con->exec_UPDATEquery('sys_file_reference', 'uuid='.$controlResult['uuid'], $entry['fileReference']);
-                    } else {
-                        $con->exec_UPDATEquery('sys_file', 'uid='.$controlResult['uid'], $entry);
-                    }
+                    $con->exec_UPDATEquery('sys_file', 'uid='.$controlResult['uid'], $entry);
                 } else {
                     unset($entry['uid']);
                     // Daten einfügen
-                    if(isset($entry['fileReference']) && $entry['fileReference'] != null){
-                        $con->exec_INSERTquery('sys_file_reference', $entry['fileReference']);
-                    } else {
-                        $con->exec_INSERTquery('sys_file', $entry);
-                    }
+                    $con->exec_INSERTquery('sys_file', $entry);
                 }
             }
             return true;
