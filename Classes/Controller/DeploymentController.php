@@ -44,12 +44,6 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $fileRepository;
-    
-    /**
-     * @var \TYPO3\Deployment\Domain\Repository\FileReferenceRepository
-     * @inject
-     */
-    protected $fileReferenceRepository;
 
     /**
      * @var \TYPO3\Deployment\Service\XmlParserService
