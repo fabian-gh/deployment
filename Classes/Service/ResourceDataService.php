@@ -86,6 +86,7 @@ class ResourceDataService extends AbstractRepository{
             $this->xmlwriter->writeElement('width', $file->getWidth());
             $this->xmlwriter->writeElement('height', $file->getHeight());
             $this->xmlwriter->writeElement('uuid', $this->getUuid($file->getUid(), 'sys_file'));
+            $this->xmlwriter->endElement();
         }
 
         $this->xmlwriter->endElement();
@@ -269,12 +270,19 @@ class ResourceDataService extends AbstractRepository{
                     copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
                 }
             } else {
+                // Daten aus Konfiguration holen
+                $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
+                $pullServer = $configuration['pullServer'];
+                $username = $configuration['username'];
+                $password = $configuration['password'];
+                
+                // TODO: Username & PAssword reinbauen für htaccess-Schutz
+                
                 // Nur Dateien >= 10 MB auf Dateiebene kopieren 
                 if($file->getSize() >= $this->maxFileSize){
-                    copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
+                    copy($pullServer.'fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
                 }
             }
-            
         }
     }
     

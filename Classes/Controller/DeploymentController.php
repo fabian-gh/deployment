@@ -234,7 +234,7 @@ class DeploymentController extends ActionController {
         $this->resource->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
-        $this->registry->set('deployment', 'last_deploy', time());
+        //$this->registry->set('deployment', 'last_deploy', time());
         
         if($result1 == true && $result2 == true){
             // Bestätigung ausgeben

@@ -12,6 +12,7 @@
 namespace TYPO3\Deployment\Scheduler;
 
 use \TYPO3\CMS\Scheduler\Task\AbstractTask;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CopyTask extends AbstractTask{
     
@@ -27,6 +28,7 @@ class CopyTask extends AbstractTask{
      * @return boolean
      */
     public function execute() {
+        $this->resourceDataService = GeneralUtility::makeInstance('TYPO3\\Deployment\\Service\\ResourceDataService');
         $this->resourceDataService->deployResources(true);
         return true;
     }

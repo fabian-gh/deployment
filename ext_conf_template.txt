@@ -1,3 +1,12 @@
+# cat=Access; type=text; label=Pull-Server: Address of pull server with trailing slash
+pullServer = 
+
+# cat=Access; type=text; label=Username: Username for login on pull server
+username = 
+
+# cat=Access; type=password; label=Password: Password for login on pull server
+password = 
+
 # cat=Backend; type=text; label=Deployment Tables: The list of deplyoment tables
 deploymentTables = pages,tt_content,sys_file
 
