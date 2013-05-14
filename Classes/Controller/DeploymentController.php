@@ -233,18 +233,17 @@ class DeploymentController extends ActionController {
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
         
-        
-        // TODO: Lesen der neuen XML Dateien und schließlich das Einfügen in die Tabellen
         // TODO: Prüfen ob FileReference Model weg kann, da dies auch in den normalen Änderungen erfasst wird
         
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result2 = $this->insertDataService->insertDataIntoTable($content);
+        DebuggerUtility::var_dump($result2);die();
         
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
         $this->resource->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
-        $this->registry->set('deployment', 'last_deploy', time());
+        //$this->registry->set('deployment', 'last_deploy', time());
         
         if($result1 == true && $result2 == true){
             // Bestätigung ausgeben

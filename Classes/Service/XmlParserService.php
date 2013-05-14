@@ -84,9 +84,10 @@ class XmlParserService extends AbstractDataService{
                 $this->xmlwriter->startElement('data');
                 $this->xmlwriter->writeAttribute('uid', $cData->getUid());
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
-                $this->xmlwriter->writeElement('fieldlist', $this->listArrayKeys($newInsert));
+                //$this->xmlwriter->writeElement('fieldlist', $this->listArrayKeys($newInsert));
+                $this->xmlwriter->writeElement('fieldlist', '*');
                 $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
-                $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
+                //$this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
                 
                 foreach($newInsert as $newkey => $newval){
                     if($newkey != 'l18n_diffsource'){

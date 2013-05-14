@@ -32,19 +32,17 @@ class InsertDataService extends AbstractDataService{
      */
     public function insertDataIntoTable($dataArr){
         $updateEntries = $insertEntries = array();
-        /** @var TYPO3\CMS\Extbase\Persistence\Generic\Storage\Typo3DbBackend $typo3DbBackend */
-        $typo3DbBackend = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\Storage\\Typo3DbBackend');
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
-        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy');
+        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
         
         if($con->isConnected()){
             foreach($dataArr as $entry){
-                if($entry['fieldlist'] !== 'l10n_diffsource'){
+                if($entry['fieldlist'] !== 'l10n_diffsource' || $entry['fieldlist'] !== 'l18n_diffsource'){
                     $controlResult = $con->exec_SELECTgetSingleRow('uid', $entry['tablename'], "uuid = '".$entry['uuid']."'");
                     
-                    if($controlResult != null){
+                    if($controlResult != null && $entry['fieldlist'] != '*'){
                         // Verarbeitung der einzufügenden Daten
                         $keys = array_keys($entry);
                         foreach($keys as $key){
@@ -56,9 +54,22 @@ class InsertDataService extends AbstractDataService{
                         
                         // Daten updaten
                         $con->exec_UPDATEquery($entry['tablename'], 'uid='.$controlResult['uid'], $updateEntries);
-                        $typo3DbBackend->clearPageCache($entry['tablename'], $controlResult['uid']);
                     } else {
-                        // Verarbeitung der einzufügenden Daten
+                        // Tabellennamen merken bevor er aus dem Array entfernt wird
+                        $tablename = $entry['tablename'];
+
+                        // Nicht mehr benötigte felder entfernen
+                        unset($entry['tablename']);
+                        unset($entry['fieldlist']);
+                        unset($entry['uid']);
+
+                        // neuen Timestamp setzen
+                        $entry['tstamp'] = time();
+
+                        $con->exec_INSERTquery($tablename, $entry);
+                        
+                        // ========================================================================
+                        /*// Verarbeitung der einzufügenden Daten
                         $keys = array_keys($entry);
                         foreach($keys as $key){
                             if($key !== 'tablename' && $key !== 'fieldlist' && $key !== 'uid' && $key !== 'pid' && $key !== 'uuid'){
@@ -74,7 +85,8 @@ class InsertDataService extends AbstractDataService{
                         );
                         
                         // Daten einfügen
-                        $con->exec_INSERTquery($entry['tablename'], $insertEntries);
+                        $con->exec_INSERTquery($entry['tablename'], $insertEntries);*/
+                        // ========================================================================
                     }
                 }
             }
@@ -91,8 +103,6 @@ class InsertDataService extends AbstractDataService{
      * @param array $dataArr
      */
     public function insertResourceDataIntoTable($dataArr){
-        /** @var TYPO3\CMS\Extbase\Persistence\Generic\Storage\Typo3DbBackend $typo3DbBackend */
-        $typo3DbBackend = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\Storage\\Typo3DbBackend');
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
@@ -106,10 +116,8 @@ class InsertDataService extends AbstractDataService{
                     // Daten updaten
                     if(isset($entry['fileReference']) && $entry['fileReference'] != null){
                         $con->exec_UPDATEquery('sys_file_reference', 'uuid='.$controlResult['uuid'], $entry['fileReference']);
-                        $typo3DbBackend->clearPageCache('sys_file_reference', $controlResult['uid']);
                     } else {
                         $con->exec_UPDATEquery('sys_file', 'uid='.$controlResult['uid'], $entry);
-                        $typo3DbBackend->clearPageCache('sys_file', $controlResult['uid']);
                     }
                 } else {
                     unset($entry['uid']);
