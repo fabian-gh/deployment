@@ -13,10 +13,6 @@ plugin.tx_deployment.persistence.classes{
     TYPO3\Deployment\Domain\Model\File{
         mapping.tableName = sys_file
     }
-
-    TYPO3\Deployment\Domain\Model\FileReference{
-        mapping.tableName = sys_file_reference
-    }
 }
 
 ### Move to general config
@@ -25,5 +21,3 @@ config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\Log < plugin
 config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\History < plugin.tx_deployment.persistence.classes.TYPO3\Deployment\Domain\Model\History
 
 config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\File < plugin.tx_deployment.persistence.classes.TYPO3\Deployment\Domain\Model\File
-
-config.tx_extbase.persistence.classes.TYPO3\Deployment\Domain\Model\FileReference < plugin.tx_deployment.persistence.classes.TYPO3\Deployment\Domain\Model\FileReference

@@ -1,5 +1,5 @@
 # cat=Backend; type=text; label=Deployment Tables: The list of deplyoment tables
-deploymentTables = pages,tt_content,sys_file,sys_file_reference
+deploymentTables = pages,tt_content,sys_file
 
 # cat=Backend; type=int+; label=Max file size: Maximum file size (Byte) for data which should be deployed
 maxFileSize = 10000000

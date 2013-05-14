@@ -38,7 +38,7 @@ class ResourceDataService extends AbstractRepository{
     /**
      * @var \TYPO3\Deployment\Domain\Model\FileReference
      */
-    protected $fileReference;
+    //protected $fileReference;
     
     /**
      * @var \XmlWriter
@@ -91,21 +91,6 @@ class ResourceDataService extends AbstractRepository{
             $this->xmlwriter->writeElement('width', $file->getWidth());
             $this->xmlwriter->writeElement('height', $file->getHeight());
             $this->xmlwriter->writeElement('uuid', $this->getUuid($file->getUid(), 'sys_file'));
-            
-            // FileRefenrece einfügen
-            $this->fileReference = $this->getFileReferenceFromTable($file->getUid());
-            if($this->fileReference != null){
-                $this->xmlwriter->startElement('fileReference');
-                $this->xmlwriter->writeElement('tablenames', ($this->fileReference->getTablenames() == null) ? '' :  $this->fileReference->getTablenames());
-                $this->xmlwriter->writeElement('fieldname', ($this->fileReference->getFieldname() == null) ? '' :  $this->fileReference->getFieldname());
-                $this->xmlwriter->writeElement('title', ($this->fileReference->getTitle() == null) ? null :  $this->fileReference->getTitle());
-                $this->xmlwriter->writeElement('description', ($this->fileReference->getDescription() == null) ? '' :  $this->fileReference->getDescription());
-                $this->xmlwriter->writeElement('alternative', ($this->fileReference->getAlternative() == null) ? '' :  $this->fileReference->getAlternative());
-                $this->xmlwriter->writeElement('link', ($this->fileReference->getLink() == null) ? '' :  $this->fileReference->getLink());
-                $this->xmlwriter->writeElement('uuid', ($this->fileReference->getUuid() == null) ? '' :  $this->fileReference->getUuid());
-                $this->xmlwriter->endElement();
-            }
-            $this->xmlwriter->endElement();
         }
 
         $this->xmlwriter->endElement();
@@ -183,22 +168,6 @@ class ResourceDataService extends AbstractRepository{
         }
         
         return $contentArr;
-    }
-    
-    
-    /**
-     * Gibt die referenzierten Daten für den übergebenen Datensatz zurück
-     * 
-     * @param string $uid
-     * @return \TYPO3\Deployment\Domain\Model\FileReference
-     */
-    protected function getFileReferenceFromTable($uid){
-        /** @var \TYPO3\Deployment\Domain\Repository\FileReferenceRepository $fileRefObj */
-        $fileRefObj = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileReferenceRepository');
-        /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $res */
-        $res = $fileRefObj->findByUidForeign($uid);
-
-        return ($res != null) ? $res[0] : null;
     }
     
     
@@ -377,20 +346,6 @@ class ResourceDataService extends AbstractRepository{
     public function setFileList($fileList) {
         $this->fileList = $fileList;
     }
-
-    /**
-     * @return \TYPO3\Deployment\Domain\Model\FileReference
-     */
-    public function getFileReference() {
-        return $this->fileReference;
-    }
-
-    /**
-     * @param \TYPO3\Deployment\Domain\Model\FileReference $fileReference
-     */
-    public function setFileReference($fileReference) {
-        $this->fileReference = $fileReference;
-    }
     
     /**
      * @return \XMLWriter
@@ -442,3 +397,56 @@ class ResourceDataService extends AbstractRepository{
         return $GLOBALS['TYPO3_DB'];
     }
 }
+
+
+
+// FileReference
+
+//            // FileRefenrece einfügen
+//            $this->fileReference = $this->getFileReferenceFromTable($file->getUid());
+//            if($this->fileReference != null){
+//                $this->xmlwriter->startElement('fileReference');
+//                $this->xmlwriter->writeElement('tablenames', ($this->fileReference->getTablenames() == null) ? '' :  $this->fileReference->getTablenames());
+//                $this->xmlwriter->writeElement('fieldname', ($this->fileReference->getFieldname() == null) ? '' :  $this->fileReference->getFieldname());
+//                $this->xmlwriter->writeElement('title', ($this->fileReference->getTitle() == null) ? null :  $this->fileReference->getTitle());
+//                $this->xmlwriter->writeElement('description', ($this->fileReference->getDescription() == null) ? '' :  $this->fileReference->getDescription());
+//                $this->xmlwriter->writeElement('alternative', ($this->fileReference->getAlternative() == null) ? '' :  $this->fileReference->getAlternative());
+//                $this->xmlwriter->writeElement('link', ($this->fileReference->getLink() == null) ? '' :  $this->fileReference->getLink());
+//                $this->xmlwriter->writeElement('uuid', ($this->fileReference->getUuid() == null) ? '' :  $this->fileReference->getUuid());
+//                $this->xmlwriter->endElement();
+//            }
+//            $this->xmlwriter->endElement();
+
+
+
+
+    /**
+     * Gibt die referenzierten Daten für den übergebenen Datensatz zurück
+     * 
+     * @param string $uid
+     * @return \TYPO3\Deployment\Domain\Model\FileReference
+     */
+//    protected function getFileReferenceFromTable($uid){
+//        /** @var \TYPO3\Deployment\Domain\Repository\FileReferenceRepository $fileRefObj */
+//        $fileRefObj = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileReferenceRepository');
+//        /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $res */
+//        $res = $fileRefObj->findByUidForeign($uid);
+//
+//        return ($res != null) ? $res[0] : null;
+//    }
+
+
+
+    /**
+//     * @return \TYPO3\Deployment\Domain\Model\FileReference
+//     */
+//    public function getFileReference() {
+//        return $this->fileReference;
+//    }
+//
+//    /**
+//     * @param \TYPO3\Deployment\Domain\Model\FileReference $fileReference
+//     */
+//    public function setFileReference($fileReference) {
+//        $this->fileReference = $fileReference;
+//    }
