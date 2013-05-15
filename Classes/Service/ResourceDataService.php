@@ -267,12 +267,14 @@ class ResourceDataService extends AbstractRepository{
             if($filesOverLimit === false){
                 // Nur Dateien <= 10 MB auf Dateiebene kopieren 
                 if($file->getSize() <= $this->maxFileSize){
-                    // Windows
-                    //copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
-                    
-                    // Linux
-                    $sourceDest = escapeshellcmd("$fileAdminPath/$fold/$filename $path/$fold/$filename");
-                    exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest"); 
+                    if(strpos(get_browser()->platform, 'Linux') !== false){
+                        // falls Linux das Betriebssystem ist
+                        $sourceDest = escapeshellcmd("$fileAdminPath/$fold/$filename $path/$fold/$filename");
+                        exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
+                    } else {
+                        // ansonsten "normales" kopieren über PHP
+                        copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
+                    }
                 }
             } else {
                 // Daten aus Konfiguration holen
@@ -285,12 +287,12 @@ class ResourceDataService extends AbstractRepository{
                 
                 // Nur Dateien >= 10 MB auf Dateiebene kopieren 
                 if($file->getSize() >= $this->maxFileSize){
-                    // Windows
-                    //copy($pullServer.'fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
-                    
-                    // Linux
-                    $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
-                    exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
+                    if(strpos(get_browser()->platform, 'Linux') !== false){
+                        $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
+                        exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
+                    } else {
+                       copy($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename); 
+                    }
                 }
             }
         }
