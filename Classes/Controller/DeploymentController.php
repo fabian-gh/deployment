@@ -163,6 +163,13 @@ class DeploymentController extends ActionController {
     public function createDeployAction(Deploy $deploy) {
         $deployData = $exFold = $newArr = array();
         
+        if(is_string($deploy)){
+            /** @var TYPO3\CMS\Extbase\Property\TypeConverter\ArrayConverter $ArrayConverter */
+            $ArrayConverter = new ArrayConverter();
+            $newArr = $ArrayConverter->convertFrom($deploy, 'Array');
+            DebuggerUtility::var_dump($newArr);die();
+        }
+        
         foreach ($deploy->getDeployEntries() as $uid) {
             $deployData[] = $this->xmlParserService->compareDataWithRegistry($uid);
         }
