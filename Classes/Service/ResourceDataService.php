@@ -292,7 +292,7 @@ class ResourceDataService extends AbstractRepository{
                         $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                         exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
                     } else {
-                       copy($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename); 
+                        copy($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename); 
                     }
                 }
             }
