@@ -241,6 +241,7 @@ class ResourceDataService extends AbstractRepository{
         $resFact = ResourceFactory::getInstance();
         $fileAdminPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
         $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
+        $os = get_browser()->platform;
         
         $data = $this->readXmlResourceList();
         
@@ -267,8 +268,8 @@ class ResourceDataService extends AbstractRepository{
             if($filesOverLimit === false){
                 // Nur Dateien <= 10 MB auf Dateiebene kopieren 
                 if($file->getSize() <= $this->maxFileSize){
-                    if(strpos(get_browser()->platform, 'Linux') !== false){
-                        // falls Linux das Betriebssystem ist
+                    if(strpos($os, 'Linux') !== false || strpos($os, 'Mac') !== false){
+                        // falls Linux oder Mac das Betriebssystem ist
                         $sourceDest = escapeshellcmd("$fileAdminPath/$fold/$filename $path/$fold/$filename");
                         exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
                     } else {
@@ -287,7 +288,7 @@ class ResourceDataService extends AbstractRepository{
                 
                 // Nur Dateien >= 10 MB auf Dateiebene kopieren 
                 if($file->getSize() >= $this->maxFileSize){
-                    if(strpos(get_browser()->platform, 'Linux') !== false){
+                    if(strpos($os, 'Linux') !== false || strpos($os, 'Mac') !== false){
                         $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                         exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
                     } else {
