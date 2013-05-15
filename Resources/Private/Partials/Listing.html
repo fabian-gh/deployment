@@ -9,6 +9,10 @@
     .space2{
         width: 250px;
     }
+    .img-spacer{
+        padding-left: 5px;
+        padding-bottom: 2px;
+    }
 </style>
 
 <f:form action="createDeploy" name="deploy" object="{deploy}">
@@ -16,7 +20,10 @@
 <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
  <table class="table typo3-dblist">
     <tr class="t3-row-header">
-        <th>&nbsp;</th>
+        <th>
+            <f:image src="{f:uri.resource(path: 'unchecked.png')}" alt="uncheck checkboxes" id="unchecked" class="img-spacer" />
+            <f:image src="{f:uri.resource(path: 'checked.png')}" alt="check checkboxes" id="checked" class="img-spacer" />
+        </th>
         <th>ID-Info</th>
         <th>Timestamp</th>
         <th>Table</th>
@@ -54,3 +61,30 @@
 
 <f:form.submit value="Liste erstellen" />   
 </f:form>
+
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+
+$('document').ready(function(){
+    // Alle Checkoxen checken und Checked-Checkbox verstecken
+    $(':checkbox').attr('checked', 'checked');
+    $('#checked').hide();
+    
+    // wenn auf Checkboxen unchecken geklickt wird dann verstecken, 
+    // Attribut entfernen und checked anzeigen
+    $('#unchecked').click(function(){
+        $(this).hide();
+        $(':checkbox').removeAttr('checked');
+        $('#checked').show();
+    });
+    
+    // analog zu oben
+    $('#checked').click(function(){
+        $(this).hide();
+        $(':checkbox').attr('checked', 'checked');
+        $('#unchecked').show();
+    });
+        
+});
+
+</script>
