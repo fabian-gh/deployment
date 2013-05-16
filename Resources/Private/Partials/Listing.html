@@ -1,5 +1,3 @@
-<link href="{f:uri.resource(path:'Css/Stylesheet.css')}" rel="stylesheet" />
-
 <f:form action="createDeploy" name="deploy" object="{deploy}">
 
 <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
@@ -44,10 +42,9 @@
 <f:form.submit value="Liste erstellen" />   
 </f:form>
 
-<!-- todo: evtl. auch auslagern -->
-
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
+    
 $.noConflict();
 jQuery('document').ready(function(){
 
