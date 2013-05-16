@@ -75,6 +75,7 @@ class DeploymentController extends ActionController {
      */
     protected $schedulerTask;
 
+    
     /**
      * IndexAction
      */
@@ -101,6 +102,7 @@ class DeploymentController extends ActionController {
         $this->xmlParserService->deleteOlderFiles();
     }
 
+    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
@@ -152,14 +154,14 @@ class DeploymentController extends ActionController {
         }
     }
 
+    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
      */
     public function createDeployAction(Deploy $deploy) {
         $deployData = $exFold = $newArr = array();
-        DebuggerUtility::var_dump($deploy);die();
-        
+
         foreach ($deploy->getDeployEntries() as $uid) {
             $deployData[] = $this->xmlParserService->compareDataWithRegistry($uid);
         }
@@ -209,6 +211,7 @@ class DeploymentController extends ActionController {
         $this->redirect('index');
     }
 
+    
     /**
      * DeployAction
      */
@@ -243,6 +246,7 @@ class DeploymentController extends ActionController {
         }
     }
 
+    
     /**
      * Prüft die Registry nach dem Eintrag. Falls nicht vorhanden wird dieser
      * erstellt
@@ -255,6 +259,7 @@ class DeploymentController extends ActionController {
         }
     }
 
+    
     /**
      * Speichert die erfragten Historyeinträge als serialisiertes Objekt in der Registry
      * 
@@ -265,6 +270,7 @@ class DeploymentController extends ActionController {
         $this->registry->set('deployment', 'storedHistoryData', $storableHisData);
     }
 
+    
     /**
      * Leert den Cache aller registrierten Seiten
      */
@@ -276,6 +282,18 @@ class DeploymentController extends ActionController {
         // ALLE Caches löschen (typo3temp/Cache + Tabellen)
         $dataHandler->clear_cacheCmd('all');
         $this->redirect('index');
+    }
+
+    
+    /**
+     * Überschreiben der Fehlermeldung "An error occurred while trying to call ..."
+     * 
+     * @return TYPO3\CMS\Core\Messaging\FlashMessage
+     */
+    protected function getErrorFlashMessage() {
+        if ($this->actionMethodName == 'createDeployAction') {
+            return false;
+        }
     }
 
 }
