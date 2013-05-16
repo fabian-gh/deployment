@@ -11,6 +11,7 @@
 
 namespace TYPO3\Deployment\Service;
 
+use TYPO3\CMS\Core\Utility\HttpUtility;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
@@ -180,7 +181,7 @@ class ResourceDataService extends AbstractRepository{
         $pathCount = strlen($path);
         // deployment-Ordner exkludieren
         foreach($fileList as $filekey => $filevalue){
-            if(strstr($filevalue, '/fileadmin/deployment') == false){
+            if(strstr($filevalue, '/fileadmin/deployment') == FALSE){
                 $newArr[$filekey] = substr($filevalue, $pathCount);
             }
         }
@@ -201,14 +202,14 @@ class ResourceDataService extends AbstractRepository{
 
         // processed Data raus
         foreach($filesInFileadmin as $filevalue){
-            if(strstr($filevalue, '_processed_/') == false){
+            if(strstr($filevalue, '_processed_/') == FALSE){
                 $fileArr[] = $filevalue;
             }
         }
         
         // temp Data raus
         foreach($fileArr as $filevalue){
-            if(strstr($filevalue, '_temp_/') == false){
+            if(strstr($filevalue, '_temp_/') == FALSE){
                 $newFileArr[] = $filevalue;
             }
         }
@@ -219,7 +220,7 @@ class ResourceDataService extends AbstractRepository{
             /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $result */
             $result = $fileRef->findByIdentifier($file);
             
-            if($result->getFirst() == null){
+            if($result->getFirst() == NULL){
                 $notIndexedFiles[] = $file;
             }
         }
@@ -236,7 +237,7 @@ class ResourceDataService extends AbstractRepository{
      * 
      * @param boolean $filesOverLimit
      */
-    public function deployResources($filesOverLimit = false){
+    public function deployResources($filesOverLimit = FALSE){
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
         $fileAdminPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
@@ -265,10 +266,10 @@ class ResourceDataService extends AbstractRepository{
                 GeneralUtility::mkdir_deep($path.'/'.$fold);
             }
             
-            if($filesOverLimit === false){
+            if($filesOverLimit === FALSE){
                 // Nur Dateien <= 10 MB auf Dateiebene kopieren 
                 if($file->getSize() <= $this->maxFileSize){
-                    if(strpos($os, 'Linux') !== false || strpos($os, 'Mac') !== false){
+                    if(strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE){
                         // falls Linux oder Mac das Betriebssystem ist
                         $sourceDest = escapeshellcmd("$fileAdminPath/$fold/$filename $path/$fold/$filename");
                         exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
@@ -283,12 +284,32 @@ class ResourceDataService extends AbstractRepository{
                 $pullServer = $configuration['pullServer'];
                 $username = $configuration['username'];
                 $password = $configuration['password'];
+
+
+
+	            // todo: prüfen ob die Usernamen und Passwort so passend mit in die URL übergeben werden
+
+	           $parts = parse_url($pullServer);
+
+	            if(trim($username) != '')
+		            $parts['user'] = $username;
+	            if(trim($password) != '')
+		            $parts['pass'] = $password;
+
+	            $pullServer = trim(HttpUtility::buildUrl($parts), '/');
+
+
+
+
+
+
+	            // foo://username:password@example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose
                 
                 // TODO: Username & Password reinbauen für htaccess-Schutz
                 
                 // Nur Dateien >= 10 MB auf Dateiebene kopieren 
                 if($file->getSize() >= $this->maxFileSize){
-                    if(strpos($os, 'Linux') !== false || strpos($os, 'Mac') !== false){
+                    if(strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE){
                         $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                         exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
                     } else {
@@ -338,7 +359,6 @@ class ResourceDataService extends AbstractRepository{
      * @return string
      */
     protected function getUuid($uid, $table){
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = '.$uid);
         
@@ -407,7 +427,7 @@ class ResourceDataService extends AbstractRepository{
     }
     
     /**
-     * @return DatabaseConnection
+     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
      */
     protected function getDatabase() {
         return $GLOBALS['TYPO3_DB'];

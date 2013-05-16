@@ -38,7 +38,7 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $historyRepository;
-    
+
     /**
      * @var \TYPO3\Deployment\Domain\Repository\FileRepository
      * @inject
@@ -62,20 +62,19 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $registry;
-    
+
     /**
      * @var \TYPO3\Deployment\Service\ResourceDataService
      * @inject
      */
     protected $resource;
-    
+
     /**
      * @var \TYPO3\Deployment\Scheduler\CopyTask
      * @inject
      */
     protected $schedulerTask;
 
-    
     /**
      * IndexAction
      */
@@ -84,126 +83,117 @@ class DeploymentController extends ActionController {
         /** @var \TYPO3\CMS\Core\Registry $registry */
         $this->registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
         $this->checkForRegistryEntry();
-        
+
         // prüfen ob Scheduler Task registiert ist
         $reg = $this->schedulerTask->checkIfTaskIsRegistered();
-        if($reg === false){
+        if ($reg === FALSE) {
             $this->flashMessageContainer->add('Bitte erstellen Sie einen Scheduler Task', 'Scheduler Task fehlt.', FlashMessage::ERROR);
         }
-        
+
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->resource->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
-        
+
         // prüft ob die Spalte UUID & der Wert existieren
         $this->insertDataService->checkIfUuidExists();
-        
+
         // XML-Dateien die älter als 0.5 Jahre sind löschen
         $this->xmlParserService->deleteOlderFiles();
     }
 
-    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
         $newHistoryEntries = $allHistoryEintries = array();
-        
+
         // Registry Eintrag holen
         $date = $this->registry->get('deployment', 'last_deploy');
-        
+
         $logEntries = $this->logRepository->findYoungerThen($date);
-        
+
         if ($logEntries->getFirst() != NULL) {
             if ($deploy === NULL) {
                 $deploy = new Deploy();
             }
             $this->view->assign('deploy', $deploy);
-            
+
             $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
-            
+
             // Einträge durchlaufen, falls Action == 1 dann handelt es sich um einen komplett 
             // neuen Datensatz, der zu einem Historyeintrag umgewandelt wird, damit dieser 
             // widerum dargestellt werden kann
-            foreach($unserializedLogData as $entry){
-                if($entry->getAction() == '1'){
+            foreach ($unserializedLogData as $entry) {
+                if ($entry->getAction() == '1') {
                     $newHistoryEntries[] = $this->xmlParserService->convertFromLogDataToHistory($entry);
                 } else {
                     /** @var \TYPO3\Deployment\Domain\Model\History $result */
                     $result = $this->historyRepository->findHistoryData($entry);
-                    
-                    if($result !== null){
+
+                    if ($result !== NULL) {
                         $result->setTstamp($result->getTstamp());
                         $historyEntries[] = $result;
                     }
                 }
             }
-            
+
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($allHistoryEintries);
             $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
             $this->storeHistoryDataInRegistry($unserializedHistoryData);
-            
+
             $this->view->assignMultiple(array(
-                'historyEntries'    => $unserializedHistoryData,
-                'diffData'          => $diffData
+                'historyEntries' => $unserializedHistoryData,
+                'diffData' => $diffData
             ));
-            
         } else {
             $this->flashMessageContainer->add('Keine Einträge gefunden', '', FlashMessage::ERROR);
         }
     }
 
-    
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate $deploy
      */
     public function createDeployAction(Deploy $deploy) {
         $deployData = $exFold = $newArr = array();
-        
-        if(is_string($deploy)){
-            /** @var TYPO3\CMS\Extbase\Property\TypeConverter\ArrayConverter $ArrayConverter */
-            $ArrayConverter = new ArrayConverter();
-            $newArr = $ArrayConverter->convertFrom($deploy, 'Array');
-            DebuggerUtility::var_dump($newArr);die();
-        }
+        DebuggerUtility::var_dump($deploy);die();
         
         foreach ($deploy->getDeployEntries() as $uid) {
             $deployData[] = $this->xmlParserService->compareDataWithRegistry($uid);
         }
-        
+
         // falls deployment-Ordner noch nicht existiert, dann erstellen
         /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
         $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
-        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
-        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/');
-        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/');
-        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource/');
-        
-        foreach($exFold as $ergkey => $ergvalue){
-            if(!$ergvalue){
-                switch($ergkey){
+        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/');
+        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/database/');
+        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/');
+        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/');
+
+        foreach ($exFold as $ergkey => $ergvalue) {
+            if (!$ergvalue) {
+                switch ($ergkey) {
                     case 0:
-                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/');
-                    break;
-                
+                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/');
+                        break;
+
                     case 1:
-                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/');
-                    break;
-                
+                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/database/');
+                        break;
+
                     case 2:
-                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/');
-                    break;
-                
+                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/');
+                        break;
+
                     case 3:
-                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource/');
-                    break;
+                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/');
+                        break;
                 }
             }
         }
-        
+
         // Mediendaten erstellen
         $date = $this->registry->get('deployment', 'last_deploy', time());
         $resourceData = $this->fileRepository->findYoungerThen($date);
@@ -219,31 +209,30 @@ class DeploymentController extends ActionController {
         $this->redirect('index');
     }
 
-    
     /**
      * DeployAction
      */
     public function deployAction() {
         // letztes Deployment-Datum lesen
         $tstamp = $this->registry->get('deployment', 'last_deploy');
-        
+
         //Mediendaten lesen
         $resourceData = $this->resource->readXmlResourceList();
         $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
-        
+
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
-        
+
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result2 = $this->insertDataService->insertDataIntoTable($content);
-        
+
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
         $this->resource->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
         //$this->registry->set('deployment', 'last_deploy', time());
-        
-        if($result1 == true && $result2 == true){
+
+        if ($result1 == TRUE && $result2 == TRUE) {
             // Bestätigung ausgeben
             $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
             // Redirect auf Hauptseite
@@ -253,36 +242,33 @@ class DeploymentController extends ActionController {
             $this->redirect('index');
         }
     }
-    
-    
+
     /**
      * Prüft die Registry nach dem Eintrag. Falls nicht vorhanden wird dieser
      * erstellt
      */
-    protected function checkForRegistryEntry(){
+    protected function checkForRegistryEntry() {
         $deploy = $this->registry->get('deployment', 'last_deploy');
-        
-        if($deploy == false){
+
+        if ($deploy == FALSE) {
             $this->registry->set('deployment', 'last_deploy', time());
         }
     }
-    
-    
+
     /**
      * Speichert die erfragten Historyeinträge als serialisiertes Objekt in der Registry
      * 
      * @param \TYPO3\Deployment\Domain\Model\HistoryData $hisData
      */
-    protected function storeHistoryDataInRegistry($hisData){
+    protected function storeHistoryDataInRegistry($hisData) {
         $storableHisData = serialize($hisData);
         $this->registry->set('deployment', 'storedHistoryData', $storableHisData);
     }
-    
-    
+
     /**
      * Leert den Cache aller registrierten Seiten
      */
-    public function clearPageCacheAction(){
+    public function clearPageCacheAction() {
         /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
         $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
         // Datahandler initialiseren
@@ -291,5 +277,5 @@ class DeploymentController extends ActionController {
         $dataHandler->clear_cacheCmd('all');
         $this->redirect('index');
     }
-    
+
 }

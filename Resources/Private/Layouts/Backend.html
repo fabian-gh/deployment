@@ -1,8 +1,13 @@
+<link type="text/css" href="{f:uri.resource(path:'Css/Stylesheet.css')}" rel="stylesheet" />
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
 <f:be.container loadExtJs="true">
+    
     <div class="typo3-fullDoc">
         <div id="typo3-docheader">
             <div id="typo3-docheader-row1">
                 <div class="buttonsleft">
+                    <f:be.buttons.icon uri="{f:uri.action(action:'index')}" icon="actions-document-close" title="Close this site" />
                     <f:render section="iconButtons" optional="true" />
                 </div>
                 <div class="buttonsright">

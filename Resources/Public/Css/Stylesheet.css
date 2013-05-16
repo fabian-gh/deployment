@@ -1,0 +1,46 @@
+.table{
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    border-collapse: collapse; 
+    border: 1px solid #000;
+    max-width: 500px;
+}
+.column{
+    border: 1px solid #000;
+    padding: 0 10px 10px 10px;
+}
+
+.table2{
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    border-collapse: collapse;
+    max-width: 850px;
+}
+
+.inner-table{
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    border-collapse: collapse;
+}
+
+.th-spacer{
+    width: 35px;
+}
+
+.th-spacer2{
+    font-size: 12px;
+    padding: 3px 0 3px 6px;
+}
+
+.space{
+    width: 95px;
+}
+
+.space2{
+    width: 250px;
+}
+
+.img-spacer{
+    margin-left: 6px;
+    margin-top: 6px;
+}

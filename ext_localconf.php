@@ -19,7 +19,7 @@ $autoLoader
 	->loadExtensionLocalConfigurationHooks()
 	->loadExtensionLocalConfigurationCommandController();
 
-
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['extbase']['typeConverters'][] = 'TYPO3\\Deployment\\Property\\TypeConverter\\ArrayConverter';
 
 /**
  * xClass -
