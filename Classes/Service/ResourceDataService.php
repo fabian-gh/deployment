@@ -245,7 +245,7 @@ class ResourceDataService extends AbstractRepository {
         $os = get_browser()->platform;
 
         $data = $this->readXmlResourceList();
-
+        
         foreach ($data as $resource) {
             /** @var \TYPO3\CMS\Core\Resource\File $file */
             $file = $resFact->getFileObject($resource['uid']);
@@ -284,21 +284,21 @@ class ResourceDataService extends AbstractRepository {
                 $server = $configuration['pullServer'];
                 $username = $configuration['username'];
                 $password = $configuration['password'];
-
+                
+                // URL in Teile zerlegen
                 $parts = parse_url($server);
 
+                // Username & Password trimmen falls nicht leer
                 if(trim($username) != ''){
                     $parts['user'] = $username;
                 }
-
                 if(trim($password) != ''){
                     $parts['pass'] = $password;
                 }
                 
-                // TODO: prüfen ob Adresse rivhtig zusammengesetzt wird
-                // http://username:password@example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose
+                // Pfad mit User und PW wieder zusammensetzen
                 $pullServer = trim(HttpUtility::buildUrl($parts), '/');
-
+                
                 // Nur Dateien >= 10 MB auf Dateiebene kopieren 
                 if ($file->getSize() >= $this->maxFileSize) {
                     if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {

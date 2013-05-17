@@ -107,13 +107,13 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
-        $newHistoryEntries = $allHistoryEintries = array();
+        $newHistoryEntries = $allHistoryEintries = $historyEntries = array();
 
         // Registry Eintrag holen
         $date = $this->registry->get('deployment', 'last_deploy');
 
         $logEntries = $this->logRepository->findYoungerThen($date);
-
+        
         if ($logEntries->getFirst() != NULL) {
             if ($deploy === NULL) {
                 $deploy = new Deploy();
@@ -121,7 +121,7 @@ class DeploymentController extends ActionController {
             $this->view->assign('deploy', $deploy);
 
             $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
-
+            
             // Einträge durchlaufen, falls Action == 1 dann handelt es sich um einen komplett 
             // neuen Datensatz, der zu einem Historyeintrag umgewandelt wird, damit dieser 
             // widerum dargestellt werden kann
@@ -131,19 +131,19 @@ class DeploymentController extends ActionController {
                 } else {
                     /** @var \TYPO3\Deployment\Domain\Model\History $result */
                     $result = $this->historyRepository->findHistoryData($entry);
-
+                    
                     if ($result !== NULL) {
                         $result->setTstamp($result->getTstamp());
                         $historyEntries[] = $result;
                     }
                 }
             }
-
+            
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($allHistoryEintries);
             $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
             $this->storeHistoryDataInRegistry($unserializedHistoryData);
-
+            
             $this->view->assignMultiple(array(
                 'historyEntries' => $unserializedHistoryData,
                 'diffData' => $diffData
@@ -232,7 +232,7 @@ class DeploymentController extends ActionController {
         $this->resource->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
-        //$this->registry->set('deployment', 'last_deploy', time());
+        $this->registry->set('deployment', 'last_deploy', time());
 
         if ($result1 == TRUE && $result2 == TRUE) {
             // Bestätigung ausgeben
