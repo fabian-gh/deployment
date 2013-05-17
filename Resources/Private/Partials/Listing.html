@@ -1,18 +1,18 @@
 <f:form action="createDeploy" name="deploy" object="{deploy}">
 
-<b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
- <table class="table2 typo3-dblist">
-    <tr class="t3-row-header">
-        <th class="th-spacer"><input type="checkbox" id="checkall" class="img-spacer" checked="checked" /></th>
-        <th class="th-spacer2">ID-Info</th>
-        <th class="th-spacer2">Timestamp</th>
-        <th class="th-spacer2">Table</th>
-        <th class="th-spacer2">Difference</th>
-    </tr>
-    <f:for each="{historyEntries}" as="entry">
+    <b>Gesamtdatensätze: </b><f:count>{historyEntries}</f:count><br /><br />
+    <table class="table2 typo3-dblist">
+        <tr class="t3-row-header">
+            <th class="th-spacer"><input type="checkbox" id="checkall" class="img-spacer" checked="checked" /></th>
+            <th class="th-spacer2">ID-Info</th>
+            <th class="th-spacer2">Timestamp</th>
+            <th class="th-spacer2">Table</th>
+            <th class="th-spacer2">Difference</th>
+        </tr>
+        <f:for each="{historyEntries}" as="entry">
 
-        <tr class="db_list_normal">
-            <td><f:form.checkbox property="deployEntries" value="{entry.uid}" checked="checked"/></td>
+            <tr class="db_list_normal">
+                <td><f:form.checkbox property="deployEntries" value="{entry.uid}" class="value-checkbox" /></td>
             <td class="space">
                 UID: {entry.uid}<br/>
                 Log-UID: {entry.sysLogUid}<br />
@@ -21,37 +21,37 @@
             <td class="space"><f:format.date format="d.m.Y H:i:s">{entry.tstamp}</f:format.date></td>
             <td class="space">{entry.tablename}</td>
             <td>
-                <f:for each="{diffData}" key="datakey" as="data">
-                    <f:if condition="{datakey} == {entry.recuid}">
-                        <table class="inner-table">
-                            <f:for each="{data}" key="key" as="valueArr">
-                                <f:for each="{valueArr}" key="valuekey" as="value">
-                                    <tr>
-                                        <td><i>{key}:</i><br /><f:format.raw>{value}</f:format.raw></td>
-                                    </tr>
-                                </f:for>
+            <f:for each="{diffData}" key="datakey" as="data">
+                <f:if condition="{datakey} == {entry.recuid}">
+                    <table class="inner-table">
+                        <f:for each="{data}" key="key" as="valueArr">
+                            <f:for each="{valueArr}" key="valuekey" as="value">
+                                <tr>
+                                    <td><i>{key}:</i><br /><f:format.raw>{value}</f:format.raw></td>
+                                </tr>
                             </f:for>
-                        </table>
-                    </f:if>
-                </f:for>
+                        </f:for>
+                    </table>
+                </f:if>
+            </f:for>
             </td>
-        </tr>
-    </f:for>
-</table><br />
+            </tr>
+        </f:for>
+    </table><br />
 
-<f:form.submit value="Liste erstellen" />   
+    <f:form.submit value="Liste erstellen" />   
 </f:form>
 
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
-    
-$.noConflict();
-jQuery('document').ready(function(){
 
-	jQuery('#checkall').click(function(){
-		jQuery('.db_list_normal :checkbox').prop('checked', jQuery(this).prop("checked"));
-	});
-        
+$.noConflict();
+jQuery('document').ready(function() {
+    jQuery('.value-checkbox').attr('checked', 'checked');
+    
+    jQuery('#checkall').click(function() {
+        jQuery('.value-checkbox').prop('checked', jQuery(this).prop("checked"));
+    });
 });
 
 </script>

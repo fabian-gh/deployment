@@ -1,5 +1,5 @@
 .table{
-    font-size: 12px;
+    font-size: 11px;
     border-collapse: collapse; 
     border: 1px solid #000;
     max-width: 500px;
@@ -10,7 +10,7 @@
 }
 
 .table2{
-    font-size: 12px;
+    font-size: 11px;
     border-collapse: collapse;
     max-width: 850px;
 }
