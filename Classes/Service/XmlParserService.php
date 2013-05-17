@@ -67,10 +67,12 @@ class XmlParserService extends AbstractDataService{
         $this->xmlwriter->openMemory();                         // Daten in Speicher schreiben
         $this->xmlwriter->setIndent(TRUE);                      // Einzug aktivieren
         $this->xmlwriter->startDocument('1.0');                 // Document-Tag erzeugen
-        $this->xmlwriter->startElement('xml');                  // Element erzeugen
-        $this->xmlwriter->writeAttribute('version', '1.0');     // Attribute für das vorherige Element vergeben
-        $this->xmlwriter->writeAttribute('encoding', 'UTF_8');
-        $this->xmlwriter->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        // Document Type Definition (DTD)
+        $this->xmlwriter->startDtd('changeSet');
+        $this->xmlwriter->writeDtdElement('changeSet', '(data)');
+        $this->xmlwriter->writeDtdElement('data', 'ANY');
+        $this->xmlwriter->writeDtdAttlist('data', 'uid CDATA #IMPLIED');
+        $this->xmlwriter->endDtd();
 
         // Daten schreiben
         $this->xmlwriter->startElement('changeSet');

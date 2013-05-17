@@ -59,10 +59,29 @@ class ResourceDataService extends AbstractRepository {
         $this->xmlwriter->openMemory();
         $this->xmlwriter->setIndent(TRUE);
         $this->xmlwriter->startDocument('1.0');
-        $this->xmlwriter->startElement('xml');
-        $this->xmlwriter->writeAttribute('version', '1.0');
-        $this->xmlwriter->writeAttribute('encoding', 'UTF_8');
-        $this->xmlwriter->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        // Document Type Definition (DTD)
+        $this->xmlwriter->startDtd('resourcelist');
+        $this->xmlwriter->writeDtdElement('resourcelist', '(file)');
+        $this->xmlwriter->writeDtdElement('file', '(uid,pid,tstamp,crdate,type,storage,identifier,extension,mime_type,name,title,sha1,size,creation_date,modification_date,width,height,uuid)');
+        $this->xmlwriter->writeDtdElement('uid', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('pid', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('tstamp', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('crdate', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('type', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('storage', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('identifier', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('extension', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('mime_type', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('name', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('title', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('sha1', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('size', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('creation_date', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('modification_date', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('width', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('height', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('uuid', '(#PCDATA)');
+        $this->xmlwriter->endDtd();
 
         // Daten schreiben
         $this->xmlwriter->startElement('resourcelist');
