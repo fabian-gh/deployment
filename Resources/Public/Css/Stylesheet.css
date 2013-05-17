@@ -1,5 +1,4 @@
 .table{
-    font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
     border-collapse: collapse; 
     border: 1px solid #000;
@@ -11,7 +10,6 @@
 }
 
 .table2{
-    font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
     border-collapse: collapse;
     max-width: 850px;

@@ -23,19 +23,19 @@ use \TYPO3\CMS\Core\Resource\ResourceFactory;
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class ResourceDataService extends AbstractRepository{
-    
+class ResourceDataService extends AbstractRepository {
+
     /**
      * max file size in Bytes
      * @var int 
      */
     protected $maxFileSize = 10000000;
-    
+
     /**
      * @var \TYPO3\Deployment\Domain\Model\File
      */
     protected $fileList;
-    
+
     /**
      * @var \XmlWriter
      */
@@ -45,13 +45,13 @@ class ResourceDataService extends AbstractRepository{
      * @var \SimpleXml
      */
     protected $xmlreader;
-    
 
+    
     /**
      * Schreibt eine XML-Datei mit allen im Fileadmin befindlichen Dateien, 
      * ohne Pfadangabe zum Fileadmin
      */
-    public function writeXmlResourceList(){
+    public function writeXmlResourceList() {
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
 
@@ -67,7 +67,7 @@ class ResourceDataService extends AbstractRepository{
         // Daten schreiben
         $this->xmlwriter->startElement('resourcelist');
 
-        foreach($this->fileList as $file) {
+        foreach ($this->fileList as $file) {
             $this->xmlwriter->startElement('file');
             $this->xmlwriter->writeElement('uid', $file->getUid());
             $this->xmlwriter->writeElement('pid', $file->getPid());
@@ -98,12 +98,12 @@ class ResourceDataService extends AbstractRepository{
         $file = GeneralUtility::tempnam('resource_');
         GeneralUtility::writeFile($file, $writeString);
 
-        $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/'.date('Y_m_d', time());
+        $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/' . date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
-        
+
         GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_resource.xml');
     }
-    
+
     
     /**
      * Liest alle noch nicht deployten Datensätze aus der Resource-XML Datei 
@@ -111,48 +111,48 @@ class ResourceDataService extends AbstractRepository{
      * 
      * @return array
      */
-    public function readXmlResourceList(){
+    public function readXmlResourceList() {
         $arrcount = 0;
         $fileArr = $dateFolder = $contentArr = $exFaf = $splittedDateTime = array();
         /** @var \TYPO3\CMS\Core\Registry $registry */
         $registry = GeneralUtility::makeInstance('t3lib_Registry');
         $timestamp = $registry->get('deployment', 'last_deploy', time());
-        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/');
-        
+        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/');
+
         if ($filesAndFolders) {
             // Dateipfad ausplitten
             foreach ($filesAndFolders as $faf) {
                 $exFaf[] = str_replace('media/', '', strstr($faf, 'media'));
             }
-            
+
             // Datum und Uhrzeit splitten
-            foreach($exFaf as $dateTime){
+            foreach ($exFaf as $dateTime) {
                 $splittedDateTime[] = explode('/', $dateTime);
             }
-            
+
             // pro Ordner/Datum ein Array mit allen Dateinamen darin
-            foreach($splittedDateTime as $dateTime){
+            foreach ($splittedDateTime as $dateTime) {
                 $dateFolder[$dateTime[0]][] = $dateTime[1];
             }
         }
-        
+
         //Dateien einlesen
         foreach ($dateFolder as $folder => $filename) {
             // Datum aus Ordner extrahieren
             $expDate = explode('_', $folder);
-            
+
             foreach ($filename as $file) {
                 // für jede Datei die Uhrzeit extrahieren
                 $temp = explode('_', $file);
                 $expTime = explode('-', $temp[0]);
                 // Timestamp erstellen
                 $dateAsTstamp = mktime($expTime[0], $expTime[1], $expTime[2], $expDate[1], $expDate[2], $expDate[0]);
-                
+
                 // wenn Datei-Timestamp später als letztes Deployment,
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
-                    $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/media/'.$folder.'/'.$file);
-                    
+                    $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/' . $folder . '/' . $file);
+
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->resourcelist->file as $fileset) {
                         foreach ($fileset as $key => $value) {
@@ -163,71 +163,71 @@ class ResourceDataService extends AbstractRepository{
                 }
             }
         }
-        
+
         return $contentArr;
     }
-    
+
     
     /**
      * Schreibt eine Dateiliste des Fileadmins, ohne Deploymentdateien
      */
-    public function readFilesInFileadmin(){
+    public function readFilesInFileadmin() {
         $fileArr = $newArr = array();
-        
+
         // direktes auslesen des Ordners, da evtl. nicht alle Dateien in Tabellen indexiert sind
-        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/';
+        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/';
         $fileList = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $path);
-        
+
         $pathCount = strlen($path);
         // deployment-Ordner exkludieren
-        foreach($fileList as $filekey => $filevalue){
-            if(strstr($filevalue, '/fileadmin/deployment') == FALSE){
+        foreach ($fileList as $filekey => $filevalue) {
+            if (strstr($filevalue, '/fileadmin/deployment') == FALSE) {
                 $newArr[$filekey] = substr($filevalue, $pathCount);
             }
         }
-        
+
         return $newArr;
     }
-    
+
     
     /**
      * Filtert alle nicht indizierten Dateien und fügt diese in die sys-file Tabelle ein
      * 
      * @return array 
      */
-    public function getNotIndexedFiles(){
+    public function getNotIndexedFiles() {
         $fileArr = $newFileArr = $notIndexedFiles = $filesInFileadmin = array();
-        
+
         $filesInFileadmin = $this->readFilesInFileadmin();
 
         // processed Data raus
-        foreach($filesInFileadmin as $filevalue){
-            if(strstr($filevalue, '_processed_/') == FALSE){
+        foreach ($filesInFileadmin as $filevalue) {
+            if (strstr($filevalue, '_processed_/') == FALSE) {
                 $fileArr[] = $filevalue;
             }
         }
-        
+
         // temp Data raus
-        foreach($fileArr as $filevalue){
-            if(strstr($filevalue, '_temp_/') == FALSE){
+        foreach ($fileArr as $filevalue) {
+            if (strstr($filevalue, '_temp_/') == FALSE) {
                 $newFileArr[] = $filevalue;
             }
         }
-        
-        foreach($newFileArr as $file){
+
+        foreach ($newFileArr as $file) {
             /** @var \TYPO3\Deployment\Domain\Repository\FileRepository $fileRef */
             $fileRef = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
             /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $result */
             $result = $fileRef->findByIdentifier($file);
-            
-            if($result->getFirst() == NULL){
+
+            if ($result->getFirst() == NULL) {
                 $notIndexedFiles[] = $file;
             }
         }
-        
+
         return $notIndexedFiles;
     }
-    
+
     
     /**
      * Dateien aus der sys_file-Tabelle holen und in den Deployment-Ordner kopieren.
@@ -237,16 +237,16 @@ class ResourceDataService extends AbstractRepository{
      * 
      * @param boolean $filesOverLimit
      */
-    public function deployResources($filesOverLimit = FALSE){
+    public function deployResources($filesOverLimit = FALSE) {
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
-        $fileAdminPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
-        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource';
+        $fileAdminPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin';
+        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource';
         $os = get_browser()->platform;
-        
+
         $data = $this->readXmlResourceList();
-        
-        foreach($data as $resource){
+
+        foreach ($data as $resource) {
             /** @var \TYPO3\CMS\Core\Resource\File $file */
             $file = $resFact->getFileObject($resource['uid']);
             $split = explode('/', $file->getIdentifier());
@@ -254,102 +254,94 @@ class ResourceDataService extends AbstractRepository{
 
             // Pfad wieder zusammensetzen
             $folder = '';
-            foreach($split as $sp){
-                if($sp != '' && $sp != 'fileadmin'){
-                    $folder = $folder.'/'.$sp;
+            foreach ($split as $sp) {
+                if ($sp != '' && $sp != 'fileadmin') {
+                    $folder = $folder . '/' . $sp;
                 }
             }
-            
+
             // erste Slash entfernen und Ordnerstruktur erstellen
             $fold = substr($folder, 1);
-            if(!is_dir($path.'/'.$fold)){
-                GeneralUtility::mkdir_deep($path.'/'.$fold);
+            if (!is_dir($path . '/' . $fold)) {
+                GeneralUtility::mkdir_deep($path . '/' . $fold);
             }
-            
-            if($filesOverLimit === FALSE){
+
+            if ($filesOverLimit === FALSE) {
                 // Nur Dateien <= 10 MB auf Dateiebene kopieren 
-                if($file->getSize() <= $this->maxFileSize){
-                    if(strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE){
-                        // falls Linux oder Mac das Betriebssystem ist
+                if ($file->getSize() <= $this->maxFileSize) {
+                    if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
+                        // falls Linux oder Mac das Betriebssystem ist über rsync
                         $sourceDest = escapeshellcmd("$fileAdminPath/$fold/$filename $path/$fold/$filename");
                         exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
                     } else {
                         // ansonsten "normales" kopieren über PHP
-                        copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
+                        copy($fileAdminPath . '/' . $fold . '/' . $filename, $path . '/' . $fold . '/' . $filename);
                     }
                 }
             } else {
                 // Daten aus Konfiguration holen
                 $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-                $pullServer = $configuration['pullServer'];
+                $server = $configuration['pullServer'];
                 $username = $configuration['username'];
                 $password = $configuration['password'];
 
+                $parts = parse_url($server);
 
+                if(trim($username) != ''){
+                    $parts['user'] = $username;
+                }
 
-	            // todo: prüfen ob die Usernamen und Passwort so passend mit in die URL übergeben werden
-
-	           $parts = parse_url($pullServer);
-
-	            if(trim($username) != '')
-		            $parts['user'] = $username;
-	            if(trim($password) != '')
-		            $parts['pass'] = $password;
-
-	            $pullServer = trim(HttpUtility::buildUrl($parts), '/');
-
-
-
-
-
-
-	            // foo://username:password@example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose
+                if(trim($password) != ''){
+                    $parts['pass'] = $password;
+                }
                 
-                // TODO: Username & Password reinbauen für htaccess-Schutz
-                
+                // TODO: prüfen ob Adresse rivhtig zusammengesetzt wird
+                // http://username:password@example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose
+                $pullServer = trim(HttpUtility::buildUrl($parts), '/');
+
                 // Nur Dateien >= 10 MB auf Dateiebene kopieren 
-                if($file->getSize() >= $this->maxFileSize){
-                    if(strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE){
+                if ($file->getSize() >= $this->maxFileSize) {
+                    if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
                         $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                         exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
                     } else {
-                        copy($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename); 
+                        copy($pullServer . '/fileadmin/' . $fold . '/' . $filename, $path . '/' . $fold . '/' . $filename);
                     }
                 }
             }
         }
     }
-    
+
     
     /**
      * Prüft ob die Dateien im resource-Ordner innerhalb des fileadmins vorhanden
      * sind. Falls nein werden diese kopiert.
      */
-    public function checkIfFileExists(){
+    public function checkIfFileExists() {
         $resourceFiles = $newArr = $newFileList = array();
-        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/';
-        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/resource/';
-        
+        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/';
+        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/';
+
         // Dateilisten 
         $fileadminFiles = $this->readFilesInFileadmin();
         $fileList = GeneralUtility::getAllFilesAndFoldersInPath($resourceFiles, $resPath);
-        
+
         // Pfade kürzen und in Array abspeichern
-        foreach($fileList as $paths){
+        foreach ($fileList as $paths) {
             $newFileList[] = str_replace('resource/', '', strstr($paths, 'resource'));
         }
-        
+
         // Unterschiede ermitteln
         $diffFiles = array_diff($newFileList, $fileadminFiles);
-        
+
         // Dateien aus resource ind fileadmin kopieren
-        foreach($diffFiles as $file){
-            if(!file_exists($path.'/'.$file)){
-                copy($resPath.$file, $path.'/'.$file);
+        foreach ($diffFiles as $file) {
+            if (!file_exists($path . '/' . $file)) {
+                copy($resPath . $file, $path . '/' . $file);
             }
         }
     }
-    
+
     
     /**
      * Gibt die entsprechende UUID passend zum Datensatz zurück
@@ -358,17 +350,17 @@ class ResourceDataService extends AbstractRepository{
      * @param string $table
      * @return string
      */
-    protected function getUuid($uid, $table){
+    protected function getUuid($uid, $table) {
         $con = $this->getDatabase();
-        $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = '.$uid);
-        
+        $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
+
         return $uuid['uuid'];
     }
-    
-    
+
+   
     
     // ============================ Getter & Setter ================================
-    
+
     /**
      * @return array
      */
@@ -382,7 +374,7 @@ class ResourceDataService extends AbstractRepository{
     public function setFileList($fileList) {
         $this->fileList = $fileList;
     }
-    
+
     /**
      * @return \XMLWriter
      */
@@ -410,7 +402,7 @@ class ResourceDataService extends AbstractRepository{
     public function setXmlreader(\SimpleXml $xmlreader) {
         $this->xmlreader = $xmlreader;
     }
-    
+
     /**
      * @return int
      */
@@ -425,13 +417,14 @@ class ResourceDataService extends AbstractRepository{
         $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
         (!empty($configuration)) ? $this->maxFileSize = $configuration['maxFileSize'] : $this->maxFileSize = 10000000;
     }
-    
+
     /**
      * @return \TYPO3\CMS\Core\Database\DatabaseConnection
      */
     protected function getDatabase() {
         return $GLOBALS['TYPO3_DB'];
     }
+
 }
 
 
