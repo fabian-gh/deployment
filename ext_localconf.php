@@ -42,10 +42,4 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['extbase']['typeConverters'][] = 'TYPO3\\
  * jeder:
  * slot('Classname', 'methoden', __CLASS__, __MEDTHOD__);
  *
- *
- *
- *
- *
- *
- *
  */
