@@ -322,7 +322,7 @@ class ResourceDataService extends AbstractRepository {
                 if ($file->getSize() >= $this->maxFileSize) {
                     if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
                         $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
-                        exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
+                        exec("rsync --compress --update --links --perms --min-size=$this->maxFileSize $sourceDest");
                     } else {
                         copy($pullServer . '/fileadmin/' . $fold . '/' . $filename, $path . '/' . $fold . '/' . $filename);
                     }
