@@ -30,12 +30,12 @@ class File extends AbstractModel {
     protected $pid;
     
     /**
-     * @var string
+     * @var \DateTime
      */
     protected $tstamp;
     
     /**
-     * @var string
+     * @var \DateTime
      */
     protected $crdate;
     
@@ -85,12 +85,12 @@ class File extends AbstractModel {
     protected $size;
     
     /**
-     * @var string
+     * @var \DateTime
      */
     protected $creationDate;
     
     /**
-     * @var string
+     * @var \DateTime
      */
     protected $modificationDate;
     
@@ -149,30 +149,30 @@ class File extends AbstractModel {
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getTstamp() {
         return $this->tstamp;
     }
 
     /**
-     * @param string $tstamp
+     * @param \DateTime $tstamp
      */
-    public function setTstamp($tstamp) {
+    public function setTstamp(\DateTime $tstamp) {
         $this->tstamp = $tstamp;
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getCrdate() {
         return $this->crdate;
     }
 
     /**
-     * @param string $crdate
+     * @param \DateTime $crdate
      */
-    public function setCrdate($crdate) {
+    public function setCrdate(\DateTime $crdate) {
         $this->crdate = $crdate;
     }
 
@@ -303,30 +303,30 @@ class File extends AbstractModel {
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getCreationDate() {
         return $this->creationDate;
     }
 
     /**
-     * @param string $creationDate
+     * @param \DateTime $creationDate
      */
-    public function setCreationDate($creationDate) {
+    public function setCreationDate(\DateTime $creationDate) {
         $this->creationDate = $creationDate;
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getModificationDate() {
         return $this->modificationDate;
     }
 
     /**
-     * @param string $modificationDate
+     * @param \DateTime $modificationDate
      */
-    public function setModificationDate($modificationDate) {
+    public function setModificationDate(\DateTime $modificationDate) {
         $this->modificationDate = $modificationDate;
     }
 

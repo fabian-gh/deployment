@@ -84,16 +84,25 @@ class XmlParserService extends AbstractDataService{
                 
                 // für jeden Datensatz ein neues data-Element mit UID als Attribut
                 $this->xmlwriter->startElement('data');
-                $this->xmlwriter->writeAttribute('uid', $cData->getUid());
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
-                //$this->xmlwriter->writeElement('fieldlist', $this->listArrayKeys($newInsert));
                 $this->xmlwriter->writeElement('fieldlist', '*');
-                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
-                //$this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
+                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
                 
                 foreach($newInsert as $newkey => $newval){
                     if($newkey != 'l18n_diffsource'){
-                        $this->xmlwriter->writeElement($newkey, $newval);
+                        if($newkey == 'pid'){
+                            $pageUuid = $this->getPageUuid($newval);
+                            $this->xmlwriter->writeElement('pid', $pageUuid);
+                        } elseif(preg_match('/header_link/', $newkey) === 1) {
+                            // TODO: Hier noch genauere Unterscheidung zwischen den einzelnen Typen
+                            $pageUuid = $this->getPageUuid($newval);
+                            $this->xmlwriter->writeElement($newkey, $pageUuid);
+                        } elseif((preg_match('/image_link/', $newkey) === 1)){
+                            // TODO: Was sagt image_link aus und was soll damit gemacht werden
+                            $this->xmlwriter->writeElement($newkey, $newval);
+                        } else {
+                            $this->xmlwriter->writeElement($newkey, $newval);
+                        }
                     }
                 }
                 
@@ -101,16 +110,17 @@ class XmlParserService extends AbstractDataService{
             } 
             // Veränderte Datensätze erstellen
             else {
+                // pid abfragen
+                $pid = $this->getPid($cData->getRecuid(), $cData->getTablename());
+                
                 // für jeden Datensatz ein neues data-Element mit UID als Attribut
                 $this->xmlwriter->startElement('data');
-                $this->xmlwriter->writeAttribute('uid', $cData->getRecuid());
 
                 // Einzelne Feldelemente schreiben
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
-                $this->xmlwriter->writeElement('uid', $cData->getRecuid());
-                $this->xmlwriter->writeElement('pid', $this->getPid($cData->getTablename(), $cData->getRecuid()));
-                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp());
+                $this->xmlwriter->writeElement('pid', $this->getPageUuid($pid));
+                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
                 $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
 
                 // geänderte Historydaten durchlaufen
@@ -325,38 +335,34 @@ class XmlParserService extends AbstractDataService{
     
     
     /**
-     * Gibt die pid der übergebenen uid innerhalb der übergebenen Tabelle zurück
+     * Gibt die uuid der übergebenen pid zurück
      * 
-     * @param string $table
-     * @param string $uid
-     * @return int
+     * @param string $pid
+     * @return string
      */
-    public function getPid($table, $uid){
+    public function getPageUuid($pid){
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
-        $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = '.$uid);
+        $uuid = $con->exec_SELECTgetSingleRow('uuid', 'pages', 'uid = '.$pid);
         
-        return (int)$pid['pid'];
+        return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
     }
     
     
     /**
-     * Generiert eine Liste aus den Arrayschlüsseln
+     * Gibt die pid der übergebenen uid zurück
      * 
-     * @param array $newInsert
-     * @return string
+     * @param string $uid
+     * @param string $table
+     * @return int
      */
-    public function listArrayKeys($newInsert){
-        $list = '';
-        $keysAsArray = array_keys($newInsert);
+    public function getPid($uid, $table){
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = '.$uid);
         
-        foreach($keysAsArray as $key){
-            $list .= $key.',';
-        }
-        
-        return $list;
+        return (!empty($pid['pid'])) ? $pid['pid'] : 0;
     }
-
 
     
     /**

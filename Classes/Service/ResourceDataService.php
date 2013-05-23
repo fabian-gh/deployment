@@ -52,6 +52,7 @@ class ResourceDataService extends AbstractRepository {
      * ohne Pfadangabe zum Fileadmin
      */
     public function writeXmlResourceList() {
+        DebuggerUtility::var_dump($this->fileList);die();
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
 
@@ -88,10 +89,9 @@ class ResourceDataService extends AbstractRepository {
 
         foreach ($this->fileList as $file) {
             $this->xmlwriter->startElement('file');
-            $this->xmlwriter->writeElement('uid', $file->getUid());
-            $this->xmlwriter->writeElement('pid', $file->getPid());
-            $this->xmlwriter->writeElement('tstamp', $file->getTstamp());
-            $this->xmlwriter->writeElement('crdate', $file->getCrdate());
+            $this->xmlwriter->writeElement('pid', $this->getPageUuid($file->getPid()));
+            $this->xmlwriter->writeElement('tstamp', $file->getTstamp()->getTimestamp());
+            $this->xmlwriter->writeElement('crdate', $file->getCrdate()->getTimestamp());
             $this->xmlwriter->writeElement('type', $file->getType());
             $this->xmlwriter->writeElement('storage', $file->getStorage());
             $this->xmlwriter->writeElement('identifier', $file->getIdentifier());
@@ -101,8 +101,8 @@ class ResourceDataService extends AbstractRepository {
             $this->xmlwriter->writeElement('title', $file->getTitle());
             $this->xmlwriter->writeElement('sha1', $file->getSha1());
             $this->xmlwriter->writeElement('size', $file->getSize());
-            $this->xmlwriter->writeElement('creation_date', $file->getCreationDate());
-            $this->xmlwriter->writeElement('modification_date', $file->getModificationDate());
+            $this->xmlwriter->writeElement('creation_date', $file->getCreationDate()->getTimestamp());
+            $this->xmlwriter->writeElement('modification_date', $file->getModificationDate()->getTimestamp());
             $this->xmlwriter->writeElement('width', $file->getWidth());
             $this->xmlwriter->writeElement('height', $file->getHeight());
             $this->xmlwriter->writeElement('uuid', $this->getUuid($file->getUid(), 'sys_file'));
@@ -374,6 +374,21 @@ class ResourceDataService extends AbstractRepository {
         $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
 
         return $uuid['uuid'];
+    }
+    
+    
+    /**
+     * Gibt die uuid der übergebenen pid zurück
+     * 
+     * @param string $pid
+     * @return string
+     */
+    public function getPageUuid($pid){
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        $uuid = $con->exec_SELECTgetSingleRow('uuid', 'pages', 'uid = '.$pid);
+        
+        return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
     }
 
    

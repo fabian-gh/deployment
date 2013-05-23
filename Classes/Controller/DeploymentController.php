@@ -141,8 +141,8 @@ class DeploymentController extends ActionController {
             
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($allHistoryEintries);
-            $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
             $this->storeHistoryDataInRegistry($unserializedHistoryData);
+            $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
                 'historyEntries' => $unserializedHistoryData,
