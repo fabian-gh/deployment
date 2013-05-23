@@ -52,7 +52,6 @@ class ResourceDataService extends AbstractRepository {
      * ohne Pfadangabe zum Fileadmin
      */
     public function writeXmlResourceList() {
-        DebuggerUtility::var_dump($this->fileList);die();
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
 
@@ -90,8 +89,8 @@ class ResourceDataService extends AbstractRepository {
         foreach ($this->fileList as $file) {
             $this->xmlwriter->startElement('file');
             $this->xmlwriter->writeElement('pid', $this->getPageUuid($file->getPid()));
-            $this->xmlwriter->writeElement('tstamp', $file->getTstamp()->getTimestamp());
-            $this->xmlwriter->writeElement('crdate', $file->getCrdate()->getTimestamp());
+            $this->xmlwriter->writeElement('tstamp', $file->getTstamp());
+            $this->xmlwriter->writeElement('crdate', $file->getCrdate());
             $this->xmlwriter->writeElement('type', $file->getType());
             $this->xmlwriter->writeElement('storage', $file->getStorage());
             $this->xmlwriter->writeElement('identifier', $file->getIdentifier());
@@ -101,15 +100,15 @@ class ResourceDataService extends AbstractRepository {
             $this->xmlwriter->writeElement('title', $file->getTitle());
             $this->xmlwriter->writeElement('sha1', $file->getSha1());
             $this->xmlwriter->writeElement('size', $file->getSize());
-            $this->xmlwriter->writeElement('creation_date', $file->getCreationDate()->getTimestamp());
-            $this->xmlwriter->writeElement('modification_date', $file->getModificationDate()->getTimestamp());
+            $this->xmlwriter->writeElement('creation_date', $file->getCreationDate());
+            $this->xmlwriter->writeElement('modification_date', $file->getModificationDate());
             $this->xmlwriter->writeElement('width', $file->getWidth());
             $this->xmlwriter->writeElement('height', $file->getHeight());
             $this->xmlwriter->writeElement('uuid', $this->getUuid($file->getUid(), 'sys_file'));
             $this->xmlwriter->endElement();
         }
 
-        $this->xmlwriter->endElement();
+        //$this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument();
         $writeString = $this->xmlwriter->outputMemory();

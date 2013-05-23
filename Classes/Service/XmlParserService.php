@@ -71,7 +71,6 @@ class XmlParserService extends AbstractDataService{
         $this->xmlwriter->startDtd('changeSet');
         $this->xmlwriter->writeDtdElement('changeSet', '(data)');
         $this->xmlwriter->writeDtdElement('data', 'ANY');
-        $this->xmlwriter->writeDtdAttlist('data', 'uid CDATA #IMPLIED');
         $this->xmlwriter->endDtd();
 
         // Daten schreiben
@@ -86,7 +85,7 @@ class XmlParserService extends AbstractDataService{
                 $this->xmlwriter->startElement('data');
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', '*');
-                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
+                //$this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
                 
                 foreach($newInsert as $newkey => $newval){
                     if($newkey != 'l18n_diffsource'){
@@ -136,7 +135,7 @@ class XmlParserService extends AbstractDataService{
             }
         }
         
-        $this->xmlwriter->endElement();
+        //$this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument(); // Dokument schließen
         $writeString = $this->xmlwriter->outputMemory();
@@ -178,7 +177,7 @@ class XmlParserService extends AbstractDataService{
                 $dateFolder[$dateTime[0]][] = $dateTime[1];
             }
         }
-
+        
         //Dateien einlesen
         foreach ($dateFolder as $folder => $filename) {
             // Datum aus Ordner extrahieren
@@ -199,6 +198,8 @@ class XmlParserService extends AbstractDataService{
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->changeSet->data as $dataset) {
                         foreach ($dataset as $key => $value) {
+                            DebuggerUtility::var_dump($key);
+                            DebuggerUtility::var_dump($value);
                             $contentArr[$arrcount][$key] = (string) $value;
                         }
                         $arrcount++;

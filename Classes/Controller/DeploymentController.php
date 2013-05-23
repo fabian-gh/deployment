@@ -217,14 +217,13 @@ class DeploymentController extends ActionController {
     public function deployAction() {
         // letztes Deployment-Datum lesen
         $tstamp = $this->registry->get('deployment', 'last_deploy');
-
+        
         //Mediendaten lesen
-        $resourceData = $this->resource->readXmlResourceList();
-        $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
+        //$resourceData = $this->resource->readXmlResourceList();
+        //$result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
 
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
-
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result2 = $this->insertDataService->insertDataIntoTable($content);
 
@@ -232,7 +231,7 @@ class DeploymentController extends ActionController {
         $this->resource->checkIfFileExists();
 
         // letzten Deployment-Stand registrieren
-        $this->registry->set('deployment', 'last_deploy', time());
+        //$this->registry->set('deployment', 'last_deploy', time());
 
         if ($result1 == TRUE && $result2 == TRUE) {
             // Bestätigung ausgeben

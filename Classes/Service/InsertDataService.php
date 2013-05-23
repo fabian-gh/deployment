@@ -32,13 +32,14 @@ class InsertDataService extends AbstractDataService{
     public function insertDataIntoTable($dataArr){
         $updateEntries = $insertEntries = array();
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
+        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
         
         if($con->isConnected()){
             foreach($dataArr as $entry){
-                if($entry['fieldlist'] !== 'l10n_diffsource' || $entry['fieldlist'] !== 'l18n_diffsource'){
+                DebuggerUtility::var_dump($entry);
+                /*if($entry['fieldlist'] !== 'l10n_diffsource' || $entry['fieldlist'] !== 'l18n_diffsource'){
                     $controlResult = $con->exec_SELECTgetSingleRow('uid', $entry['tablename'], "uuid = '".$entry['uuid']."'");
                     
                     if($controlResult != null && $entry['fieldlist'] != '*'){
@@ -70,8 +71,8 @@ class InsertDataService extends AbstractDataService{
                             $con->exec_INSERTquery($tablename, $entry);
                         }
                     }
-                }
-            }
+                }*/
+            }die();
             return true;
         }
     }
