@@ -35,10 +35,53 @@ class InsertDataService extends AbstractDataService{
         $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
-        
+        DebuggerUtility::var_dump($dataArr);
         if($con->isConnected()){
             foreach($dataArr as $entry){
-                DebuggerUtility::var_dump($entry);
+                if($entry['fieldlist'] !== 'l10n_diffsource' || $entry['fieldlist'] !== 'l18n_diffsource'){
+                    $lastModified = $con->exec_SELECTgetSingleRow('tstamp', $entry['tablename'], "uuid = '".$entry['uuid']."'");
+                    
+                    // wenn letzte Aktualisierung jünger ist als einzutragender Stand
+                    if($lastModified['tstamp'] > $entry['tstamp']){
+                        // TODO: Einträge sammeln und in Wizardausgabe fragen ob Datensätze ersetzt werden sollen
+                        // TODO: Update
+                    } 
+                    // wenn Eintrag älter ist als der zu aktualisierende
+                    elseif($lastModified['tstamp'] < $entry['tstamp']) {
+                        // Tabellennamen vor Löschung merken
+                        $table = $entry['tablename'];
+                        
+                        // entsprechende pid herausfinden
+                        $pid = $con->exec_SELECTgetSingleRow('pid', 'pages', "uuid = '".$entry['pid']."'");
+                        
+                        // pid und timestamp durch aktuelle Werte ersetzen
+                        $entry['pid'] = $pid['pid'];
+                        $entry['tstamp'] = time();
+                        // Tabellennamen, Fieldlist und UID löschen
+                        unset($entry['tablename']);
+                        unset($entry['fieldlist']);
+                        unset($entry['uid']);
+                        
+                        // Daten aktualisieren
+                        $con->exec_UPDATEquery($table, 'uuid='.$entry['uuid'], $entry);
+                    }
+                    // falls Datensatz noch nicht exisitert, dann einfügen
+                    elseif($lastModified === false){
+                        $table = $entry['tablename'];
+                        
+                        // neuen Timestamp setzen
+                        $entry['tstamp'] = time();
+                        // TODO: Was passiert mit pid? Auf Ausweichseite einfügen mit PID 1.000.000 und dann manuell zuweisen
+                        unset($entry['tablename']);
+                        unset($entry['fieldlist']);
+                        unset($entry['uid']);
+
+                        $con->exec_INSERTquery($table, $entry);
+                    }
+                }
+                
+                
+                
                 /*if($entry['fieldlist'] !== 'l10n_diffsource' || $entry['fieldlist'] !== 'l18n_diffsource'){
                     $controlResult = $con->exec_SELECTgetSingleRow('uid', $entry['tablename'], "uuid = '".$entry['uuid']."'");
                     
