@@ -220,8 +220,8 @@ class DeploymentController extends ActionController {
         
         //Mediendaten lesen
         $resourceData = $this->resource->readXmlResourceList();
-        //$result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
-
+        $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
+        die();
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
         // content in DB-Felder der jeweiligen Tabelle schreiben
@@ -239,9 +239,18 @@ class DeploymentController extends ActionController {
             // Redirect auf Hauptseite
             $this->redirect('index');
         } else {
-            $this->flashMessageContainer->add('Die Daten konnten nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es ist ein Fehler aufgetreten', FlashMessage::ERROR);
-            $this->redirect('index');
+            $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es ist ein Fehler aufgetreten', FlashMessage::ERROR);
+            $this->redirect('failure', 'Deployment', 'deployment', $result2);
         }
+    }
+    
+    
+    public function failureAction($failureentries){
+        $this->view->assign('failureEntries', $failureentries);
+    }
+    
+    public function clearFailuresAction(){
+        // TODO: Verarbeitung nachdem das Formular abgeschickt wurde
     }
 
     
