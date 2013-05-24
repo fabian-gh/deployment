@@ -219,8 +219,8 @@ class DeploymentController extends ActionController {
         $tstamp = $this->registry->get('deployment', 'last_deploy');
         
         //Mediendaten lesen
-        //$resourceData = $this->resource->readXmlResourceList();
-        //$result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
+        $resourceData = $this->resource->readXmlResourceList();
+        $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
 
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);

@@ -196,10 +196,8 @@ class XmlParserService extends AbstractDataService{
                     $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/'.$folder.'/'.$file);
 
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
-                    foreach ($this->xmlreader->changeSet->data as $dataset) {
+                    foreach ($this->xmlreader->data as $dataset) {
                         foreach ($dataset as $key => $value) {
-                            DebuggerUtility::var_dump($key);
-                            DebuggerUtility::var_dump($value);
                             $contentArr[$arrcount][$key] = (string) $value;
                         }
                         $arrcount++;
@@ -207,7 +205,7 @@ class XmlParserService extends AbstractDataService{
                 }
             }
         }
-
+        
         return $contentArr;
     }
     

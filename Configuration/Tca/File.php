@@ -10,7 +10,7 @@ $TCA['sys_file'] = array(
 );
 
 $fields = array(
-    'uid',
+    'uid'
 );
 
 

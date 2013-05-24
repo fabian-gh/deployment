@@ -177,7 +177,7 @@ class ResourceDataService extends AbstractRepository {
                     $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/' . $folder . '/' . $file);
 
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
-                    foreach ($this->xmlreader->resourcelist->file as $fileset) {
+                    foreach ($this->xmlreader->file as $fileset) {
                         foreach ($fileset as $key => $value) {
                             $contentArr[$arrcount][$key] = (string) $value;
                         }
