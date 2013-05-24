@@ -194,7 +194,7 @@ class XmlParserService extends AbstractDataService{
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
                     $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/'.$folder.'/'.$file);
-                    
+
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->changeSet->data as $dataset) {
                         foreach ($dataset as $key => $value) {

@@ -52,6 +52,9 @@ class ResourceDataService extends AbstractRepository {
      * ohne Pfadangabe zum Fileadmin
      */
     public function writeXmlResourceList() {
+        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
+        $resFact = ResourceFactory::getInstance();
+        
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
 
@@ -62,9 +65,9 @@ class ResourceDataService extends AbstractRepository {
         // Document Type Definition (DTD)
         $this->xmlwriter->startDtd('resourcelist');
         $this->xmlwriter->writeDtdElement('resourcelist', '(file)');
-        $this->xmlwriter->writeDtdElement('file', '(uid,pid,tstamp,crdate,type,storage,identifier,extension,mime_type,name,title,sha1,size,creation_date,modification_date,width,height,uuid)');
-        $this->xmlwriter->writeDtdElement('uid', '(#PCDATA)');
-        $this->xmlwriter->writeDtdElement('pid', '(#PCDATA)');
+        $this->xmlwriter->writeDtdElement('file', '(tstamp,crdate,type,storage,identifier,extension,mime_type,name,title,sha1,size,creation_date,modification_date,width,height,uuid)');
+        //$this->xmlwriter->writeDtdElement('uid', '(#PCDATA)');
+        //$this->xmlwriter->writeDtdElement('pid', '(#PCDATA)');
         $this->xmlwriter->writeDtdElement('tstamp', '(#PCDATA)');
         $this->xmlwriter->writeDtdElement('crdate', '(#PCDATA)');
         $this->xmlwriter->writeDtdElement('type', '(#PCDATA)');
@@ -87,24 +90,26 @@ class ResourceDataService extends AbstractRepository {
         $this->xmlwriter->startElement('resourcelist');
 
         foreach ($this->fileList as $file) {
+            $FileObj = $resFact->getFileObject($file->getUid());
             $this->xmlwriter->startElement('file');
-            $this->xmlwriter->writeElement('pid', $this->getPageUuid($file->getPid()));
-            $this->xmlwriter->writeElement('tstamp', $file->getTstamp());
-            $this->xmlwriter->writeElement('crdate', $file->getCrdate());
-            $this->xmlwriter->writeElement('type', $file->getType());
-            $this->xmlwriter->writeElement('storage', $file->getStorage());
-            $this->xmlwriter->writeElement('identifier', $file->getIdentifier());
-            $this->xmlwriter->writeElement('extension', $file->getExtension());
-            $this->xmlwriter->writeElement('mime_type', $file->getMimeType());
-            $this->xmlwriter->writeElement('name', $file->getName());
-            $this->xmlwriter->writeElement('title', $file->getTitle());
-            $this->xmlwriter->writeElement('sha1', $file->getSha1());
-            $this->xmlwriter->writeElement('size', $file->getSize());
-            $this->xmlwriter->writeElement('creation_date', $file->getCreationDate());
-            $this->xmlwriter->writeElement('modification_date', $file->getModificationDate());
-            $this->xmlwriter->writeElement('width', $file->getWidth());
-            $this->xmlwriter->writeElement('height', $file->getHeight());
-            $this->xmlwriter->writeElement('uuid', $this->getUuid($file->getUid(), 'sys_file'));
+            //$this->xmlwriter->writeElement('pid', $this->getPageUuid($FileObj->getProperty('uid')));
+            $this->xmlwriter->writeElement('tstamp', $FileObj->getProperty('tstamp'));
+            $this->xmlwriter->writeElement('crdate', $FileObj->getProperty('crdate'));
+            $this->xmlwriter->writeElement('type', $FileObj->getProperty('type'));
+            $this->xmlwriter->writeElement('storage', $FileObj->getProperty('storage'));
+            $this->xmlwriter->writeElement('identifier', $FileObj->getProperty('identifier'));
+            $this->xmlwriter->writeElement('extension', $FileObj->getProperty('extension'));
+            $this->xmlwriter->writeElement('mime_type', $FileObj->getProperty('mime_type'));
+            $this->xmlwriter->writeElement('name', $FileObj->getProperty('name'));
+            $this->xmlwriter->writeElement('title', $FileObj->getProperty('title'));
+            $this->xmlwriter->writeElement('sha1', $FileObj->getProperty('sha1'));
+            $this->xmlwriter->writeElement('size', $FileObj->getProperty('size'));
+            $this->xmlwriter->writeElement('creation_date', $FileObj->getProperty('creation_date'));
+            $this->xmlwriter->writeElement('modification_date', $FileObj->getProperty('modification_date'));
+            $this->xmlwriter->writeElement('width', $FileObj->getProperty('width'));
+            $this->xmlwriter->writeElement('height', $FileObj->getProperty('height'));
+            //$this->xmlwriter->writeElement('uuid', $this->getUuid($file->getUid(), 'sys_file'));
+            $this->xmlwriter->writeElement('uuid', $FileObj->getProperty('uuid'));
             $this->xmlwriter->endElement();
         }
 

@@ -192,27 +192,3 @@ class InsertDataService extends AbstractDataService{
             mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
     }
 }
-
-
-
-
-// Aus alter insertDataIntoTable
-// ========================================================================
-/*// Verarbeitung der einzufügenden Daten
-$keys = array_keys($entry);
-foreach($keys as $key){
-    if($key !== 'tablename' && $key !== 'fieldlist' && $key !== 'uid' && $key !== 'pid' && $key !== 'uuid'){
-        $updateKey = $key;
-    }
-}
-$insertEntries = array(
-    'tstamp'    => time(),
-    'crdate'    => time(),
-    $updateKey  => $entry[$key],
-    'pid'       => $entry['pid'],
-    'uuid'      => $entry['uuid'],
-);
-
-// Daten einfügen
-$con->exec_INSERTquery($entry['tablename'], $insertEntries);*/
-// ========================================================================
