@@ -25,75 +25,78 @@ class InsertDataService extends AbstractDataService{
     
     /**
      * Prüft ob der übergebene Eintrag eingefügt oder aktualisert werden muss.
-     * Falls der Eintrag älter ist als der vorhandene, dann für manuelle fehlerbehung sammeln
+     * Falls der Eintrag älter ist als der vorhandene, dann für manuelle Fehlerbehung sammeln
      * 
      * @param array $entry
      * @param boolean $flag
-     * @return mixed <b>true</b> if no failures, else <b>array</b>
+     * @return mixed <b>array</b> or <b>true</b>
      */
-    protected function checkDataValue($entry, $flag = false){
-        $entryCollection = array();
+    protected function checkDataValues($entry, $flag = false){
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
         
-        // letzte Aktualisierung abfragen
-        $lastModified = $con->exec_SELECTgetSingleRow('tstamp', $entry['tablename'], "uuid = '".$entry['uuid']."'");
-
-        // wenn letzte Aktualisierung jünger ist als einzutragender Stand
-        if($lastModified['tstamp'] > $entry['tstamp']){
-            $entryCollection[] = $entry;
-        } 
-        // wenn Eintrag älter ist als der zu aktualisierende
-        elseif($lastModified['tstamp'] < $entry['tstamp']) {
-            // Tabellennamen vor Löschung merken
-            $table = $entry['tablename'];
-
-            if($flag === true){
-                // entsprechende pid herausfinden
-                $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$entry['pid']."'");
-                
-                // pid und timestamp durch aktuelle Werte ersetzen
-                $entry['pid'] = $uid['uid'];
-            } else {
-                $pid = $con->exec_SELECTgetSingleRow('pid', 'pages', "uuid = '".$entry['pid']."'");
-                $entry['pid'] = $pid['pid'];
-            }
-
-            $entry['tstamp'] = time();
-            // Tabellennamen, Fieldlist und UID löschen
-            unset($entry['tablename']);
-            unset($entry['fieldlist']);
-            unset($entry['uid']);
-
-            // Daten aktualisieren
-            $con->exec_UPDATEquery($table, 'uuid='.$entry['uuid'], $entry);
-        }
-        // falls Datensatz noch nicht exisitert, dann einfügen
-        elseif($lastModified === false){
-            $table = $entry['tablename'];
+        if($con->isConnected()){
+            // letzte Aktualisierung abfragen
+            $lastModified = $con->exec_SELECTgetSingleRow('tstamp', $entry['tablename'], "uuid = '".$entry['uuid']."'");
             
-            // falls neuer Eintrag in pages-Tabelle
-            if($flag === true){
-                $entry['pid'] = 0;
-            } 
-            // falls neuer Eintrag in andere Tabelle, dann wieder die entsprechende PID abfragen
-            else {
-                $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$entry['pid']."'");
-                $entry['pid'] = $uid['uid'];
+            // falls Datensatz noch nicht exisitert, dann einfügen
+            if($lastModified === false){
+                $table = $entry['tablename'];
+
+                // falls neuer Eintrag in pages-Tabelle
+                if($flag === true){
+                    $entry['pid'] = 0;
+                } 
+                // falls neuer Eintrag in andere Tabelle, dann wieder die entsprechende PID abfragen
+                else {
+                    $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$entry['pid']."'");
+                    $entry['pid'] = $uid['uid'];
+                }
+
+                // neuen Timestamp setzen
+                $entry['tstamp'] = time();
+                unset($entry['tablename']);
+                unset($entry['fieldlist']);
+                unset($entry['uid']);
+                
+                $con->exec_INSERTquery($table, $entry);
+                
+                return true;
             }
+            // wenn letzte Aktualisierung jünger ist als einzutragender Stand
+            elseif($lastModified['tstamp'] > $entry['tstamp']){
+                return $entry;
+            } 
+            // wenn Eintrag älter ist als der zu aktualisierende
+            elseif($lastModified['tstamp'] < $entry['tstamp']) {
+                // Tabellennamen vor Löschung merken
+                $table = $entry['tablename'];
 
-            // neuen Timestamp setzen
-            $entry['tstamp'] = time();
-            unset($entry['tablename']);
-            unset($entry['fieldlist']);
-            unset($entry['uid']);
+                if($flag === true){
+                    // entsprechende pid herausfinden
+                    $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$entry['pid']."'");
 
-            $con->exec_INSERTquery($table, $entry);
+                    // pid und timestamp durch aktuelle Werte ersetzen
+                    $entry['pid'] = $uid['uid'];
+                } else {
+                    $pid = $con->exec_SELECTgetSingleRow('pid', 'pages', "uuid = '".$entry['pid']."'");
+                    $entry['pid'] = $pid['pid'];
+                }
+
+                $entry['tstamp'] = time();
+                // Tabellennamen, Fieldlist und UID löschen
+                unset($entry['tablename']);
+                unset($entry['fieldlist']);
+                unset($entry['uid']);
+
+                // Daten aktualisieren
+                $con->exec_UPDATEquery($table, 'uuid='.$entry['uuid'], $entry);
+                
+                return true;
+            }
         }
-        
-        return (empty($entryCollection)) ? true : $entryCollection;
     }
     
     
@@ -106,41 +109,35 @@ class InsertDataService extends AbstractDataService{
      */
     public function insertDataIntoTable($dataArr){
         $entryCollection = $secondPriority = array();
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
-        // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
-        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
         
-        if($con->isConnected()){
-            foreach($dataArr as $entry){
-                // page-Einträge haben Vorrang, 1. Priorität
-                // Sicherstellung dass erst die Seiten vorhanden sind bevor
-                // diese referenziert werden
-                if($entry['tablename'] == 'pages'){
-                    $res = $this->checkDataValue($entry, true);
-                    
-                    if($res !== true){
-                        $entryCollection[] = $res;
-                    }
-                } 
-                // alle anderen Einträge werden gesammelt und im zweiten Schritt verarbeitet, 2. Priorität
-                else {
-                    $secondPriority[] = $entry;
+        foreach($dataArr as $entry){
+            // page-Einträge haben Vorrang, 1. Priorität
+            // Sicherstellung dass erst die Seiten vorhanden sind bevor
+            // diese referenziert werden
+            if($entry['tablename'] == 'pages'){
+                $res = $this->checkDataValues($entry, true);
+                
+                if($res !== true){
+                    $entryCollection[] = $res;
                 }
+            } 
+            // alle anderen Einträge werden gesammelt und im zweiten Schritt verarbeitet, 2. Priorität
+            else {
+                $secondPriority[] = $entry;
             }
-            
-            foreach($secondPriority as $second){
-                if($second['fieldlist'] !== 'l10n_diffsource' || $second['fieldlist'] !== 'l18n_diffsource'){
-                    $res = $this->checkDataValue($second);
-                    
-                    if($res !== true){
-                        $entryCollection[] = $res;
-                    }
-                }
-            }
-            
-            return (empty($entryCollection)) ? true : $entryCollection;
         }
+
+        foreach($secondPriority as $second){
+            if($second['fieldlist'] !== 'l10n_diffsource' || $second['fieldlist'] !== 'l18n_diffsource'){
+                $res = $this->checkDataValues($second);
+                
+                if($res !== true){
+                    $entryCollection[] = $res;
+                }
+            }
+        }
+
+        return (empty($entryCollection)) ? true : $entryCollection;
     }
     
     
@@ -150,28 +147,42 @@ class InsertDataService extends AbstractDataService{
      * existiert
      * 
      * @param array $dataArr
+     * @return mixed If no failure <b>true</b>, else <b>array</b> 
      */
     public function insertResourceDataIntoTable($dataArr){
+        $entryCollection = array();
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
         $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
-        DebuggerUtility::var_dump($dataArr);
-        /*if($con->isConnected()){
+        
+        if($con->isConnected()){
             foreach($dataArr as $entry){
-                $controlResult = $con->exec_SELECTgetSingleRow('uid, uuid', 'sys_file', "uuid = '".$entry['uuid']."'");
-                
-                if($controlResult != null){
-                    // Daten updaten
-                    $con->exec_UPDATEquery('sys_file', 'uid='.$controlResult['uid'], $entry);
-                } else {
-                    unset($entry['uid']);
+                // letzte Aktualisierung abfragen
+                $lastModified = $con->exec_SELECTgetSingleRow('tstamp', 'sys_file', "uuid = '".$entry['uuid']."'");
+
+                // falls Datensatz noch nicht exisitert, dann einfügen
+                if($lastModified === false){
+                    $entry['tstamp'] = time();
+                    
                     // Daten einfügen
                     $con->exec_INSERTquery('sys_file', $entry);
                 }
+                // wenn letzte Aktualisierung jünger ist als einzutragender Stand
+                elseif($lastModified['tstamp'] > $entry['tstamp']){
+                    $entryCollection[] = $entry;
+                } 
+                // wenn Eintrag älter ist als der zu aktualisierende
+                elseif($lastModified['tstamp'] < $entry['tstamp']) {
+                    $entry['tstamp'] = time();
+                    
+                    // Daten aktualisieren
+                    $con->exec_UPDATEquery('sys_file', 'uuid='.$entry['uuid'], $entry);
+                }
             }
-            return true;
-        }*/
+            
+            return (empty($entryCollection)) ? true : $entryCollection;
+        }
     }
     
     

@@ -215,18 +215,19 @@ class DeploymentController extends ActionController {
      * DeployAction
      */
     public function deployAction() {
+        $result1 = $result2 = array();
         // letztes Deployment-Datum lesen
         $tstamp = $this->registry->get('deployment', 'last_deploy');
         
         //Mediendaten lesen
         $resourceData = $this->resource->readXmlResourceList();
         $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
-        die();
+        
         // XML lesen
         $content = $this->xmlParserService->readXML($tstamp);
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result2 = $this->insertDataService->insertDataIntoTable($content);
-
+        
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
         $this->resource->checkIfFileExists();
 
@@ -239,13 +240,14 @@ class DeploymentController extends ActionController {
             // Redirect auf Hauptseite
             $this->redirect('index');
         } else {
-            $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es ist ein Fehler aufgetreten', FlashMessage::ERROR);
-            $this->redirect('failure', 'Deployment', 'deployment', $result2);
+            $failures = array_merge($result1, $result2);
+            $this->failureAction($failures);
         }
     }
     
     
     public function failureAction($failureentries){
+        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es ist ein Fehler aufgetreten', FlashMessage::ERROR);
         $this->view->assign('failureEntries', $failureentries);
     }
     
