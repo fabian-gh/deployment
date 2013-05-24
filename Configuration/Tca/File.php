@@ -11,25 +11,6 @@ $TCA['sys_file'] = array(
 
 $fields = array(
     'uid',
-    'pid',
-    'tstamp',
-    'crdate',
-    'type',
-    'storage',
-    'identifier',
-    'extension',
-    'mimeType',
-    'name',
-    'title',
-    'sha1',
-    'size',
-    'creationDate',
-    'modificationDate',
-    'width',
-    'height',
-    'description',
-    'alternative',
-    'uuid'
 );
 
 
