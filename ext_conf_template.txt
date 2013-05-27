@@ -12,3 +12,6 @@ deploymentTables = pages,tt_content,sys_file, sys_file_reference
 
 # cat=Backend; type=int+; label=Max file size: Maximum file size (Byte) for data which should be deployed
 maxFileSize = 10000000
+
+#cat=Datahandling; type=boolean; label=Delete files older than 1/2 year?
+deleteOlderFiles = 1
