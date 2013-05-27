@@ -70,7 +70,7 @@ class InsertDataService extends AbstractDataService{
                 unset($entry['fieldlist']);
                 unset($entry['uid']);
                 
-                $con->exec_INSERTquery($table, $entry);
+                //$con->exec_INSERTquery($table, $entry);
                 
                 return true;
             } 
@@ -97,7 +97,7 @@ class InsertDataService extends AbstractDataService{
                 unset($entry['uid']);
 
                 // Daten aktualisieren
-                $con->exec_UPDATEquery($table, 'uuid='.$entry['uuid'], $entry);
+                //$con->exec_UPDATEquery($table, 'uuid='.$entry['uuid'], $entry);
                 
                 return true;
             }
@@ -128,13 +128,15 @@ class InsertDataService extends AbstractDataService{
             }
         }
         
-        // und für jede UUID prüfen ob diese nochmals vorkommt
-        foreach($pageTreeDepth as $uuid){
-            // wenn UUID nochmal vorkommt (nur auf neue Datensätze beschränken)
-            if($uuid == $data['uuid'] && $data['fieldlist'] == '*'){
-                // dann die pages-Einträge zurück liefern, damit diese noch
-                // vor den 1. Prioritätsstufe eingetragen werden
-                $beforePages[] = $data['uuid'];
+        foreach($dataArr as $data){
+            // und für jede UUID prüfen ob diese nochmals vorkommt
+            foreach($pageTreeDepth as $uuid){
+                // wenn UUID nochmal vorkommt (nur auf neue Datensätze beschränken)
+                if($uuid == $data['uuid'] && $data['fieldlist'] == '*'){
+                    // dann die pages-Einträge zurück liefern, damit diese noch
+                    // vor den 1. Prioritätsstufe eingetragen werden
+                    $beforePages[] = $data['uuid'];
+                }
             }
         }
         
@@ -155,22 +157,24 @@ class InsertDataService extends AbstractDataService{
         
         // Seitenbaumtiefenabhängigkeiten prüfen
         $pageTreeCheck = $this->checkPageTreeDepth($dataArr);
-        foreach($dataArr as $entry){
-            // vor 1. Prioritätstsufe alle Abhängigen Seiten einfügen
-            if($pageTreeCheck !== true){
-                // hierfür die UUIDs vergleichen
-                foreach($pageTreeCheck as $uuid){
-                    // falls diese gleich sind
-                    if($uuid == $entry['uuid']){
-                        // Daten verarbeiten --> einfügen
-                        $res = $this->checkDataValues($entry, true);
-                        // falls Ergebnis nicht passt, dann in Fehlerarray schreiben
-                        if($res !== true){
-                            $entryCollection[] = $res;
-                        } 
-                        // ansonsten den Eintrag entfernen
-                        else {
-                            unset($entry);
+        if(!empty($pageTreeCheck)){
+            foreach($dataArr as $entry){
+                // vor 1. Prioritätstsufe alle Abhängigen Seiten einfügen
+                if($pageTreeCheck !== true){
+                    // hierfür die UUIDs vergleichen
+                    foreach($pageTreeCheck as $uuid){
+                        // falls diese gleich sind
+                        if($uuid == $entry['uuid']){
+                            // Daten verarbeiten --> einfügen
+                            $res = $this->checkDataValues($entry, true);
+                            // falls Ergebnis nicht passt, dann in Fehlerarray schreiben
+                            if($res !== true){
+                                $entryCollection[] = $res;
+                            } 
+                            // ansonsten den Eintrag entfernen
+                            else {
+                                unset($entry);
+                            }
                         }
                     }
                 }
@@ -220,7 +224,7 @@ class InsertDataService extends AbstractDataService{
                 }
             }
         }
-
+        
         return (empty($entryCollection)) ? true : $entryCollection;
     }
     
@@ -247,17 +251,19 @@ class InsertDataService extends AbstractDataService{
 
                 // falls Datensatz noch nicht exisitert, dann einfügen
                 if($lastModified === false){
+                    unset($entry['tablename']);
                     $entry['tstamp'] = time();
                     
                     // Daten einfügen
-                    $con->exec_INSERTquery('sys_file', $entry);
+                    //$con->exec_INSERTquery('sys_file', $entry);
                 } 
                 // wenn Eintrag älter ist als der zu aktualisierende
                 elseif($lastModified['tstamp'] < $entry['tstamp']) {
+                    unset($entry['tablename']);
                     $entry['tstamp'] = time();
                     
                     // Daten aktualisieren
-                    $con->exec_UPDATEquery('sys_file', 'uuid='.$entry['uuid'], $entry);
+                    //$con->exec_UPDATEquery('sys_file', 'uuid='.$entry['uuid'], $entry);
                 }
                 // wenn letzte Aktualisierung jünger ist als einzutragender Stand
                 elseif($lastModified['tstamp'] > $entry['tstamp']){

@@ -15,6 +15,7 @@ namespace TYPO3\Deployment\Controller;
 use \TYPO3\CMS\Core\Messaging\FlashMessage;
 use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
+use \TYPO3\Deployment\Domain\Model\Request\Failure;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -55,6 +56,12 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $insertDataService;
+    
+    /**
+     * @var \TYPO3\Deployment\Service\FailureService
+     * @inject
+     */
+    protected $failureService;
 
     /**
      * @var \TYPO3\CMS\Core\Registry
@@ -237,24 +244,38 @@ class DeploymentController extends ActionController {
 
         // letzten Deployment-Stand registrieren
         //$this->registry->set('deployment', 'last_deploy', time());
-
-        if ($result1 == TRUE && $result2 == TRUE) {
+        
+        if ($result1 === true && $result2 === true) {
             // Bestätigung ausgeben
             $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
             // Redirect auf Hauptseite
             $this->redirect('index');
-        } else {
+        } elseif(is_array ($result1) && is_array ($result2)) {
             $failures = array_merge($result1, $result2);
-            $this->failureAction($failures);
+            $this->forward('failure', null, null, array('failures' => $failures));
         }
     }
     
     
-    public function failureAction($failureentries){
-        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es ist ein Fehler aufgetreten', FlashMessage::ERROR);
-        $this->view->assign('failureEntries', $failureentries);
+    /**
+     * Bei Fehlern diese an View weiterleiten
+     * 
+     * @param array $failures
+     */
+    public function failureAction($failures){
+        $databaseEntries = $this->failureService->getFailureEntries($failures);
+        
+        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es ist ein Fehler aufgetreten!', FlashMessage::ERROR);
+        $this->view->assignMultiple(array(
+            'failureEntries' => $failures,
+            'databaseEntries' => $databaseEntries
+        ));
     }
     
+    
+    /**
+     * Fehlerbehebung
+     */
     public function clearFailuresAction(){
         // TODO: Verarbeitung nachdem das Formular abgeschickt wurde
     }

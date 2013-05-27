@@ -66,8 +66,6 @@ class ResourceDataService extends AbstractRepository {
         $this->xmlwriter->startDtd('resourcelist');
         $this->xmlwriter->writeDtdElement('resourcelist', '(file)');
         $this->xmlwriter->writeDtdElement('file', '(tstamp,crdate,type,storage,identifier,extension,mime_type,name,title,sha1,size,creation_date,modification_date,width,height,uuid)');
-        //$this->xmlwriter->writeDtdElement('uid', '(#PCDATA)');
-        //$this->xmlwriter->writeDtdElement('pid', '(#PCDATA)');
         $this->xmlwriter->writeDtdElement('tstamp', '(#PCDATA)');
         $this->xmlwriter->writeDtdElement('crdate', '(#PCDATA)');
         $this->xmlwriter->writeDtdElement('type', '(#PCDATA)');
@@ -92,7 +90,7 @@ class ResourceDataService extends AbstractRepository {
         foreach ($this->fileList as $file) {
             $FileObj = $resFact->getFileObject($file->getUid());
             $this->xmlwriter->startElement('file');
-            //$this->xmlwriter->writeElement('pid', $this->getPageUuid($FileObj->getProperty('uid')));
+            $this->xmlwriter->writeElement('tablename', 'sys_file');
             $this->xmlwriter->writeElement('tstamp', $FileObj->getProperty('tstamp'));
             $this->xmlwriter->writeElement('crdate', $FileObj->getProperty('crdate'));
             $this->xmlwriter->writeElement('type', $FileObj->getProperty('type'));

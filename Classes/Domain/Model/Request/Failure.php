@@ -37,7 +37,7 @@ class Failure extends AbstractEntity {
     }
 
     /**
-     * @param array $logEntries
+     * @param array $failureEntries
      */
     public function setFailureEntries($failureEntries) {
         $this->failureEntries = $failureEntries;
