@@ -47,7 +47,6 @@ class InsertDataService extends AbstractDataService{
 
                 // falls neuer Eintrag in pages-Tabelle
                 if($flag === true){
-                    // TODO: Seitenbaumtiefe beachten
                     $entry['pid'] = 0;
                 } 
                 // falls neuer Eintrag in andere Tabelle, dann wieder die entsprechende PID abfragen
@@ -111,6 +110,39 @@ class InsertDataService extends AbstractDataService{
     
     
     /**
+     * Prüft ob Abhängigkeiten in der Seitenbaumtiefe vorhanden sind
+     * 
+     * @param array $dataArr
+     * @return mixed <b>true</b> if no dependencies, else <b>array</b>
+     */
+    public function checkPageTreeDepth($dataArr){
+        $pageTreeDepth = array();
+        $beforePages = array();
+        
+        // prüfen ob Seitenbaumabhängigkeiten existieren
+        foreach($dataArr as $data){
+            // wenn Tabelleneinträge für pages-Tabelle vorhanden sind
+            if($data['tablename'] == 'pages'){
+                // dann Seiten-UUID speichern
+                $pageTreeDepth[] = $data['pid'];
+            }
+        }
+        
+        // und für jede UUID prüfen ob diese nochmals vorkommt
+        foreach($pageTreeDepth as $uuid){
+            // wenn UUID nochmal vorkommt (nur auf neue Datensätze beschränken)
+            if($uuid == $data['uuid'] && $data['fieldlist'] == '*'){
+                // dann die pages-Einträge zurück liefern, damit diese noch
+                // vor den 1. Prioritätsstufe eingetragen werden
+                $beforePages[] = $data['uuid'];
+            }
+        }
+        
+        return (empty($beforePages)) ? true : array_unique($beforePages);
+    }
+    
+    
+    /**
      * Einfügen/ Aktualisieren der Daten über 3 Prioritätsstufen hinweg
      * 
      * @param array $dataArr
@@ -121,12 +153,37 @@ class InsertDataService extends AbstractDataService{
         $secondPriority = array();
         $thirdPriority = array();
         
+        // Seitenbaumtiefenabhängigkeiten prüfen
+        $pageTreeCheck = $this->checkPageTreeDepth($dataArr);
         foreach($dataArr as $entry){
+            // vor 1. Prioritätstsufe alle Abhängigen Seiten einfügen
+            if($pageTreeCheck !== true){
+                // hierfür die UUIDs vergleichen
+                foreach($pageTreeCheck as $uuid){
+                    // falls diese gleich sind
+                    if($uuid == $entry['uuid']){
+                        // Daten verarbeiten --> einfügen
+                        $res = $this->checkDataValues($entry, true);
+                        // falls Ergebnis nicht passt, dann in Fehlerarray schreiben
+                        if($res !== true){
+                            $entryCollection[] = $res;
+                        } 
+                        // ansonsten den Eintrag entfernen
+                        else {
+                            unset($entry);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Daten durchwandern und einfügen/aktualisieren
+        foreach($dataArr as $firstPriority){
             // page-Einträge haben Vorrang, 1. Priorität
             // Sicherstellung dass erst die Seiten vorhanden sind bevor
             // diese referenziert werden
-            if($entry['tablename'] == 'pages'){
-                $res = $this->checkDataValues($entry, true);
+            if($firstPriority['tablename'] == 'pages'){
+                $res = $this->checkDataValues($firstPriority, true);
                 
                 if($res !== true){
                     $entryCollection[] = $res;
@@ -134,7 +191,7 @@ class InsertDataService extends AbstractDataService{
             } 
             // alle anderen Einträge werden gesammelt und im zweiten Schritt verarbeitet, 2. Priorität
             else {
-                $secondPriority[] = $entry;
+                $secondPriority[] = $firstPriority;
             }
         }
 
