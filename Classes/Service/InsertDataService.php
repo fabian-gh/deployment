@@ -47,6 +47,7 @@ class InsertDataService extends AbstractDataService{
 
                 // falls neuer Eintrag in pages-Tabelle
                 if($flag === true){
+                    // TODO: Seitenbaumtiefe beachten
                     $entry['pid'] = 0;
                 } 
                 // falls neuer Eintrag in andere Tabelle, dann wieder die entsprechende PID abfragen
@@ -64,10 +65,6 @@ class InsertDataService extends AbstractDataService{
                 $con->exec_INSERTquery($table, $entry);
                 
                 return true;
-            }
-            // wenn letzte Aktualisierung jünger ist als einzutragender Stand
-            elseif($lastModified['tstamp'] > $entry['tstamp']){
-                return $entry;
             } 
             // wenn Eintrag älter ist als der zu aktualisierende
             elseif($lastModified['tstamp'] < $entry['tstamp']) {
@@ -96,19 +93,24 @@ class InsertDataService extends AbstractDataService{
                 
                 return true;
             }
+            // wenn letzte Aktualisierung jünger ist als einzutragender Stand
+            elseif($lastModified['tstamp'] > $entry['tstamp']){
+                return $entry;
+            }
         }
     }
     
     
     /**
-     * Diese Methode vergleicht die UUID's der Datensätze und modifiziert die
-     * Datensätze anhand dieser bzw. fügt den Datensatz neu ein.
+     * Einfügen/ Aktualisieren der Daten über 3 Prioritätsstufen hinweg
      * 
      * @param array $dataArr
      * @return mixed If no failure <b>true</b>, else <b>array</b> 
      */
     public function insertDataIntoTable($dataArr){
-        $entryCollection = $secondPriority = array();
+        $entryCollection = array();
+        $secondPriority = array();
+        $thirdPriority = array();
         
         foreach($dataArr as $entry){
             // page-Einträge haben Vorrang, 1. Priorität
@@ -127,9 +129,25 @@ class InsertDataService extends AbstractDataService{
             }
         }
 
+        // zweite Prioritätsstufe
+        // wenn Tabelle tt_content entspricht, dann Verarbeitung, ansonsten sammeln
         foreach($secondPriority as $second){
-            if($second['fieldlist'] !== 'l10n_diffsource' || $second['fieldlist'] !== 'l18n_diffsource'){
+            if($second['tablename'] == 'tt_content'){
                 $res = $this->checkDataValues($second);
+                
+                if($res !== true){
+                    $entryCollection[] = $res;
+                }
+            } else {
+                $thirdPriority[] = $second;
+            }
+        }
+        
+        // dritte Prioritätsstufe
+        // Daten aller restlichen Tabellen einfügen/aktualisieren
+        foreach($thirdPriority as $third){
+            if($third['fieldlist'] !== 'l10n_diffsource' || $third['fieldlist'] !== 'l18n_diffsource'){
+                $res = $this->checkDataValues($third);
                 
                 if($res !== true){
                     $entryCollection[] = $res;
@@ -167,10 +185,6 @@ class InsertDataService extends AbstractDataService{
                     
                     // Daten einfügen
                     $con->exec_INSERTquery('sys_file', $entry);
-                }
-                // wenn letzte Aktualisierung jünger ist als einzutragender Stand
-                elseif($lastModified['tstamp'] > $entry['tstamp']){
-                    $entryCollection[] = $entry;
                 } 
                 // wenn Eintrag älter ist als der zu aktualisierende
                 elseif($lastModified['tstamp'] < $entry['tstamp']) {
@@ -178,6 +192,10 @@ class InsertDataService extends AbstractDataService{
                     
                     // Daten aktualisieren
                     $con->exec_UPDATEquery('sys_file', 'uuid='.$entry['uuid'], $entry);
+                }
+                // wenn letzte Aktualisierung jünger ist als einzutragender Stand
+                elseif($lastModified['tstamp'] > $entry['tstamp']){
+                    $entryCollection[] = $entry;
                 }
             }
             
@@ -225,7 +243,10 @@ class InsertDataService extends AbstractDataService{
      * ob hier Werte gesetzt sind. Falls nein, dann Werte generieren.
      */
     public function checkIfUuidExists(){
-        $tablefields = $results = $tables = $inputArr = array();
+        $tablefields = array();
+        $results = array();
+        $tables = array();
+        $inputArr = array();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         

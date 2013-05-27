@@ -89,17 +89,33 @@ class XmlParserService extends AbstractDataService{
                 
                 foreach($newInsert as $newkey => $newval){
                     if($newkey != 'l18n_diffsource'){
+                        // PID durch UUID ersetzen
                         if($newkey == 'pid'){
                             $pageUuid = $this->getPageUuid($newval);
                             $this->xmlwriter->writeElement('pid', $pageUuid);
-                        } elseif(preg_match('/header_link/', $newkey) === 1) {
+                        } 
+                        // uid_local durch UUId ersetzen
+                        elseif($newkey == 'uid_local'){
+                            $fileUuid = $this->getFileUuid($newval);
+                            $this->xmlwriter->writeElement('uid_local', $fileUuid);
+                        }
+                        // uid_foreign durch UUID ersetzen
+                        elseif($newkey == 'uid_foreign'){
+                            $contentUuid = $this->getContentUuid($newval);
+                            $this->xmlwriter->writeElement('uid_foreign', $contentUuid);
+                        }
+                        // header_link durch entsprechende UUID ersetzen
+                        elseif($newkey == 'header_link') {
                             // TODO: Hier noch genauere Unterscheidung zwischen den einzelnen Typen
                             $pageUuid = $this->getPageUuid($newval);
                             $this->xmlwriter->writeElement($newkey, $pageUuid);
-                        } elseif((preg_match('/image_link/', $newkey) === 1)){
+                        } 
+                        // image_link durch UUId ersetzen
+                        elseif($newkey == 'image_link'){
                             // TODO: Was sagt image_link aus und was soll damit gemacht werden
                             $this->xmlwriter->writeElement($newkey, $newval);
-                        } else {
+                        } 
+                        else {
                             $this->xmlwriter->writeElement($newkey, $newval);
                         }
                     }
@@ -334,7 +350,7 @@ class XmlParserService extends AbstractDataService{
     
     
     /**
-     * Gibt die uuid der übergebenen pid zurück
+     * Gibt die uuid der übergebenen pid aus der pages-Tabelle zurück
      * 
      * @param string $pid
      * @return string
@@ -343,6 +359,36 @@ class XmlParserService extends AbstractDataService{
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         $uuid = $con->exec_SELECTgetSingleRow('uuid', 'pages', 'uid = '.$pid);
+        
+        return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
+    }
+    
+    
+    /**
+     * Gibt die uuid der übergebenen uid aus der tt_content-Tabelle zurück
+     * 
+     * @param string $pid
+     * @return string
+     */
+    public function getContentUuid($uid){
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        $uuid = $con->exec_SELECTgetSingleRow('uuid', 'tt_content', 'uid = '.$uid);
+        
+        return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
+    }
+    
+    
+    /**
+     * Gibt die uuid der übergebenen uid aus der sys_file-Tabelle zurück
+     * 
+     * @param string $pid
+     * @return string
+     */
+    public function getFileUuid($uid){
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        $uuid = $con->exec_SELECTgetSingleRow('uuid', 'sys_file', 'uid = '.$uid);
         
         return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
     }

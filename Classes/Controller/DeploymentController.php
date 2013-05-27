@@ -107,7 +107,9 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
-        $newHistoryEntries = $allHistoryEintries = $historyEntries = array();
+        $newHistoryEntries = array();
+        $allHistoryEintries = array();
+        $historyEntries = array();
 
         // Registry Eintrag holen
         $date = $this->registry->get('deployment', 'last_deploy');
@@ -159,7 +161,8 @@ class DeploymentController extends ActionController {
      * @dontvalidate $deploy
      */
     public function createDeployAction(Deploy $deploy) {
-        $deployData = $exFold = $newArr = array();
+        $deployData = array();
+        $exFold = array();
 
         foreach ($deploy->getDeployEntries() as $uid) {
             $deployData[] = $this->xmlParserService->compareDataWithRegistry($uid);
@@ -215,7 +218,8 @@ class DeploymentController extends ActionController {
      * DeployAction
      */
     public function deployAction() {
-        $result1 = $result2 = array();
+        $result1 = array();
+        $result2 = array();
         // letztes Deployment-Datum lesen
         $tstamp = $this->registry->get('deployment', 'last_deploy');
         
