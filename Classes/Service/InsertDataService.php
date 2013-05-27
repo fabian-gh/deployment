@@ -54,6 +54,15 @@ class InsertDataService extends AbstractDataService{
                 else {
                     $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$entry['pid']."'");
                     $entry['pid'] = $uid['uid'];
+                    
+                    // wenn die Einträge uid_foreign und uid_local vorhanden sind, dann diese durch UUID ersetzen
+                    if(isset($entry['uid_foreign']) && isset($entry['uid_local'])){
+                        $uid_foreign = $con->exec_SELECTgetSingleRow('uid', 'tt_content', "uuid = '".$entry['pid']."'");
+                        $uid_local = $con->exec_SELECTgetSingleRow('uid', 'sys_file', "uuid = '".$entry['pid']."'");
+                        
+                        $entry['uid_foreign'] = $uid_foreign;
+                        $entry['uid_local'] = $uid_local;
+                    }
                 }
 
                 // neuen Timestamp setzen
