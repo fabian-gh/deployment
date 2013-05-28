@@ -278,8 +278,9 @@ class DeploymentController extends ActionController {
         
         $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
-            'failureEntries' => $failures,
-            'databaseEntries' => $databaseEntries
+            'failureEntries'    => $failures,
+            'databaseEntries'   => $databaseEntries,
+            'diffData'          => $diff
         ));
     }
     
