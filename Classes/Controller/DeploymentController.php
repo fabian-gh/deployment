@@ -252,7 +252,17 @@ class DeploymentController extends ActionController {
             $this->redirect('index');
         } elseif(is_array ($result1) && is_array ($result2)) {
             $failures = array_merge($result1, $result2);
-            $this->forward('failure', null, null, array('failures' => $failures));
+            
+            // leere Einträge entfernen
+            foreach($failures as $fail){
+                if($fail === null){
+                    unset($fail);
+                } else {
+                    $fail2[] = $fail;
+                }
+            }
+            
+            $this->forward('failure', null, null, array('failures' => $fail2));
         }
     }
     
@@ -264,8 +274,9 @@ class DeploymentController extends ActionController {
      */
     public function failureAction($failures){
         $databaseEntries = $this->failureService->getFailureEntries($failures);
+        $diff = $this->failureService->getFailureDataDiff($failures, $databaseEntries);
         
-        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es ist ein Fehler aufgetreten!', FlashMessage::ERROR);
+        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failureEntries' => $failures,
             'databaseEntries' => $databaseEntries

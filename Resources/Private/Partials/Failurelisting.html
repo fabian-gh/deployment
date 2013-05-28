@@ -1,4 +1,30 @@
 <f:form action="clearFailures" name="failure" object="{failure}">
     <f:debug title="FailureEntries">{failureEntries}</f:debug>
     <f:debug title="DatabaseEntries">{databaseEntries}</f:debug>
+
+    <b>Zu überprüfende Einträge: </b><f:count>{failureEntries}</f:count><br /><br />
+
+    <table class="table2 typo3-dblist">
+        <tr class="t3-row-header">
+            <th>&nbsp;</th>
+            <th class="th-spacer2">To be updated entry</th>
+            <th class="th-spacer2">Database entry</th>
+        </tr>
+        <f:for each="{failureEntries}" as="fEntry" iteration="itemIteration">
+            <tr class="db_list_normal">
+                <td>O</td>
+                <td>
+                    <table class="table3">
+                        <f:for each="{fEntry}" as="value" key="key">
+                            <tr class="db_list_normal">
+                                <td class="td-spacer"><b>{key}:</b></td>
+                                <td class="td-spacer">{value}</td>
+                            </tr>
+                        </f:for>
+                    </table>
+                </td>
+            </tr>
+        </f:for>
+    </table>
+
 </f:form>

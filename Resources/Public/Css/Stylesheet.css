@@ -15,6 +15,14 @@
     max-width: 850px;
 }
 
+.table3{
+    font-size: 11px;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    width: 450px;
+    box-shadow: 0 0 5px #888;
+}
+
 .inner-table{
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
@@ -28,6 +36,11 @@
 .th-spacer2{
     font-size: 12px;
     padding: 3px 0 3px 6px;
+}
+
+.td-spacer{
+    width: auto;
+    padding: 0;
 }
 
 .space{

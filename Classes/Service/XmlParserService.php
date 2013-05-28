@@ -110,9 +110,9 @@ class XmlParserService extends AbstractDataService{
                             $pageUuid = $this->getPageUuid($newval);
                             $this->xmlwriter->writeElement($newkey, $pageUuid);
                         } 
-                        // image_link durch UUId ersetzen
-                        elseif($newkey == 'image_link'){
-                            // TODO: Was sagt image_link aus und was soll damit gemacht werden
+                        // link in sys_file_reference durch UUId ersetzen
+                        elseif($newkey == 'link'){
+                            // TODO: link verarbeiten
                             $this->xmlwriter->writeElement($newkey, $newval);
                         } 
                         else {
