@@ -1,33 +1,65 @@
-<f:form action="clearFailures" name="failure" object="{failure}">
-    <f:debug title="FailureEntries">{failureEntries}</f:debug>
-    <f:debug title="DatabaseEntries">{databaseEntries}</f:debug>
-    <f:debug title="Diffdata">{diffData}</f:debug>
-
+<f:form action="clearFailures" name="checkFailures" object="{failure}">
+    <br />
     <b>Zu überprüfende Einträge: </b><f:count>{failureEntries}</f:count><br /><br />
 
     <table class="table2 typo3-dblist">
         <tr class="t3-row-header">
             <th>&nbsp;</th>
-            <th class="th-spacer2">Insert/Update Entry</th>
+            <th class="th-spacer3">Insert/Update Entry</th>
             <th>&nbsp;</th>
-            <th class="th-spacer2">Database Entry</th>
+            <th class="th-spacer3">Database Entry</th>
         </tr>
         <f:for each="{failureEntries}" as="fEntry" iteration="itemIteration">
             <tr class="db_list_normal">
                 
-                <td>O<f:comment><f:form.checkbox property="failureEntries" value="{fEntry.tablename}.{fEntry.uuid}" class="value-checkbox" /></f:comment></td>
+                <td><f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" class="value-checkbox" /></td>
                 <td>
                     <table class="table3">
                         <f:for each="{fEntry}" as="value" key="key">
                             <tr class="db_list_normal">
                                 <td class="td-spacer"><b>{key}:</b></td>
-                                <td class="td-spacer">{value}</td>
+                                <f:if condition="{0:key} == {0:'tstamp'}">
+                                    <f:then>
+                                        <td class="td-spacer"><b><f:format.date format="d.m.Y H:i:s">@{value}</f:format.date></b></td>
+                                    </f:then>
+                                    <f:else>
+                                        <f:if condition="{0:key} == {0:'crdate'}">
+                                            <f:then>
+                                                <td class="td-spacer"><f:format.date format="d.m.Y H:i:s">@{value}</f:format.date></td>
+                                            </f:then>
+                                            <f:else>
+                                                <f:if condition="{0:key} == {0:'creation_date'}">
+                                                    <f:then>
+                                                        <td class="td-spacer"><f:format.date format="d.m.Y H:i:s">@{value}</f:format.date></td>
+                                                    </f:then>
+                                                    <f:else>
+                                                        <f:if condition="{0:key} == {0:'modification_date'}">
+                                                            <f:then>
+                                                                <td class="td-spacer"><f:format.date format="d.m.Y H:i:s">@{value}</f:format.date></td>
+                                                            </f:then>
+                                                            <f:else>
+                                                                <f:if condition="{0:key} == {0:'l10n_diffsource'}">
+                                                                    <f:then>
+                                                                        <td class="td-spacer"><f:format.crop maxCharacters="25" append="&nbsp;&nbsp;[...]">{value}</f:format.crop></td>
+                                                                    </f:then>
+                                                                    <f:else>
+                                                                       <td class="td-spacer">{value}</td> 
+                                                                    </f:else>
+                                                                </f:if>
+                                                            </f:else>
+                                                        </f:if>
+                                                    </f:else>
+                                                </f:if>
+                                            </f:else>
+                                        </f:if>
+                                    </f:else>
+                                </f:if>
                             </tr>
                         </f:for>
                     </table>
                 </td>
                 
-                <td>O<f:comment><f:form.checkbox property="databaseEntries" value="{diff.tablename}.{diff.uuid}" class="value-checkbox" /></f:comment></td>
+                <td><f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" class="value-checkbox" /></td>
                 <td>
                     <table class="table3">
                         <f:for each="{databaseEntries}" as="datavalue" key="datakey">
@@ -35,7 +67,42 @@
                                 <f:for each="{datavalue}" as="dvalue" key="dkey">
                                     <tr class="db_list_normal">
                                         <td class="td-spacer"><b>{dkey}:</b></td>
-                                        <td class="td-spacer">{dvalue}</td>
+                                        <f:if condition="{0:dkey} == {0:'tstamp'}">
+                                            <f:then>
+                                                <td class="td-spacer"><b><f:format.date format="d.m.Y H:i:s">@{dvalue}</f:format.date></b></td>
+                                            </f:then>
+                                            <f:else>
+                                                <f:if condition="{0:dkey} == {0:'crdate'}">
+                                                    <f:then>
+                                                        <td class="td-spacer"><f:format.date format="d.m.Y H:i:s">@{dvalue}</f:format.date></td>
+                                                    </f:then>
+                                                    <f:else>
+                                                        <f:if condition="{0:dkey} == {0:'creation_date'}">
+                                                            <f:then>
+                                                                <td class="td-spacer"><f:format.date format="d.m.Y H:i:s">@{dvalue}</f:format.date></td>
+                                                            </f:then>
+                                                            <f:else>
+                                                                <f:if condition="{0:dkey} == {0:'modification_date'}">
+                                                                    <f:then>
+                                                                        <td class="td-spacer"><f:format.date format="d.m.Y H:i:s">@{dvalue}</f:format.date></td>
+                                                                    </f:then>
+                                                                    <f:else>
+                                                                        <f:if condition="{0:dkey} == {0:'l10n_diffsource'}">
+                                                                            <f:then>
+                                                                                <td class="td-spacer"><f:format.crop maxCharacters="25" append="&nbsp;&nbsp;[...]">{dvalue}</f:format.crop></td>
+                                                                            </f:then>
+                                                                            <f:else>
+                                                                               <td class="td-spacer">{dvalue}</td> 
+                                                                            </f:else>
+                                                                        </f:if>
+                                                                    </f:else>
+                                                                </f:if>
+                                                            </f:else>
+                                                        </f:if>
+                                                    </f:else>
+                                                </f:if>
+                                            </f:else>
+                                        </f:if>
                                     </tr>
                                 </f:for>
                             </f:if>
@@ -46,5 +113,5 @@
             </tr>
         </f:for>
     </table>
-
+    <f:form.submit value="Einträge korrigieren" />  
 </f:form>

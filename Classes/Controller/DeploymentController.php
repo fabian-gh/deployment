@@ -16,6 +16,7 @@ use \TYPO3\CMS\Core\Messaging\FlashMessage;
 use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\Deployment\Domain\Model\Request\Failure;
+use \TYPO3\Deployment\Domain\Model\Request\Databasefailure;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -154,8 +155,8 @@ class DeploymentController extends ActionController {
             $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
-                'historyEntries' => $unserializedHistoryData,
-                'diffData' => $diffData
+                'historyEntries'    => $unserializedHistoryData,
+                'diffData'          => $diffData
             ));
         } else {
             $this->flashMessageContainer->add('Keine Einträge gefunden', '', FlashMessage::ERROR);
@@ -268,16 +269,21 @@ class DeploymentController extends ActionController {
     
     
     /**
-     * Bei Fehlern diese an View weiterleiten
+     * Fehlerbehandlung
      * 
      * @param array $failures
      */
-    public function failureAction($failures){
+    public function failureAction($failures, Failure $failureObj = null){
+        if ($failureObj === null) {
+            $failureObj = new Failure();
+        }
+
         $databaseEntries = $this->failureService->getFailureEntries($failures);
         $diff = $this->failureService->getFailureDataDiff($failures, $databaseEntries);
         
-        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie folgende Einträge', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
+        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
+            'failure'           => $failureObj,
             'failureEntries'    => $failures,
             'databaseEntries'   => $databaseEntries,
             'diffData'          => $diff
@@ -288,8 +294,10 @@ class DeploymentController extends ActionController {
     /**
      * Fehlerbehebung
      */
-    public function clearFailuresAction(){
+    public function clearFailuresAction(Failure $failures){
         // TODO: Verarbeitung nachdem das Formular abgeschickt wurde
+        // TODO: Ausschluss von zwei Checkboxen in einer Zeile gleichgzeitig angekreuzt
+        DebuggerUtility::var_dump($failures);die();
     }
 
     

@@ -19,8 +19,7 @@
     font-size: 11px;
     border-collapse: collapse;
     border: 1px solid #ccc;
-    width: 450px;
-    box-shadow: 0 0 5px #888;
+    max-width: 400px;
 }
 
 .inner-table{
@@ -36,6 +35,11 @@
 .th-spacer2{
     font-size: 11px;
     padding: 3px 0 3px 6px;
+}
+
+.th-spacer3{
+    font-size: 11px;
+    padding: 3px 0 3px 7px;
 }
 
 .td-spacer{
