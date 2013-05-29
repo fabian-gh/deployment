@@ -63,6 +63,7 @@ class FailureService extends AbstractDataService {
      * @return array
      */
     public function getFailureDataDiff($failures, $database){
+        $differences = array();
         $count = 0;
         /** @var \TYPO3\CMS\Core\Utility\DiffUtility $diff */
         $diff = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
@@ -72,7 +73,7 @@ class FailureService extends AbstractDataService {
                 if($key == 'tablename' && $key == 'fieldlist'){
                     unset($key);
                 } else {
-                    $differences[$count][] = $diff->makeDiffDisplay($value, $database[$count][$key]);
+                    $differences[$count][$key] = $diff->makeDiffDisplay($value, $database[$count][$key]);
                 }
             }
             $count++;

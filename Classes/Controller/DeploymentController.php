@@ -276,7 +276,7 @@ class DeploymentController extends ActionController {
         $databaseEntries = $this->failureService->getFailureEntries($failures);
         $diff = $this->failureService->getFailureDataDiff($failures, $databaseEntries);
         
-        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie das Deployment', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
+        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie folgende Einträge', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failureEntries'    => $failures,
             'databaseEntries'   => $databaseEntries,

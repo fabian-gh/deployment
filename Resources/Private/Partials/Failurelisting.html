@@ -1,18 +1,21 @@
 <f:form action="clearFailures" name="failure" object="{failure}">
     <f:debug title="FailureEntries">{failureEntries}</f:debug>
     <f:debug title="DatabaseEntries">{databaseEntries}</f:debug>
+    <f:debug title="Diffdata">{diffData}</f:debug>
 
     <b>Zu überprüfende Einträge: </b><f:count>{failureEntries}</f:count><br /><br />
 
     <table class="table2 typo3-dblist">
         <tr class="t3-row-header">
             <th>&nbsp;</th>
-            <th class="th-spacer2">To be updated entry</th>
-            <th class="th-spacer2">Database entry</th>
+            <th class="th-spacer2">Insert/Update Entry</th>
+            <th>&nbsp;</th>
+            <th class="th-spacer2">Database Entry</th>
         </tr>
         <f:for each="{failureEntries}" as="fEntry" iteration="itemIteration">
             <tr class="db_list_normal">
-                <td>O</td>
+                
+                <td>O<f:comment><f:form.checkbox property="failureEntries" value="{fEntry.tablename}.{fEntry.uuid}" class="value-checkbox" /></f:comment></td>
                 <td>
                     <table class="table3">
                         <f:for each="{fEntry}" as="value" key="key">
@@ -23,6 +26,23 @@
                         </f:for>
                     </table>
                 </td>
+                
+                <td>O<f:comment><f:form.checkbox property="databaseEntries" value="{diff.tablename}.{diff.uuid}" class="value-checkbox" /></f:comment></td>
+                <td>
+                    <table class="table3">
+                        <f:for each="{databaseEntries}" as="datavalue" key="datakey">
+                            <f:if condition="{datakey} == {itemIteration.index}">
+                                <f:for each="{datavalue}" as="dvalue" key="dkey">
+                                    <tr class="db_list_normal">
+                                        <td class="td-spacer"><b>{dkey}:</b></td>
+                                        <td class="td-spacer">{dvalue}</td>
+                                    </tr>
+                                </f:for>
+                            </f:if>
+                        </f:for>
+                    </table>
+                </td>
+                
             </tr>
         </f:for>
     </table>
