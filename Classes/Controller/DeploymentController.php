@@ -272,6 +272,8 @@ class DeploymentController extends ActionController {
      * Fehlerbehandlung
      * 
      * @param array $failures
+     * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failures
+     * @dontvalidate $failures
      */
     public function failureAction($failures, Failure $failureObj = null){
         if ($failureObj === null) {
@@ -279,20 +281,22 @@ class DeploymentController extends ActionController {
         }
 
         $databaseEntries = $this->failureService->getFailureEntries($failures);
-        $diff = $this->failureService->getFailureDataDiff($failures, $databaseEntries);
+        //$diff = $this->failureService->getFailureDataDiff($failures, $databaseEntries);
         
         $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failure'           => $failureObj,
             'failureEntries'    => $failures,
-            'databaseEntries'   => $databaseEntries,
-            'diffData'          => $diff
+            'databaseEntries'   => $databaseEntries
         ));
     }
     
     
     /**
      * Fehlerbehebung
+     * 
+     * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failures
+     * @dontvalidate $failures
      */
     public function clearFailuresAction(Failure $failures){
         // TODO: Verarbeitung nachdem das Formular abgeschickt wurde

@@ -9,13 +9,19 @@
             <th>&nbsp;</th>
             <th class="th-spacer3">Database Entry</th>
         </tr>
-        <f:for each="{failureEntries}" as="fEntry" iteration="itemIteration">
+        <f:for each="{failureEntries}" as="fEntry" key="fKey" iteration="itemIteration">
+            <tr rowspan="2"><td class="innertableheader-spacer" colspan="4"><b>Tabelle: {fEntry.tablename}</b></td></tr>
+            
             <tr class="db_list_normal">
                 
                 <td><f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" class="value-checkbox" /></td>
                 <td>
                     <table class="table3">
+                        
                         <f:for each="{fEntry}" as="value" key="key">
+                            <f:if condition="{0:key} != {0:'tablename'}">
+                            <f:if condition="{0:key} != {0:'fieldlist'}">
+                            
                             <tr class="db_list_normal">
                                 <td class="td-spacer"><b>{key}:</b></td>
                                 <f:if condition="{0:key} == {0:'tstamp'}">
@@ -55,7 +61,12 @@
                                     </f:else>
                                 </f:if>
                             </tr>
+                            
+                            </f:if>
+                            </f:if>
+                            
                         </f:for>
+                        
                     </table>
                 </td>
                 

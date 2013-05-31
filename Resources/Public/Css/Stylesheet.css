@@ -28,6 +28,10 @@
     border-collapse: collapse;
 }
 
+.innertableheader-spacer{
+    padding-top: 5px;
+}
+
 .th-spacer{
     width: 35px;
 }
