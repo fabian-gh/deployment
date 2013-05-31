@@ -242,11 +242,11 @@ class DeploymentController extends ActionController {
         
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
         $this->resource->checkIfFileExists();
-
-        // letzten Deployment-Stand registrieren
-        //$this->registry->set('deployment', 'last_deploy', time());
         
         if ($result1 === true && $result2 === true) {
+            // letzten Deployment-Stand registrieren
+            //$this->registry->set('deployment', 'last_deploy', time());
+            
             // Bestätigung ausgeben
             $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
             // Redirect auf Hauptseite
@@ -263,7 +263,7 @@ class DeploymentController extends ActionController {
                 }
             }
             
-            $this->forward('failure', null, null, array('failures' => $fail2));
+            $this->forward('listFailure', null, null, array('failures' => $fail2));
         }
     }
     
@@ -275,7 +275,7 @@ class DeploymentController extends ActionController {
      * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failures
      * @dontvalidate $failures
      */
-    public function failureAction($failures, Failure $failureObj = null){
+    public function listFailureAction($failures, Failure $failureObj = null){
         if ($failureObj === null) {
             $failureObj = new Failure();
         }
@@ -302,6 +302,12 @@ class DeploymentController extends ActionController {
         // TODO: Verarbeitung nachdem das Formular abgeschickt wurde
         // TODO: Ausschluss von zwei Checkboxen in einer Zeile gleichgzeitig angekreuzt
         DebuggerUtility::var_dump($failures);die();
+        
+        //$this->registry->set('deployment', 'last_deploy', time());
+        // Bestätigung ausgeben
+        //$this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
+        // Redirect auf Hauptseite
+        //$this->redirect('index');
     }
 
     
