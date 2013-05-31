@@ -16,7 +16,6 @@ use \TYPO3\CMS\Core\Messaging\FlashMessage;
 use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\Deployment\Domain\Model\Request\Failure;
-use \TYPO3\Deployment\Domain\Model\Request\Databasefailure;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -151,7 +150,7 @@ class DeploymentController extends ActionController {
             
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($allHistoryEintries);
-            $this->storeHistoryDataInRegistry($unserializedHistoryData);
+            $this->storeHistoryDataInRegistry($unserializedHistoryData, 'storedHistoryData');
             $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
@@ -249,6 +248,7 @@ class DeploymentController extends ActionController {
             
             // Bestätigung ausgeben
             $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
+            
             // Redirect auf Hauptseite
             $this->redirect('index');
         } elseif(is_array ($result1) && is_array ($result2)) {
@@ -272,16 +272,17 @@ class DeploymentController extends ActionController {
      * Fehlerbehandlung
      * 
      * @param array $failures
-     * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failures
+     * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failure
      * @dontvalidate $failures
      */
     public function listFailureAction($failures, Failure $failure = null){
         if ($failure === null) {
             $failure = new Failure();
         }
-
+        
+        // Fehleinträge in Registry speichern
+        $this->storeDataInRegistry($failures, 'storedFailures');
         $databaseEntries = $this->failureService->getFailureEntries($failures);
-        //$diff = $this->failureService->getFailureDataDiff($failures, $databaseEntries);
         
         $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
@@ -299,15 +300,16 @@ class DeploymentController extends ActionController {
      * @dontvalidate $failures
      */
     public function clearFailuresAction(Failure $failure){
-        // TODO: Verarbeitung nachdem das Formular abgeschickt wurde
-        // TODO: Ausschluss von zwei Checkboxen in einer Zeile gleichgzeitig angekreuzt
-        DebuggerUtility::var_dump($failure);die();
+        $storedFailures = $this->registry->get('deployment', 'storedFailures');
+        $res = $this->failureService->proceedFailureEntries($failure->getFailureEntries(), $storedFailures);
         
-        //$this->registry->set('deployment', 'last_deploy', time());
-        // Bestätigung ausgeben
-        //$this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
-        // Redirect auf Hauptseite
-        //$this->redirect('index');
+        if($res){
+            //$this->registry->set('deployment', 'last_deploy', time());
+            $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
+            $this->redirect('index');
+        } else {
+            $this->forward('listFailure', null, null, array('failures' => $storedFailures));
+        }
     }
 
     
@@ -325,13 +327,14 @@ class DeploymentController extends ActionController {
 
     
     /**
-     * Speichert die erfragten Historyeinträge als serialisiertes Objekt in der Registry
+     * Persistiert Einträge in der Registry
      * 
-     * @param \TYPO3\Deployment\Domain\Model\HistoryData $hisData
+     * @param mixed $data
+     * @param string $key
      */
-    protected function storeHistoryDataInRegistry($hisData) {
-        $storableHisData = serialize($hisData);
-        $this->registry->set('deployment', 'storedHistoryData', $storableHisData);
+    protected function storeDataInRegistry($data, $key) {
+        $storableData = serialize($data);
+        $this->registry->set('deployment', $key, $storableData);
     }
 
     

@@ -81,4 +81,52 @@ class FailureService extends AbstractDataService {
         
         return $differences;
     }
+    
+    
+    /**
+     * Verarbeitung der angekreuzten Fehler
+     * 
+     * @param array $failures
+     * @param string $storedFailures serialized array from registry
+     * @return boolean
+     */
+    public function proceedFailureEntries($failures, $storedFailures){
+        $fails = array();
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
+        // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
+        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
+        
+        // Fehler aus Registry deserialisieren
+        $unserializedFailures = unserialize($storedFailures);
+        
+        // Einträge splitten
+        foreach($failures as $fail){
+            $fails[] = explode('.', $fail);
+        }
+        
+        // wenn 'list' ausgewählt wurde dann update, bei database nichts tun
+        foreach($fails as $entry){
+            if($entry[0] == 'list'){
+                foreach($unserializedFailures as $unFail){
+                    if($unFail['tablename'] == $entry[1] && $unFail['uuid'] == $entry[2]){
+                        // nicht benötigte Einträge entfernen
+                        unset($unFail['tablename']);
+                        if(isset($unFail['fieldlist']) || isset($unFail['uid']) || isset($unFail['pid'])){
+                            unset($unFail['fieldlist']);
+                            unset($unFail['uid']);
+                            unset($unFail['pid']);
+                        }
+                        
+                        // Timestamp ändern
+                        $unFail['tstamp'] = time();
+                        
+                        // In DB updaten
+                        $con->exec_UPDATEquery($entry[1], 'uuid='.$entry[2]);
+                    }
+                }
+            }
+        }
+        return true;
+    }
 }
