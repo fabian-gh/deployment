@@ -275,9 +275,9 @@ class DeploymentController extends ActionController {
      * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failures
      * @dontvalidate $failures
      */
-    public function listFailureAction($failures, Failure $failureObj = null){
-        if ($failureObj === null) {
-            $failureObj = new Failure();
+    public function listFailureAction($failures, Failure $failure = null){
+        if ($failure === null) {
+            $failure = new Failure();
         }
 
         $databaseEntries = $this->failureService->getFailureEntries($failures);
@@ -285,7 +285,7 @@ class DeploymentController extends ActionController {
         
         $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
-            'failure'           => $failureObj,
+            'failure'           => $failure,
             'failureEntries'    => $failures,
             'databaseEntries'   => $databaseEntries
         ));
@@ -295,13 +295,13 @@ class DeploymentController extends ActionController {
     /**
      * Fehlerbehebung
      * 
-     * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failures
+     * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failure
      * @dontvalidate $failures
      */
-    public function clearFailuresAction(Failure $failures){
+    public function clearFailuresAction(Failure $failure){
         // TODO: Verarbeitung nachdem das Formular abgeschickt wurde
         // TODO: Ausschluss von zwei Checkboxen in einer Zeile gleichgzeitig angekreuzt
-        DebuggerUtility::var_dump($failures);die();
+        DebuggerUtility::var_dump($failure);die();
         
         //$this->registry->set('deployment', 'last_deploy', time());
         // Bestätigung ausgeben
