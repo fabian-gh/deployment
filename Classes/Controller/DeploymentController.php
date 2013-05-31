@@ -100,7 +100,7 @@ class DeploymentController extends ActionController {
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->resource->getNotIndexedFiles();
         $this->insertDataService->processNotIndexedFiles($notIndexed);
-
+        
         // prüft ob die Spalte UUID & der Wert existieren
         $this->insertDataService->checkIfUuidExists();
 

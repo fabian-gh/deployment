@@ -298,7 +298,11 @@ class InsertDataService extends AbstractDataService{
             $res = $fileRep->findByIdentifierWithoutHeadingSlash('/fileadmin/');
             
             foreach($res as $file){
-                $identifier = $file->getIdentifier();
+                // File-Objekt über UID des Ergebnisses erzeugen
+                $File = $resFact->getFileObject($file->getUid());
+                // Identifier des Objekts abfragen
+                $identifier = $File->getIdentifier();
+                
                 if(strstr($identifier, '/fileadmin') != false){
                     $croppedIdentifier = substr($identifier, 10);
                     $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $croppedIdentifier));
