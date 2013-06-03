@@ -107,7 +107,6 @@ class XmlResourceService extends AbstractRepository {
             $this->xmlwriter->writeElement('modification_date', $FileObj->getProperty('modification_date'));
             $this->xmlwriter->writeElement('width', $FileObj->getProperty('width'));
             $this->xmlwriter->writeElement('height', $FileObj->getProperty('height'));
-            //$this->xmlwriter->writeElement('uuid', $this->getUuid($file->getUid(), 'sys_file'));
             $this->xmlwriter->writeElement('uuid', $FileObj->getProperty('uuid'));
             $this->xmlwriter->endElement();
         }

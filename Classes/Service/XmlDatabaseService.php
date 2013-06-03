@@ -60,7 +60,6 @@ class XmlDatabaseService extends AbstractDataService{
         $newInsert = array();
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
-        $fileService = new FileService();
         
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
@@ -106,16 +105,10 @@ class XmlDatabaseService extends AbstractDataService{
                             $this->xmlwriter->writeElement('uid_foreign', $contentUuid);
                         }
                         // header_link (tt_content) durch entsprechende UUID ersetzen
-                        elseif($newkey == 'header_link') {
-                            $substring = $fileService->checkLinks($newval);
+                        elseif($newkey == 'header_link' || $newkey == 'link') {
+                            $substring = $this->checkLinks($newval);
                             $this->xmlwriter->writeElement($newkey, $substring);
-                        } 
-                        // link (sys_file_reference) durch UUId ersetzen
-                        elseif($newkey == 'link'){
-                            $substring = $fileService->checkLinks($newval);
-                            $this->xmlwriter->writeElement($newkey, $substring);
-                        } 
-                        else {
+                        } else {
                             $this->xmlwriter->writeElement($newkey, $newval);
                         }
                     }
@@ -142,7 +135,12 @@ class XmlDatabaseService extends AbstractDataService{
                 foreach ($cData->getHistoryData() as $datakey => $data) {
                     if ($datakey == 'newRecord') {
                         foreach ($data as $key => $value) {
-                            $this->xmlwriter->writeElement($key, $value);
+                            if($key === 'header_link' || $key == 'link'){
+                                $substring = $this->checkLinks($value);
+                                $this->xmlwriter->writeElement($key, $substring);
+                            } else {
+                                $this->xmlwriter->writeElement($key, $value);
+                            }
                         }
                     }
                 }
@@ -150,7 +148,7 @@ class XmlDatabaseService extends AbstractDataService{
                 $this->xmlwriter->endElement();
             }
         }
-        die();
+        
         //$this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument(); // Dokument schließen
@@ -236,7 +234,7 @@ class XmlDatabaseService extends AbstractDataService{
         $split = explode(':', $link);
         
         if(is_numeric($link)){
-            return $link;
+            return 'page:'.$this->getPageUuid($link);
         } elseif($split[0] === 'file'){
             $split[1] = $this->getFileUuid($split[1]);
             return implode(':', $split);

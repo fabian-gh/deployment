@@ -47,12 +47,39 @@ class InsertDataService extends AbstractDataService{
 
                 // falls neuer Eintrag in pages-Tabelle
                 if($flag === true){
+                    // pid auf 0 setzen
                     $entry['pid'] = 0;
                 } 
-                // falls neuer Eintrag in andere Tabelle, dann wieder die entsprechende PID abfragen
+                // falls neuer Eintrag in andere Tabelle
                 else {
+                    // dann wieder die entsprechende PID abfragen und ersetzen
                     $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$entry['pid']."'");
                     $entry['pid'] = $uid['uid'];
+                    
+                    // Link abfragen und ersetzen
+                    if($entry['header_link'] != ''){
+                        $split = explode(':', $entry['header_link']);
+                        
+                        if($split[0] === 'file'){
+                            $uid = $con->exec_SELECTgetSingleRow('uid', 'sys_file', "uuid = '".$split[1]."'");
+                            $split[1] = $uid['uid'];
+                            $entry['header_link'] = implode(':', $split);
+                        } elseif($split[0] === 'page') {
+                            $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$split[1]."'");
+                            $entry['header_link'] = $uid['uid'];
+                        }
+                    } elseif($entry['link'] != ''){
+                        $split = explode(':', $entry['link']);
+                        
+                       if($split[0] === 'file'){
+                            $uid = $con->exec_SELECTgetSingleRow('uid', 'sys_file', "uuid = '".$split[1]."'");
+                            $split[1] = $uid['uid'];
+                            $entry['link'] = implode(':', $split);
+                        } elseif($split[0] === 'page'){
+                            $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$split[1]."'");
+                            $entry['link'] = $uid['uid'];
+                        }
+                    }
                     
                     // wenn die Einträge uid_foreign und uid_local vorhanden sind, dann diese durch UUID ersetzen
                     if(isset($entry['uid_foreign']) && isset($entry['uid_local'])){
@@ -82,12 +109,35 @@ class InsertDataService extends AbstractDataService{
                 if($flag === true){
                     // entsprechende pid herausfinden
                     $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$entry['pid']."'");
-
-                    // pid und timestamp durch aktuelle Werte ersetzen
                     $entry['pid'] = $uid['uid'];
                 } else {
                     $pid = $con->exec_SELECTgetSingleRow('pid', 'pages', "uuid = '".$entry['pid']."'");
                     $entry['pid'] = $pid['pid'];
+                    
+                     // Link abfragen und ersetzen
+                    if($entry['header_link'] != ''){
+                        $split = explode(':', $entry['header_link']);
+                        
+                        if($split[0] === 'file'){
+                            $uid = $con->exec_SELECTgetSingleRow('uid', 'sys_file', "uuid = '".$split[1]."'");
+                            $split[1] = $uid['uid'];
+                            $entry['header_link'] = implode(':', $split);
+                        } elseif($split[0] === 'page'){
+                            $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$split[1]."'");
+                            $entry['header_link'] = $uid['uid'];
+                        } 
+                    } elseif($entry['link'] != ''){
+                        $split = explode(':', $entry['link']);
+                        
+                        if($split[0] === 'file'){
+                            $uid = $con->exec_SELECTgetSingleRow('uid', 'sys_file', "uuid = '".$split[1]."'");
+                            $split[1] = $uid['uid'];
+                            $entry['link'] = implode(':', $split);
+                        } elseif($split[0] === 'page'){
+                            $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$split[1]."'");
+                            $entry['link'] = $uid['uid'];
+                        } 
+                    }
                 }
 
                 $entry['tstamp'] = time();
@@ -95,7 +145,7 @@ class InsertDataService extends AbstractDataService{
                 unset($entry['tablename']);
                 unset($entry['fieldlist']);
                 unset($entry['uid']);
-
+                
                 // Daten aktualisieren
                 //$con->exec_UPDATEquery($table, 'uuid='.$entry['uuid'], $entry);
                 
@@ -115,7 +165,7 @@ class InsertDataService extends AbstractDataService{
      * @param array $dataArr
      * @return mixed <b>true</b> if no dependencies, else <b>array</b>
      */
-    public function checkPageTreeDepth($dataArr){
+    public function checkPageTree($dataArr){
         $pageTreeDepth = array();
         $beforePages = array();
         
@@ -156,7 +206,7 @@ class InsertDataService extends AbstractDataService{
         $thirdPriority = array();
         
         // Seitenbaumtiefenabhängigkeiten prüfen
-        $pageTreeCheck = $this->checkPageTreeDepth($dataArr);
+        $pageTreeCheck = $this->checkPageTree($dataArr);
         if(!empty($pageTreeCheck)){
             foreach($dataArr as $entry){
                 // vor 1. Prioritätstsufe alle Abhängigen Seiten einfügen

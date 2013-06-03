@@ -180,8 +180,8 @@ class DeploymentController extends ActionController {
         foreach ($deploy->getDeployEntries() as $uid) {
             $deployData[] = $this->xmlDatabaseService->compareDataWithRegistry($uid);
         }
-
-        // falls deployment-Ordner noch nicht existiert, dann erstellen
+        
+        // falls deployment-Ordner noch nicht existieren, dann erstellen
         /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
         $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
         $exFold[] = $folder->folderExists($this->fileService->getDeploymentPathWithTarilingSlash());
@@ -237,8 +237,8 @@ class DeploymentController extends ActionController {
         $tstamp = $this->registry->get('deployment', 'last_deploy');
         
         //Mediendaten lesen
-        $resourceData = $this->xmlResourceService->readXmlResourceList();
-        $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
+        /*$resourceData = $this->xmlResourceService->readXmlResourceList();
+        $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);*/
         
         // XML lesen
         $content = $this->xmlDatabaseService->readXML($tstamp);
