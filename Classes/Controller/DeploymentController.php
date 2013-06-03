@@ -156,7 +156,7 @@ class DeploymentController extends ActionController {
             
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlDatabaseService->unserializeHistoryData($allHistoryEintries);
-            $this->storeHistoryDataInRegistry($unserializedHistoryData, 'storedHistoryData');
+            $this->storeDataInRegistry($unserializedHistoryData, 'storedHistoryData');
             $diffData = $this->xmlDatabaseService->getHistoryDataDiff($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
@@ -184,29 +184,29 @@ class DeploymentController extends ActionController {
         // falls deployment-Ordner noch nicht existiert, dann erstellen
         /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
         $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
-        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/');
-        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/database/');
-        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/');
-        $exFold[] = $folder->folderExists(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/');
+        $exFold[] = $folder->folderExists($this->fileService->getDeploymentPathWithTarilingSlash());
+        $exFold[] = $folder->folderExists($this->fileService->getDeploymentDatabasePathWithTarilingSlash());
+        $exFold[] = $folder->folderExists($this->fileService->getDeploymentMediaPathWithTarilingSlash());
+        $exFold[] = $folder->folderExists($this->fileService->getDeploymentResourcePathWithTarilingSlash());
 
         foreach ($exFold as $ergkey => $ergvalue) {
             if (!$ergvalue) {
                 switch ($ergkey) {
                     case 0:
-                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/');
-                        break;
+                        GeneralUtility::mkdir($ergvalue);
+                    break;
 
                     case 1:
-                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/database/');
-                        break;
+                        GeneralUtility::mkdir($ergvalue);
+                    break;
 
                     case 2:
-                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/');
-                        break;
+                        GeneralUtility::mkdir($ergvalue);
+                    break;
 
                     case 3:
-                        GeneralUtility::mkdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/');
-                        break;
+                        GeneralUtility::mkdir($ergvalue);
+                    break;
                 }
             }
         }
