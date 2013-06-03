@@ -96,13 +96,29 @@ class XmlDatabaseService extends AbstractDataService{
                         } 
                         // uid_local durch UUId ersetzen
                         elseif($newkey == 'uid_local'){
-                            $fileUuid = $this->getFileUuid($newval);
-                            $this->xmlwriter->writeElement('uid_local', $fileUuid);
+                            // normaler Fall, ohne tt_news
+                            if($cData->getTablename() != 'tt_news_related_mm' && $cData->getTablename() != 'tt_news_cat_mm'){
+                                $fileUuid = $this->getFileUuid($newval);
+                                $this->xmlwriter->writeElement('uid_local', $fileUuid);
+                            } 
+                            // Fallabdeckung für tt_news
+                            elseif($cData->getTablename() == 'tt_news_cat_mm') {
+                                $uuid = $this->getUuid($newval, 'tt_news');
+                                $this->xmlwriter->writeElement('uid_local', $uuid);
+                            }
                         }
                         // uid_foreign durch UUID ersetzen
                         elseif($newkey == 'uid_foreign'){
-                            $contentUuid = $this->getContentUuid($newval);
-                            $this->xmlwriter->writeElement('uid_foreign', $contentUuid);
+                            // normaler Fall, ohne tt_news
+                            if($cData->getTablename() != 'tt_news_related_mm' && $cData->getTablename() != 'tt_news_cat_mm'){
+                                $contentUuid = $this->getContentUuid($newval);
+                                $this->xmlwriter->writeElement('uid_foreign', $contentUuid);
+                            } 
+                            // Fallabdeckung für tt_news
+                            elseif($cData->getTablename() == 'tt_news_cat_mm'){
+                                $uuid = $this->getUuid($newval, 'tt_content');
+                                $this->xmlwriter->writeElement('uid_foreign', $uuid);
+                            }
                         }
                         // header_link (tt_content) durch entsprechende UUID ersetzen
                         elseif($newkey == 'header_link' || $newkey == 'link') {
@@ -367,6 +383,9 @@ class XmlDatabaseService extends AbstractDataService{
     }
     
     
+
+    
+    
     /**
      * Gibt die uuid der übergebenen pid aus der pages-Tabelle zurück
      * 
@@ -425,57 +444,6 @@ class XmlDatabaseService extends AbstractDataService{
         $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = '.$uid);
         
         return (!empty($pid['pid'])) ? $pid['pid'] : 0;
-    }
-
-    
-    /**
-     * Löscht alle XML-Dateien und Ordner, die älter als ein halbes Jahr sind
-     */
-    public function deleteOlderFiles(){
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-        $deleteState = $configuration['deleteOlderFiles'];
-        
-        // falls Daten gelöscht werden sollen
-        if($deleteState == 1){
-            $fileArr  = array();
-            $split  = array();
-            $dateFolder = array();
-            
-            $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/', '', true);
-        
-            if ($filesAndFolders) {
-                // Dateipfad ausplitten
-                foreach ($filesAndFolders as $faf) {
-                    $exFaf[] = explode('/', $faf);
-                }
-
-                // pro Ordner/Datum ein Array mit allen Dateinamen darin
-                foreach ($exFaf as $item) {
-                    if ($item[7] != '' && $item[8] != '') {
-                        $dateFolder[$item[7]][] = $item[8];
-                    }
-                }
-
-                // Datum splitten und löschen
-                foreach($dateFolder as $datekey => $files){
-                    $split = explode('_', $datekey);
-                    $splitdate = mktime(0, 0, 0, $split[1], $split[2], $split[0]);
-
-                    // falls Ordner älter als halbes Jahr
-                    if($splitdate+(6*30*24*60*60) < time()){
-                        // dann Dateien in Ordner löschen
-                        foreach($files as $filevalue){
-                            $splitFile = explode('_', $filevalue);
-                            $folder = ($splitFile[1] == 'changes.xml') ? 'database' : 'media';
-
-                            unlink(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$datekey.'/'.$filevalue);
-                        }
-                        // Ordner selbst löschen
-                        rmdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$datekey);
-                    }
-                }
-            }
-        }
     }
     
     

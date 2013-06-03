@@ -81,13 +81,24 @@ class InsertDataService extends AbstractDataService{
                         }
                     }
                     
-                    // wenn die Einträge uid_foreign und uid_local vorhanden sind, dann diese durch UUID ersetzen
+                    // wenn die Einträge uid_foreign und uid_local vorhanden sind, dann diese durch UID ersetzen
                     if(isset($entry['uid_foreign']) && isset($entry['uid_local'])){
-                        $uid_foreign = $con->exec_SELECTgetSingleRow('uid', 'tt_content', "uuid = '".$entry['pid']."'");
-                        $uid_local = $con->exec_SELECTgetSingleRow('uid', 'sys_file', "uuid = '".$entry['pid']."'");
-                        
-                        $entry['uid_foreign'] = $uid_foreign;
-                        $entry['uid_local'] = $uid_local;
+                        // falls nicht tt_news
+                        if($entry['tablename'] != 'tt_news_cat_mm' && $entry['tablename'] != 'tt_news_related_mm'){
+                            $uid_foreign = $con->exec_SELECTgetSingleRow('uid', 'tt_content', "uuid = '".$entry['pid']."'");
+                            $uid_local = $con->exec_SELECTgetSingleRow('uid', 'sys_file', "uuid = '".$entry['pid']."'");
+                            
+                            $entry['uid_foreign'] = $uid_foreign['uid'];
+                            $entry['uid_local'] = $uid_local['uid'];
+                        } 
+                        // falls tt_news
+                        elseif($entry['tablename'] != 'tt_news_cat_mm'){
+                            $uid_foreign = $con->exec_SELECTgetSingleRow('uid', 'tt_content', "uuid = '".$entry['pid']."'");
+                            $uid_local = $con->exec_SELECTgetSingleRow('uid', 'tt_news', "uuid = '".$entry['pid']."'");
+                            
+                            $entry['uid_foreign'] = $uid_foreign['uid'];
+                            $entry['uid_local'] = $uid_local['uid'];
+                        }
                     }
                 }
 
