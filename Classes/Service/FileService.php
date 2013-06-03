@@ -169,6 +169,8 @@ class FileService extends AbstractDataService {
     }
     
     
+    // ======================================= Getter ===============================================
+    
     /**
      * @return string
      */

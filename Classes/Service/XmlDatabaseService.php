@@ -16,6 +16,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Model\LogData;
 use \TYPO3\Deployment\Domain\Model\HistoryData;
 use \TYPO3\Deployment\Domain\Model\History;
+use \TYPO3\Deployment\Service\FileService;
 
 /**
  * XmlDatabaseService
@@ -59,6 +60,7 @@ class XmlDatabaseService extends AbstractDataService{
         $newInsert = array();
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
+        $fileService = new FileService();
         
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
@@ -85,7 +87,6 @@ class XmlDatabaseService extends AbstractDataService{
                 $this->xmlwriter->startElement('data');
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', '*');
-                //$this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
                 
                 foreach($newInsert as $newkey => $newval){
                     if($newkey != 'l18n_diffsource'){
@@ -104,16 +105,15 @@ class XmlDatabaseService extends AbstractDataService{
                             $contentUuid = $this->getContentUuid($newval);
                             $this->xmlwriter->writeElement('uid_foreign', $contentUuid);
                         }
-                        // header_link durch entsprechende UUID ersetzen
+                        // header_link (tt_content) durch entsprechende UUID ersetzen
                         elseif($newkey == 'header_link') {
-                            // TODO: Hier noch genauere Unterscheidung zwischen den einzelnen Typen
-                            $pageUuid = $this->getPageUuid($newval);
-                            $this->xmlwriter->writeElement($newkey, $pageUuid);
+                            $substring = $fileService->checkLinks($newval);
+                            $this->xmlwriter->writeElement($newkey, $substring);
                         } 
-                        // link in sys_file_reference durch UUId ersetzen
+                        // link (sys_file_reference) durch UUId ersetzen
                         elseif($newkey == 'link'){
-                            // TODO: link verarbeiten
-                            $this->xmlwriter->writeElement($newkey, $newval);
+                            $substring = $fileService->checkLinks($newval);
+                            $this->xmlwriter->writeElement($newkey, $substring);
                         } 
                         else {
                             $this->xmlwriter->writeElement($newkey, $newval);
@@ -150,7 +150,7 @@ class XmlDatabaseService extends AbstractDataService{
                 $this->xmlwriter->endElement();
             }
         }
-        
+        die();
         //$this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument(); // Dokument schließen
@@ -223,6 +223,26 @@ class XmlDatabaseService extends AbstractDataService{
         }
         
         return $contentArr;
+    }
+    
+    
+    /**
+     * Ersetzt die uid im übergebenen Link durch die UUID
+     * 
+     * @param string $link
+     * @return string
+     */
+    public function checkLinks($link){
+        $split = explode(':', $link);
+        
+        if(is_numeric($link)){
+            return $link;
+        } elseif($split[0] === 'file'){
+            $split[1] = $this->getFileUuid($split[1]);
+            return implode(':', $split);
+        } else {
+            return $link;
+        }
     }
     
     

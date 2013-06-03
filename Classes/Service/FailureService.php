@@ -37,15 +37,15 @@ class FailureService extends AbstractDataService {
         
         if($con->isConnected()){
             foreach($failures as $failure){
-                // Schlüsseliste erstellen
-                $keyList = '';
+                $keyListArr = array();
+                // Array mit Schlüsseln erstellen
                 foreach($failure as $key => $value){
                     if($key != 'tablename' && $key != 'fieldlist'){
-                        $keyList .= $key.',';
+                        $keyListArr[] = $key;
                     }
                 }
-                //letzte Komma entfernen
-                $keyList = substr($keyList, 0, strlen($keyList)-1);
+                // Liste erstellen
+                $keyList = implode(',', $keyListArr);
                 
                 $failureEntries[] = $con->exec_SELECTgetSingleRow($keyList, $failure['tablename'], "uuid='".$failure['uuid']."'");
             }
