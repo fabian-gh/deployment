@@ -1,7 +1,7 @@
 <?php
 
 /**
- * XmlParserService
+ * XmlDatabaseService
  *
  * @category   Extension
  * @package    Deployment
@@ -18,12 +18,12 @@ use \TYPO3\Deployment\Domain\Model\HistoryData;
 use \TYPO3\Deployment\Domain\Model\History;
 
 /**
- * XmlParserService
+ * XmlDatabaseService
  *
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class XmlParserService extends AbstractDataService{
+class XmlDatabaseService extends AbstractDataService{
 
     /**
      * @var \TYPO3\Deployment\Domain\Model\HistoryData
@@ -162,7 +162,7 @@ class XmlParserService extends AbstractDataService{
         $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/'.date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
         
-        GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_changes.xml');
+        GeneralUtility::upload_copy_move($file, $folder.'/'.date('H-i-s', time()).'_changes.xml');
     }
 
     

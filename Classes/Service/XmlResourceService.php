@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ResourceDataService
+ * XmlResourceService
  *
  * @category   Extension
  * @package    Deployment
@@ -19,12 +19,12 @@ use \TYPO3\CMS\Core\Resource\ResourceFactory;
 use \TYPO3\Deployment\Service\FileService;
 
 /**
- * ResourceDataService
+ * XmlResourceService
  *
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic@t-online.de>
  */
-class ResourceDataService extends AbstractRepository {
+class XmlResourceService extends AbstractRepository {
 
     /**
      * max file size in Bytes

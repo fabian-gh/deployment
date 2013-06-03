@@ -46,10 +46,10 @@ class DeploymentController extends ActionController {
     protected $fileRepository;
 
     /**
-     * @var \TYPO3\Deployment\Service\XmlParserService
+     * @var \TYPO3\Deployment\Service\XmlDatabaseService
      * @inject
      */
-    protected $xmlParserService;
+    protected $xmlDatabaseService;
 
     /**
      * @var \TYPO3\Deployment\Service\InsertDataService
@@ -76,10 +76,10 @@ class DeploymentController extends ActionController {
     protected $registry;
 
     /**
-     * @var \TYPO3\Deployment\Service\ResourceDataService
+     * @var \TYPO3\Deployment\Service\XmlResourceService
      * @inject
      */
-    protected $resource;
+    protected $xmlResourceService;
 
     /**
      * @var \TYPO3\Deployment\Scheduler\CopyTask
@@ -111,7 +111,7 @@ class DeploymentController extends ActionController {
         $this->insertDataService->checkIfUuidExists();
 
         // XML-Dateien die älter als 0.5 Jahre sind löschen
-        $this->xmlParserService->deleteOlderFiles();
+        $this->xmlDatabaseService->deleteOlderFiles();
     }
 
     
@@ -135,14 +135,14 @@ class DeploymentController extends ActionController {
             }
             $this->view->assign('deploy', $deploy);
 
-            $unserializedLogData = $this->xmlParserService->unserializeLogData($logEntries);
+            $unserializedLogData = $this->xmlDatabaseService->unserializeLogData($logEntries);
             
             // Einträge durchlaufen, falls Action == 1 dann handelt es sich um einen komplett 
             // neuen Datensatz, der zu einem Historyeintrag umgewandelt wird, damit dieser 
             // widerum dargestellt werden kann
             foreach ($unserializedLogData as $entry) {
                 if ($entry->getAction() == '1') {
-                    $newHistoryEntries[] = $this->xmlParserService->convertFromLogDataToHistory($entry);
+                    $newHistoryEntries[] = $this->xmlDatabaseService->convertFromLogDataToHistory($entry);
                 } else {
                     /** @var \TYPO3\Deployment\Domain\Model\History $result */
                     $result = $this->historyRepository->findHistoryData($entry);
@@ -155,9 +155,9 @@ class DeploymentController extends ActionController {
             }
             
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
-            $unserializedHistoryData = $this->xmlParserService->unserializeHistoryData($allHistoryEintries);
+            $unserializedHistoryData = $this->xmlDatabaseService->unserializeHistoryData($allHistoryEintries);
             $this->storeHistoryDataInRegistry($unserializedHistoryData, 'storedHistoryData');
-            $diffData = $this->xmlParserService->getHistoryDataDiff($unserializedHistoryData);
+            $diffData = $this->xmlDatabaseService->getHistoryDataDiff($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
                 'historyEntries'    => $unserializedHistoryData,
@@ -178,7 +178,7 @@ class DeploymentController extends ActionController {
         $exFold = array();
 
         foreach ($deploy->getDeployEntries() as $uid) {
-            $deployData[] = $this->xmlParserService->compareDataWithRegistry($uid);
+            $deployData[] = $this->xmlDatabaseService->compareDataWithRegistry($uid);
         }
 
         // falls deployment-Ordner noch nicht existiert, dann erstellen
@@ -214,13 +214,13 @@ class DeploymentController extends ActionController {
         // Mediendaten erstellen
         $date = $this->registry->get('deployment', 'last_deploy', time());
         $resourceData = $this->fileRepository->findYoungerThen($date);
-        $this->resource->setFileList($resourceData);
-        $this->resource->writeXmlResourceList();
+        $this->xmlResourceService->setFileList($resourceData);
+        $this->xmlResourceService->writeXmlResourceList();
 
         // Deploydaten setzen und XML erstellen
-        $this->xmlParserService->setDeployData(array_unique($deployData));
-        $this->xmlParserService->writeXML();
-        $this->resource->deployResources();
+        $this->xmlDatabaseService->setDeployData(array_unique($deployData));
+        $this->xmlDatabaseService->writeXML();
+        $this->xmlResourceService->deployResources();
 
         $this->flashMessageContainer->add('Daten wurden erstellt.', '', FlashMessage::OK);
         $this->redirect('index');
@@ -237,11 +237,11 @@ class DeploymentController extends ActionController {
         $tstamp = $this->registry->get('deployment', 'last_deploy');
         
         //Mediendaten lesen
-        $resourceData = $this->resource->readXmlResourceList();
+        $resourceData = $this->xmlResourceService->readXmlResourceList();
         $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
         
         // XML lesen
-        $content = $this->xmlParserService->readXML($tstamp);
+        $content = $this->xmlDatabaseService->readXML($tstamp);
         // content in DB-Felder der jeweiligen Tabelle schreiben
         $result2 = $this->insertDataService->insertDataIntoTable($content);
         
