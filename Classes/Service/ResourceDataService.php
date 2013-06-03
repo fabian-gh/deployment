@@ -16,6 +16,7 @@ use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
+use \TYPO3\Deployment\Service\FileService;
 
 /**
  * ResourceDataService
@@ -190,67 +191,6 @@ class ResourceDataService extends AbstractRepository {
 
     
     /**
-     * Schreibt eine Dateiliste des Fileadmins, ohne Deploymentdateien
-     */
-    public function readFilesInFileadmin() {
-        $fileArr = $newArr = array();
-
-        // direktes auslesen des Ordners, da evtl. nicht alle Dateien in Tabellen indexiert sind
-        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/';
-        $fileList = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $path);
-
-        $pathCount = strlen($path);
-        // deployment-Ordner exkludieren
-        foreach ($fileList as $filekey => $filevalue) {
-            if (strstr($filevalue, '/fileadmin/deployment') == FALSE) {
-                $newArr[$filekey] = substr($filevalue, $pathCount);
-            }
-        }
-
-        return $newArr;
-    }
-
-    
-    /**
-     * Filtert alle nicht indizierten Dateien und fügt diese in die sys-file Tabelle ein
-     * 
-     * @return array 
-     */
-    public function getNotIndexedFiles() {
-        $fileArr = $newFileArr = $notIndexedFiles = $filesInFileadmin = array();
-
-        $filesInFileadmin = $this->readFilesInFileadmin();
-
-        // processed Data raus
-        foreach ($filesInFileadmin as $filevalue) {
-            if (strstr($filevalue, '_processed_/') == FALSE) {
-                $fileArr[] = $filevalue;
-            }
-        }
-
-        // temp Data raus
-        foreach ($fileArr as $filevalue) {
-            if (strstr($filevalue, '_temp_/') == FALSE) {
-                $newFileArr[] = $filevalue;
-            }
-        }
-
-        foreach ($newFileArr as $file) {
-            /** @var \TYPO3\Deployment\Domain\Repository\FileRepository $fileRef */
-            $fileRef = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
-            /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $result */
-            $result = $fileRef->findByIdentifier($file);
-
-            if ($result->getFirst() == NULL) {
-                $notIndexedFiles[] = $file;
-            }
-        }
-
-        return $notIndexedFiles;
-    }
-
-    
-    /**
      * Dateien aus der sys_file-Tabelle holen und in den Deployment-Ordner kopieren.
      * Falls nötig, vorher die Ordnerstruktur erstellen.
      * Wenn $filesOverLimit = true dann werden Dateien über der Grenze deployed.
@@ -259,10 +199,12 @@ class ResourceDataService extends AbstractRepository {
      * @param boolean $filesOverLimit
      */
     public function deployResources($filesOverLimit = FALSE) {
+        /** @var \TYPO3\Deployment\Service\FileService $fileService */
+        $fileService = new FileService();
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
-        $fileAdminPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin';
-        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource';
+        $fileAdminPath = $fileService->getFileadminPathWithoutTrailingSlash();
+        $path = $fileService->getDeploymentResourcePathWithoutTarilingSlash();
         $os = get_browser()->platform;
 
         $data = $this->readXmlResourceList();
@@ -296,7 +238,7 @@ class ResourceDataService extends AbstractRepository {
                         exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
                     } else {
                         // ansonsten "normales" kopieren über PHP
-                        copy($fileAdminPath . '/' . $fold . '/' . $filename, $path . '/' . $fold . '/' . $filename);
+                        copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
                     }
                 }
             } else {
@@ -326,39 +268,9 @@ class ResourceDataService extends AbstractRepository {
                         $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                         exec("rsync --compress --update --links --perms --min-size=$this->maxFileSize $sourceDest");
                     } else {
-                        copy($pullServer . '/fileadmin/' . $fold . '/' . $filename, $path . '/' . $fold . '/' . $filename);
+                        copy($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
                     }
                 }
-            }
-        }
-    }
-
-    
-    /**
-     * Prüft ob die Dateien im resource-Ordner innerhalb des fileadmins vorhanden
-     * sind. Falls nein werden diese kopiert.
-     */
-    public function checkIfFileExists() {
-        $resourceFiles = $newArr = $newFileList = array();
-        $path = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/';
-        $resPath = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/';
-
-        // Dateilisten 
-        $fileadminFiles = $this->readFilesInFileadmin();
-        $fileList = GeneralUtility::getAllFilesAndFoldersInPath($resourceFiles, $resPath);
-
-        // Pfade kürzen und in Array abspeichern
-        foreach ($fileList as $paths) {
-            $newFileList[] = str_replace('resource/', '', strstr($paths, 'resource'));
-        }
-
-        // Unterschiede ermitteln
-        $diffFiles = array_diff($newFileList, $fileadminFiles);
-
-        // Dateien aus resource ind fileadmin kopieren
-        foreach ($diffFiles as $file) {
-            if (!file_exists($path . '/' . $file)) {
-                copy($resPath . $file, $path . '/' . $file);
             }
         }
     }

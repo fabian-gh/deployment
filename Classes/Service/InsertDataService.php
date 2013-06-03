@@ -274,44 +274,6 @@ class InsertDataService extends AbstractDataService{
             return (empty($entryCollection)) ? true : $entryCollection;
         }
     }
-    
-    
-    /**
-     * Nicht indizierte Daten in Tabelle eintragen
-     * 
-     * @param array $fileArr
-     */
-    public function processNotIndexedFiles($fileArr){
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
-        $resFact = ResourceFactory::getInstance();
-        
-        foreach($fileArr as $file){
-            $res = $resFact->getFileObjectFromCombinedIdentifier('/fileadmin/'.$file);
-            // selbstständige Indizierung wenn etwas mit $res gemacht wird
-            $res->isIndexed();
-        }
-
-        if($con->isConnected()){
-            $fileRep = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
-            $res = $fileRep->findByIdentifierWithoutHeadingSlash('/fileadmin/');
-            
-            foreach($res as $file){
-                // File-Objekt über UID des Ergebnisses erzeugen
-                $File = $resFact->getFileObject($file->getUid());
-                // Identifier des Objekts abfragen
-                $identifier = $File->getIdentifier();
-                
-                if(strstr($identifier, '/fileadmin') != false){
-                    $croppedIdentifier = substr($identifier, 10);
-                    $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $croppedIdentifier));
-                } else {
-                    $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $identifier));
-                }
-            }
-        }
-    }
 
     
     /**
@@ -321,8 +283,9 @@ class InsertDataService extends AbstractDataService{
     public function checkIfUuidExists(){
         $tablefields = array();
         $results = array();
-        $tables = array();
         $inputArr = array();
+        /** @var \TYPO3\Deployment\Service\FileService $fileService */
+        $fileService = new FileService();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         
@@ -347,22 +310,10 @@ class InsertDataService extends AbstractDataService{
             
             foreach($results as $tabkey => $tabval){
                 foreach($tabval as $value){
-                    $inputArr = array('uuid' => $this->generateUuid());
+                    $inputArr = array('uuid' => $fileService->generateUuid());
                     $con->exec_UPDATEquery($tabkey, 'uid='.$value['uid'], $inputArr);
                 }
             }
         }
-    }
-    
-    
-    /**
-     * Generiert eine UUID
-     *
-     * @return string
-     */
-    private function generateUuid() {
-        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, 
-            mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
     }
 }

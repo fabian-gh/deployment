@@ -62,6 +62,12 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $failureService;
+    
+    /**
+     * @var \TYPO3\Deployment\Service\FileService
+     * @inject 
+     */
+    protected $fileService;
 
     /**
      * @var \TYPO3\CMS\Core\Registry
@@ -98,8 +104,8 @@ class DeploymentController extends ActionController {
         }
 
         // Noch nicht indizierte Dateien indizieren
-        $notIndexed = $this->resource->getNotIndexedFiles();
-        $this->insertDataService->processNotIndexedFiles($notIndexed);
+        $notIndexed = $this->fileService->getNotIndexedFiles();
+        $this->fileService->processNotIndexedFiles($notIndexed);
         
         // prüft ob die Spalte UUID & der Wert existieren
         $this->insertDataService->checkIfUuidExists();
@@ -240,7 +246,7 @@ class DeploymentController extends ActionController {
         $result2 = $this->insertDataService->insertDataIntoTable($content);
         
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
-        $this->resource->checkIfFileExists();
+        $this->fileService->checkIfFileExists();
         
         if ($result1 === true && $result2 === true) {
             // letzten Deployment-Stand registrieren
