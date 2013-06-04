@@ -184,10 +184,10 @@ class DeploymentController extends ActionController {
         // falls deployment-Ordner noch nicht existieren, dann erstellen
         /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
         $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
-        $exFold[] = $folder->folderExists($this->fileService->getDeploymentPathWithTarilingSlash());
-        $exFold[] = $folder->folderExists($this->fileService->getDeploymentDatabasePathWithTarilingSlash());
-        $exFold[] = $folder->folderExists($this->fileService->getDeploymentMediaPathWithTarilingSlash());
-        $exFold[] = $folder->folderExists($this->fileService->getDeploymentResourcePathWithTarilingSlash());
+        $exFold[] = $folder->folderExists($this->fileService->getDeploymentPathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($this->fileService->getDeploymentDatabasePathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($this->fileService->getDeploymentMediaPathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($this->fileService->getDeploymentResourcePathWithTrailingSlash());
 
         foreach ($exFold as $ergkey => $ergvalue) {
             if (!$ergvalue) {

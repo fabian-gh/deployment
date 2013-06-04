@@ -96,7 +96,7 @@ class FileService extends AbstractDataService {
     public function checkIfFileExists() {
         $resourceFiles = $newArr = $newFileList = array();
         $path = $this->getFileadminPathWithTrailingSlash();
-        $resPath = $this->getDeploymentResourcePathWithTarilingSlash();
+        $resPath = $this->getDeploymentResourcePathWithTrailingSlash();
 
         // Dateilisten 
         $fileadminFiles = $this->readFilesInFileadmin();
@@ -240,56 +240,56 @@ class FileService extends AbstractDataService {
     /**
      * @return string
      */
-    public function getDeploymentPathWithoutTarilingSlash(){
+    public function getDeploymentPathWithoutTrailingSlash(){
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment';
     }
     
     /**
      * @return string
      */
-    public function getDeploymentPathWithTarilingSlash(){
+    public function getDeploymentPathWithTrailingSlash(){
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/';
     }
     
     /**
      * @return string
      */
-    public function getDeploymentDatabasePathWithoutTarilingSlash(){
+    public function getDeploymentDatabasePathWithoutTrailingSlash(){
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/database';
     }
     
     /**
      * @return string
      */
-    public function getDeploymentDatabasePathWithTarilingSlash(){
+    public function getDeploymentDatabasePathWithTrailingSlash(){
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/database/';
     }
     
     /**
      * @return string
      */
-    public function getDeploymentMediaPathWithoutTarilingSlash(){
+    public function getDeploymentMediaPathWithoutTrailingSlash(){
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media';
     }
     
     /**
      * @return string
      */
-    public function getDeploymentMediaPathWithTarilingSlash(){
+    public function getDeploymentMediaPathWithTrailingSlash(){
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/';
     }
     
     /**
      * @return string
      */
-    public function getDeploymentResourcePathWithoutTarilingSlash(){
+    public function getDeploymentResourcePathWithoutTrailingSlash(){
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource';
     }
     
     /**
      * @return string
      */
-    public function getDeploymentResourcePathWithTarilingSlash(){
+    public function getDeploymentResourcePathWithTrailingSlash(){
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/';
     }
 }

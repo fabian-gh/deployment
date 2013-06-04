@@ -203,7 +203,7 @@ class XmlResourceService extends AbstractRepository {
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
         $fileAdminPath = $fileService->getFileadminPathWithoutTrailingSlash();
-        $path = $fileService->getDeploymentResourcePathWithoutTarilingSlash();
+        $path = $fileService->getDeploymentResourcePathWithoutTrailingSlash();
         $os = get_browser()->platform;
 
         $data = $this->readXmlResourceList();
