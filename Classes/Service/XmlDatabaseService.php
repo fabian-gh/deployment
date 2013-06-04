@@ -105,6 +105,9 @@ class XmlDatabaseService extends AbstractDataService{
                             elseif($cData->getTablename() == 'tt_news_cat_mm') {
                                 $uuid = $this->getUuid($newval, 'tt_news');
                                 $this->xmlwriter->writeElement('uid_local', $uuid);
+                            } elseif($cData->getTablename() == 'tt_news_related_mm') {
+                                $uuid = $this->getUuid($newval, 'tt_news');
+                                $this->xmlwriter->writeElement('uid_local', $uuid);
                             }
                         }
                         // uid_foreign durch UUID ersetzen
@@ -116,8 +119,13 @@ class XmlDatabaseService extends AbstractDataService{
                             } 
                             // Fallabdeckung für tt_news
                             elseif($cData->getTablename() == 'tt_news_cat_mm'){
-                                $uuid = $this->getUuid($newval, 'tt_content');
-                                $this->xmlwriter->writeElement('uid_foreign', $uuid);
+                                $table = $con->exec_SELECTgetSingleRow('uid_foreign, tablenames', 'tt_news_cat_mm', 'uid_local='.$newkey);
+                                $uuid_foreign = $this->getUuid($table['uid_foreign'], $table['tablenames']);
+                                $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
+                            } elseif($cData->getTablename() == 'tt_news_related_mm') {
+                                $table = $con->exec_SELECTgetSingleRow('uid_foreign, tablenames', 'tt_news_crelated_mm', 'uid_local='.$newkey);
+                                $uuid_foreign = $this->getUuid($table['uid_foreign'], $table['tablenames']);
+                                $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
                             }
                         }
                         // header_link (tt_content) durch entsprechende UUID ersetzen

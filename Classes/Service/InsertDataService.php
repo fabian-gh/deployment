@@ -68,7 +68,8 @@ class InsertDataService extends AbstractDataService{
                             $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$split[1]."'");
                             $entry['header_link'] = $uid['uid'];
                         }
-                    } elseif($entry['link'] != ''){
+                    } 
+                    elseif($entry['link'] != ''){
                         $split = explode(':', $entry['link']);
                         
                        if($split[0] === 'file'){
@@ -92,12 +93,21 @@ class InsertDataService extends AbstractDataService{
                             $entry['uid_local'] = $uid_local['uid'];
                         } 
                         // falls tt_news
-                        elseif($entry['tablename'] != 'tt_news_cat_mm'){
-                            $uid_foreign = $con->exec_SELECTgetSingleRow('uid', 'tt_content', "uuid = '".$entry['pid']."'");
-                            $uid_local = $con->exec_SELECTgetSingleRow('uid', 'tt_news', "uuid = '".$entry['pid']."'");
-                            
-                            $entry['uid_foreign'] = $uid_foreign['uid'];
+                        elseif($entry['tablename'] == 'tt_news_cat_mm'){
+                            $uid_local = $con->exec_SELECTgetSingleRow('uid', 'tt_news', "uuid = '".$entry['uid_local']."'");
                             $entry['uid_local'] = $uid_local['uid'];
+                            
+                            $table = $con->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid = '".$entry['uid_foreign']."'");
+                            $uid_foreign = $con->exec_SELECTgetSingleRow('uid', $table['tablenames'], "uuid = '".$entry['uid_foreign']."'");
+                            $entry['uid_foreign'] = $uid_foreign['uid'];
+                        } 
+                        elseif($entry['tablename'] == 'tt_news_related_mm'){
+                            $uid_local = $con->exec_SELECTgetSingleRow('uid', 'tt_news', "uuid = '".$entry['uid_local']."'");
+                            $entry['uid_local'] = $uid_local['uid'];
+                            
+                            $table = $con->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid = '".$entry['uid_foreign']."'");
+                            $uid_foreign = $con->exec_SELECTgetSingleRow('uid', $table['tablenames'], "uuid = '".$entry['uid_foreign']."'");
+                            $entry['uid_foreign'] = $uid_foreign['uid'];
                         }
                     }
                 }
@@ -137,7 +147,8 @@ class InsertDataService extends AbstractDataService{
                             $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$split[1]."'");
                             $entry['header_link'] = $uid['uid'];
                         } 
-                    } elseif($entry['link'] != ''){
+                    } 
+                    elseif($entry['link'] != ''){
                         $split = explode(':', $entry['link']);
                         
                         if($split[0] === 'file'){
@@ -148,6 +159,35 @@ class InsertDataService extends AbstractDataService{
                             $uid = $con->exec_SELECTgetSingleRow('uid', 'pages', "uuid = '".$split[1]."'");
                             $entry['link'] = $uid['uid'];
                         } 
+                    }
+                    
+                    // wenn die Einträge uid_foreign und uid_local vorhanden sind, dann diese durch UID ersetzen
+                    if(isset($entry['uid_foreign']) && isset($entry['uid_local'])){
+                        // falls nicht tt_news
+                        if($entry['tablename'] != 'tt_news_cat_mm' && $entry['tablename'] != 'tt_news_related_mm'){
+                            $uid_foreign = $con->exec_SELECTgetSingleRow('uid', 'tt_content', "uuid = '".$entry['pid']."'");
+                            $uid_local = $con->exec_SELECTgetSingleRow('uid', 'sys_file', "uuid = '".$entry['pid']."'");
+                            
+                            $entry['uid_foreign'] = $uid_foreign['uid'];
+                            $entry['uid_local'] = $uid_local['uid'];
+                        } 
+                        // falls tt_news
+                        elseif($entry['tablename'] == 'tt_news_cat_mm'){
+                            $uid_local = $con->exec_SELECTgetSingleRow('uid', 'tt_news', "uuid = '".$entry['uid_local']."'");
+                            $entry['uid_local'] = $uid_local['uid'];
+                            
+                            $table = $con->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid = '".$entry['uid_foreign']."'");
+                            $uid_foreign = $con->exec_SELECTgetSingleRow('uid', $table['tablenames'], "uuid = '".$entry['uid_foreign']."'");
+                            $entry['uid_foreign'] = $uid_foreign['uid'];
+                        } 
+                        elseif($entry['tablename'] == 'tt_news_related_mm'){
+                            $uid_local = $con->exec_SELECTgetSingleRow('uid', 'tt_news', "uuid = '".$entry['uid_local']."'");
+                            $entry['uid_local'] = $uid_local['uid'];
+                            
+                            $table = $con->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid = '".$entry['uid_foreign']."'");
+                            $uid_foreign = $con->exec_SELECTgetSingleRow('uid', $table['tablenames'], "uuid = '".$entry['uid_foreign']."'");
+                            $entry['uid_foreign'] = $uid_foreign['uid'];
+                        }
                     }
                 }
 
