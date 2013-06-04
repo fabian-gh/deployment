@@ -34,6 +34,11 @@ class Log extends AbstractModel{
      */
     protected $action;
     
+    /**
+     * @var string
+     */
+    protected $tablename;
+    
     
     /**
      * @return string
@@ -76,4 +81,18 @@ class Log extends AbstractModel{
     public function setAction($action) {
         $this->action = $action;
     }  
+    
+    /**
+     * @return string
+     */
+    public function getTablename() {
+        return $this->tablename;
+    }
+
+    /**
+     * @param string $tablename
+     */
+    public function setTablename($tablename) {
+        $this->tablename = $tablename;
+    }
 }

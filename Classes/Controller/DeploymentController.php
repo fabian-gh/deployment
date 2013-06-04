@@ -333,18 +333,6 @@ class DeploymentController extends ActionController {
 
     
     /**
-     * Persistiert Einträge in der Registry
-     * 
-     * @param mixed $data
-     * @param string $key
-     */
-    protected function storeDataInRegistry($data, $key) {
-        $storableData = serialize($data);
-        $this->registry->set('deployment', $key, $storableData);
-    }
-
-    
-    /**
      * Leert den Cache aller registrierten Seiten
      */
     public function clearPageCacheAction() {
@@ -355,6 +343,18 @@ class DeploymentController extends ActionController {
         // ALLE Caches löschen (typo3temp/Cache + Tabellen)
         $dataHandler->clear_cacheCmd('all');
         $this->redirect('index');
+    }
+    
+    
+    /**
+     * Persistiert Einträge in der Registry
+     * 
+     * @param mixed $data
+     * @param string $key
+     */
+    protected function storeDataInRegistry($data, $key) {
+        $storableData = serialize($data);
+        $this->registry->set('deployment', $key, $storableData);
     }
 
     

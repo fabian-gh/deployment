@@ -389,9 +389,10 @@ class InsertDataService extends AbstractDataService{
         $fileService = new FileService();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
+        $configuration = new ConfigurationService();
         
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-        $tables = GeneralUtility::trimExplode(',', $configuration['deploymentTables'], TRUE);
+        $tables = $configuration->getDeploymentTables();
         
         if($con->isConnected()){
             foreach($tables as $table){

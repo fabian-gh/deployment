@@ -242,10 +242,11 @@ class XmlResourceService extends AbstractRepository {
                 }
             } else {
                 // Daten aus Konfiguration holen
-                $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-                $server = $configuration['pullServer'];
-                $username = $configuration['username'];
-                $password = $configuration['password'];
+                /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
+                $configuration = new ConfigurationService();
+                $server = $configuration->getPullserver();
+                $username = $configuration->getUsername();
+                $password = $configuration->getPassword();
                 
                 // URL in Teile zerlegen
                 $parts = parse_url($server);
@@ -361,8 +362,9 @@ class XmlResourceService extends AbstractRepository {
      * @param int $maxFileSize
      */
     public function setMaxFileSize() {
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-        (!empty($configuration)) ? $this->maxFileSize = $configuration['maxFileSize'] : $this->maxFileSize = 10000000;
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
+        $configuration = new ConfigurationService();
+        (!empty($configuration)) ? $this->maxFileSize = $configuration->getMaxFileSize() : $this->maxFileSize = 10000000;
     }
 
     /**

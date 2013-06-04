@@ -15,6 +15,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Install\tx_em_Install;
 use TYPO3\CMS\Install\CheckTheDatabaseHookInterface;
+use TYPO3\Deployment\Service\ConfigurationService;
 
 /**
  * @todo       General class information
@@ -67,8 +68,9 @@ CREATE TABLE ###TABLE### (
      * @return string Either empty string or table create strings
      */
     public function appendGlobalTableDefinitions($allSqlContent, \TYPO3\CMS\Install\Sql\SchemaMigrator $instSqlObj, \TYPO3\CMS\Install\Installer $parent) {
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-        $tables = GeneralUtility::trimExplode(',', $configuration['deploymentTables'], TRUE);
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
+        $configuration = new ConfigurationService();
+        $tables = $configuration->getDeploymentTables();
         
         $return = '';
         foreach ($tables as $table) {

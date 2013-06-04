@@ -173,8 +173,9 @@ class FileService extends AbstractDataService {
      * Löscht alle XML-Dateien und Ordner, die älter als ein halbes Jahr sind
      */
     public function deleteOlderFiles(){
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-        $deleteState = $configuration['deleteOlderFiles'];
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
+        $configuration = new ConfigurationService();
+        $deleteState = $configuration->getDeleteState();
         
         // falls Daten gelöscht werden sollen
         if($deleteState == 1){

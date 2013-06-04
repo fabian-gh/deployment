@@ -11,6 +11,9 @@
 
 namespace TYPO3\Deployment\Domain\Repository;
 
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\Deployment\Service\ConfigurationService;
 /**
  * Log Repository
  *
@@ -24,11 +27,14 @@ class LogRepository extends AbstractRepository {
      * Gibt alle noch nicht deployeten Datensätze zurück
      * 
      * @param string $timestamp
-     * @return array<\TYPO3\CMS\Extbase\Persistence\QueryResultInterface>
+     * @return array<\TYPO3\Deployment\Domain\Model\Log>
      */
     public function findYoungerThen($timestamp) {
         $query = $this->createQuery();
-
+        
+        $configuration = new ConfigurationService();
+        $configuration->checkTableEntries();
+        
         $constraints = array();
         $constraints[] = $query->greaterThanOrEqual('tstamp', $timestamp);
         $constraints[] = $query->equals('error', '0');
@@ -36,8 +42,11 @@ class LogRepository extends AbstractRepository {
         $constraints[] = $query->logicalNot($query->equals('tablename', ''));
         
         $query->matching($query->logicalAnd($constraints));
+        $result = $query->execute();
         
-        return $query->execute();
+        // Filterung von Datensätzen die in Tabellen stehen, die auch in der 
+        // Konfiguration aufgelistet sind
+        return $configuration->filterEntries($result);
     }
 
     /**
