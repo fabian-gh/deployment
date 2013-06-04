@@ -196,8 +196,15 @@ class XmlDatabaseService extends AbstractDataService{
      */
     public function readXML($timestamp) {
         $arrcount = 0;
-        $fileArr = $dateFolder = $contentArr = $exFaf = array();
-        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/');
+        $validationResult = array();
+        $fileArr = array();
+        $dateFolder = array();
+        $contentArr = array();
+        $exFaf = array();
+        /** @var \TYPO3\Deployment\Service\FileService $fileService */
+        $fileService = new FileService();
+        
+        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentDatabasePathWithTrailingSlash());
         
         if ($filesAndFolders) {
             // Dateipfad ausplitten
@@ -231,7 +238,7 @@ class XmlDatabaseService extends AbstractDataService{
                 // wenn Datei-Timestamp später als letztes Deployment,
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
-                    $fileService = new FileService();
+                    $validationResult['validation']['database/'.$folder.'/'.$file] = $fileService->xmlValidation($fileService->getDeploymentDatabasePathWithTrailingSlash().$folder.'/'.$file);
                     $xmlString = file_get_contents($fileService->getDeploymentDatabasePathWithTrailingSlash().$folder.'/'.$file);
 
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
@@ -244,8 +251,7 @@ class XmlDatabaseService extends AbstractDataService{
                 }
             }
         }
-        
-        return $contentArr;
+        return array_merge($contentArr, $validationResult);
     }
     
     

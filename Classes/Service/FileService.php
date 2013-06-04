@@ -132,7 +132,7 @@ class FileService extends AbstractDataService {
         
         foreach($fileArr as $file){
             $res = $resFact->getFileObjectFromCombinedIdentifier('/fileadmin/'.$file);
-            // selbstständige Indizierung wenn etwas mit $res gemacht wird
+            // automatische Indizierung sobald mit $res gearbeitet wird
             $res->isIndexed();
         }
 
@@ -217,6 +217,47 @@ class FileService extends AbstractDataService {
                     }
                 }
             }
+        }
+    }
+    
+    
+    /**
+     * Validiert die übergebene Datei
+     * 
+     * @param XML-File $file
+     * @return boolean
+     */
+    public function xmlValidation($file){
+        $dom = new \DOMDocument;
+        $dom->load($file);
+        
+        if($dom->validate()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    
+    /**
+     * Splittet die Validierung von den Daten
+     * 
+     * @param array $content
+     * @param array $validation
+     * @return array
+     */
+    public function splitContent($content, $validation = false){
+        $newArr = array();
+        
+        if(!$validation){
+            foreach($content as $key => $value){
+                if($key != 'validation'){
+                    $newArr[] = $value;
+                }
+            }
+            return $newArr;
+        } else {
+            return $content['validation'];
         }
     }
     

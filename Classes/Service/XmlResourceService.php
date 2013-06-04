@@ -134,11 +134,18 @@ class XmlResourceService extends AbstractRepository {
      */
     public function readXmlResourceList() {
         $arrcount = 0;
-        $fileArr = $dateFolder = $contentArr = $exFaf = $splittedDateTime = array();
+        $fileArr = array();
+        $dateFolder = array();
+        $contentArr = array();
+        $exFaf = array();
+        $splittedDateTime = array();
         /** @var \TYPO3\CMS\Core\Registry $registry */
         $registry = GeneralUtility::makeInstance('t3lib_Registry');
+        /** @var \TYPO3\Deployment\Service\FileService $fileService */
+        $fileService = new FileService();
+        
         $timestamp = $registry->get('deployment', 'last_deploy', time());
-        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/');
+        $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentMediaPathWithTrailingSlash());
 
         if ($filesAndFolders) {
             // Dateipfad ausplitten
@@ -172,8 +179,9 @@ class XmlResourceService extends AbstractRepository {
                 // wenn Datei-Timestamp später als letztes Deployment,
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
-                    $xmlString = file_get_contents(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/' . $folder . '/' . $file);
-
+                    $validationResult['validation']['database/'.$folder.'/'.$file] = $fileService->xmlValidation($fileService->getDeploymentMediaPathWithTrailingSlash().$folder.'/'.$file);
+                    $xmlString = file_get_contents($fileService->getDeploymentMediaPathWithTrailingSlash().$folder.'/'.$file);
+                    
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->file as $fileset) {
                         foreach ($fileset as $key => $value) {
@@ -184,8 +192,7 @@ class XmlResourceService extends AbstractRepository {
                 }
             }
         }
-
-        return $contentArr;
+        return array_merge($contentArr, $validationResult);
     }
 
     

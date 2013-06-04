@@ -122,7 +122,7 @@ class FailureService extends AbstractDataService {
                         $unFail['tstamp'] = time();
                         
                         // In DB updaten
-                        $con->exec_UPDATEquery($entry[1], 'uuid='.$entry[2]);
+                        //$con->exec_UPDATEquery($entry[1], 'uuid='.$entry[2]);
                     }
                 }
             }

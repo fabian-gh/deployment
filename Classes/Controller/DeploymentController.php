@@ -238,26 +238,39 @@ class DeploymentController extends ActionController {
         
         //Mediendaten lesen
         $resourceData = $this->xmlResourceService->readXmlResourceList();
-        $result1 = $this->insertDataService->insertResourceDataIntoTable($resourceData);
+        // Gelesene Daten splitten, da sowohl die Resultate als auch die Ergebnisse
+        // der Validierung in einem Array stehen
+        $contentSplit1 = $this->fileService->splitContent($resourceData);
+        $result1 = $this->insertDataService->insertResourceDataIntoTable($contentSplit1);
+        $validationContent1 = $this->fileService->splitContent($resourceData, true);
         
         // XML lesen
         $content = $this->xmlDatabaseService->readXML($tstamp);
-        // content in DB-Felder der jeweiligen Tabelle schreiben
-        $result2 = $this->insertDataService->insertDataIntoTable($content);
+        $contentSplit2 = $this->fileService->splitContent($content);
+        $result2 = $this->insertDataService->insertDataIntoTable($contentSplit2);
+        $validationContent2 = $this->fileService->splitContent($content, true);
+        
+        $validationContent = array_merge($validationContent1, $validationContent2);
         
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
         $this->fileService->checkIfFileExists();
         
-        if ($result1 === true && $result2 === true) {
+        if($result1 === true && $result2 === true){
             // letzten Deployment-Stand registrieren
             //$this->registry->set('deployment', 'last_deploy', time());
             
             // Bestätigung ausgeben
             $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
             
+            // Warnung falls XML nicht valide
+            if(in_array(false, $validationContent)){
+                $this->flashMessageContainer->add('Das Deployment wurde dennoch fortgesetzt', 'XML-Datei nicht valide', FlashMessage::WARNING);
+            }
+            
             // Redirect auf Hauptseite
             $this->redirect('index');
-        } elseif(is_array ($result1) && is_array ($result2)) {
+        } 
+        elseif(is_array ($result1) && is_array ($result2)) {
             $failures = array_merge($result1, $result2);
             
             // leere Einträge entfernen
@@ -271,6 +284,20 @@ class DeploymentController extends ActionController {
             
             $this->forward('listFailure', null, null, array('failures' => $fail2));
         }
+    }
+    
+    
+    /**
+     * Leert den Cache aller registrierten Seiten
+     */
+    public function clearPageCacheAction() {
+        /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+        // Datahandler initialiseren
+        $dataHandler->start();
+        // ALLE Caches löschen (typo3temp/Cache + Tabellen)
+        $dataHandler->clear_cacheCmd('all');
+        $this->redirect('index');
     }
     
     
@@ -329,20 +356,6 @@ class DeploymentController extends ActionController {
         if ($deploy == FALSE) {
             $this->registry->set('deployment', 'last_deploy', time());
         }
-    }
-
-    
-    /**
-     * Leert den Cache aller registrierten Seiten
-     */
-    public function clearPageCacheAction() {
-        /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
-        $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
-        // Datahandler initialiseren
-        $dataHandler->start();
-        // ALLE Caches löschen (typo3temp/Cache + Tabellen)
-        $dataHandler->clear_cacheCmd('all');
-        $this->redirect('index');
     }
     
     
