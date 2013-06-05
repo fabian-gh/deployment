@@ -268,7 +268,14 @@ class DeploymentController extends ActionController {
             // Redirect auf Hauptseite
             $this->redirect('index');
         } 
-        elseif(is_array($result1) && is_array($result2)) {
+        elseif(is_array($result1) || is_array($result2)) {
+            if(!is_array($result1)){
+                $result1 = array();
+            }
+            if(!is_array($result2)){
+                $result2 = array();
+            }
+            
             $failures = array_merge($result1, $result2);
             
             // leere Einträge entfernen
@@ -304,12 +311,12 @@ class DeploymentController extends ActionController {
         if ($failure === null) {
             $failure = new Failure();
         }
-        
+       
         // Fehleinträge in Registry speichern
         $this->storeDataInRegistry($failures, 'storedFailures');
         $databaseEntries = $this->failureService->getFailureEntries($failures);
-        $diff = $this->failureService->getFailureDataDiff($failures, $databaseEntries);
-        
+        $diff = $this->failureService->getFailureDataDiff($databaseEntries, $failures);
+       
         $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failure'           => $failure,

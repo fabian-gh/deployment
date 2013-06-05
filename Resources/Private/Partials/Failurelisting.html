@@ -1,24 +1,29 @@
 <f:form action="clearFailures" name="failure" object="{failure}">
-    <f:debug>{diff}</f:debug>
     <br />
     <b>Zu überprüfende Einträge: </b><f:count>{failureEntries}</f:count><br /><br />
-    
+   
     <table class="table2 typo3-dblist">
         <tr class="t3-row-header">
-            <th>&nbsp;</th>
-            <th class="th-spacer3">Insert/Update Entry</th>
-            <th>&nbsp;</th>
-            <th class="th-spacer3">Database Entry</th>
+            <th>Selection</th>
+            <th class="th-spacer3">Differences</th>
         </tr>
         <f:for each="{diff}" as="diffEntry">
-            <table>
-                <f:for each="{diffEntry}" as="entry" key="key">
-                    <tr><td><b>{key}: </b></td><td>{entry}</td></tr>
-                </f:for>
-            </table>
+            <tr>
+                <td>
+            <f:form.checkbox property="failureEntries" value="list.{diffEntry.tablename}.{diffEntry.uuid}" id="failurecheckbox_{diffEntry.uuid}" class="failure-checkbox" />&nbsp;Listeneintrag (<span class="green">grün</span>) verwenden<br />
+                    <f:form.checkbox property="failureEntries" value="database.{diffEntry.tablename}.{diffEntry.uuid}" id="databasecheckbox_{diffEntry.uuid}" class="database-checkbox" />&nbsp;Datenbankeintrag (<span class="red">rot</span>/schwarz) verwenden
+                </td>
+            <td>
+                <table class="table3">
+                    <f:for each="{diffEntry}" as="entry" key="key">
+                        <tr class="db_list_normal"><td><b>{key}: </b></td><td><f:format.raw>{entry}</f:format.raw></td></tr>
+                    </f:for>
+                </table>
+            </td>
+            </tr>
         </f:for>
     </table>
-    <f:form.submit value="Einträge korrigieren" />  
+    <f:form.submit value="Einträge korrigieren" /> 
 </f:form>
 
 
