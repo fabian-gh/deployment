@@ -152,4 +152,25 @@ class FailureService extends AbstractDataService {
         }
         return true;
     }
+    
+    
+    /**
+     * Löscht leere Einträge aus dem Fehlerarray
+     * 
+     * @param array $failures
+     * @return array
+     */
+    public function deleteEmptyEntries($failures){
+        $fail2 = array();
+        
+        foreach($failures as $fail){
+            if($fail === null){
+                unset($fail);
+            } else {
+                $fail2[] = $fail;
+            }
+        }
+        
+        return $fail2;
+    }
 }

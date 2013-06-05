@@ -196,41 +196,13 @@ class DeploymentController extends ActionController {
      */
     public function createDeployAction(Deploy $deploy) {
         $deployData = array();
-        $exFold = array();
 
         foreach ($deploy->getDeployEntries() as $uid) {
             $deployData[] = $this->xmlDatabaseService->compareDataWithRegistry($uid);
         }
         
         // falls deployment-Ordner noch nicht existieren, dann erstellen
-        /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
-        $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
-        $exFold[] = $folder->folderExists($this->fileService->getDeploymentPathWithTrailingSlash());
-        $exFold[] = $folder->folderExists($this->fileService->getDeploymentDatabasePathWithTrailingSlash());
-        $exFold[] = $folder->folderExists($this->fileService->getDeploymentMediaPathWithTrailingSlash());
-        $exFold[] = $folder->folderExists($this->fileService->getDeploymentResourcePathWithTrailingSlash());
-
-        foreach ($exFold as $ergkey => $ergvalue) {
-            if (!$ergvalue) {
-                switch ($ergkey) {
-                    case 0:
-                        GeneralUtility::mkdir($ergvalue);
-                    break;
-
-                    case 1:
-                        GeneralUtility::mkdir($ergvalue);
-                    break;
-
-                    case 2:
-                        GeneralUtility::mkdir($ergvalue);
-                    break;
-
-                    case 3:
-                        GeneralUtility::mkdir($ergvalue);
-                    break;
-                }
-            }
-        }
+        $this->fileService->createDirectories();
 
         // Mediendaten erstellen
         $date = $this->registry->get('deployment', 'last_deploy', time());
@@ -241,7 +213,6 @@ class DeploymentController extends ActionController {
         // Deploydaten setzen und XML erstellen
         $this->xmlDatabaseService->setDeployData(array_unique($deployData));
         $this->xmlDatabaseService->writeXML();
-        //$this->xmlResourceService->deployResources();
 
         $this->flashMessageContainer->add('Daten wurden erstellt.', '', FlashMessage::OK);
         $this->redirect('index');
@@ -297,19 +268,13 @@ class DeploymentController extends ActionController {
             // Redirect auf Hauptseite
             $this->redirect('index');
         } 
-        elseif(is_array ($result1) && is_array ($result2)) {
+        elseif(is_array($result1) && is_array($result2)) {
             $failures = array_merge($result1, $result2);
             
             // leere Einträge entfernen
-            foreach($failures as $fail){
-                if($fail === null){
-                    unset($fail);
-                } else {
-                    $fail2[] = $fail;
-                }
-            }
+            $fail = $this->failureService->deleteEmptyEntries($failures);
             
-            $this->forward('listFailure', null, null, array('failures' => $fail2));
+            $this->forward('listFailure', null, null, array('failures' => $fail));
         }
     }
     

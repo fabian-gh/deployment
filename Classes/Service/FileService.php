@@ -37,6 +37,7 @@ namespace TYPO3\Deployment\Service;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
+use \TYPO3\Deployment\Service\FileService;
 
 /**
  * FileService
@@ -238,6 +239,45 @@ class FileService extends AbstractDataService {
                         // Ordner selbst löschen
                         rmdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$datekey);
                     }
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * Erstellt die Verzeichnisstruktur falls diese nicht bereits vorhanden sein sollte
+     */
+    public function createDirectories(){
+        $exFold = array();
+        /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
+        $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
+        /** @var \TYPO3\Deployment\Service\FileService $fileService */
+        $fileService = new FileService();
+        
+        $exFold[] = $folder->folderExists($fileService->getDeploymentPathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($fileService->getDeploymentDatabasePathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($fileService->getDeploymentMediaPathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($fileService->getDeploymentResourcePathWithTrailingSlash());
+
+        foreach ($exFold as $ergkey => $ergvalue) {
+            if (!$ergvalue) {
+                switch ($ergkey) {
+                    case 0:
+                        GeneralUtility::mkdir($ergvalue);
+                    break;
+
+                    case 1:
+                        GeneralUtility::mkdir($ergvalue);
+                    break;
+
+                    case 2:
+                        GeneralUtility::mkdir($ergvalue);
+                    break;
+
+                    case 3:
+                        GeneralUtility::mkdir($ergvalue);
+                    break;
                 }
             }
         }
