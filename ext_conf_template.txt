@@ -7,11 +7,8 @@ username =
 # cat=Access; type=password; label=Password: Password for login on pull server
 password = 
 
-# cat=Backend; type=text; label=Additional Deployment Tables: The list of deplyoment tables (tt_content and pages are standard)
+# cat=Datahandling; type=text; label=Additional Deployment Tables: The list of deplyoment tables (tt_content and pages are standard)
 deploymentTables = sys_file, sys_file_reference
-
-# cat=Backend; type=int+; label=Max file size: Maximum file size (Byte) for data which should be deployed
-maxFileSize = 10000000
 
 #cat=Datahandling; type=boolean; label=Delete files older than 1/2 year?
 deleteOlderFiles = 1

@@ -27,12 +27,6 @@ use \TYPO3\Deployment\Service\FileService;
 class XmlResourceService extends AbstractRepository {
 
     /**
-     * max file size in Bytes
-     * @var int 
-     */
-    protected $maxFileSize = 10000000;
-
-    /**
      * @var \TYPO3\Deployment\Domain\Model\File
      */
     protected $fileList;
@@ -194,25 +188,42 @@ class XmlResourceService extends AbstractRepository {
         }
         return array_merge($contentArr, $validationResult);
     }
-
+    
     
     /**
-     * Dateien aus der sys_file-Tabelle holen und in den Deployment-Ordner kopieren.
-     * Falls nötig, vorher die Ordnerstruktur erstellen.
-     * Wenn $filesOverLimit = true dann werden Dateien über der Grenze deployed.
-     * Nur für Scheduler Task wichtig
-     * 
-     * @param boolean $filesOverLimit
+     * Dateien aus der sys_file-Tabelle über die XML-Datei einlesen und diese
+     * mittels des Scheduler Task vom Quellsystem kopieren
      */
-    public function deployResources($filesOverLimit = FALSE) {
+    public function deployResources(){
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
-        $fileAdminPath = $fileService->getFileadminPathWithoutTrailingSlash();
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
+        $configuration = new ConfigurationService();
+        
         $path = $fileService->getDeploymentResourcePathWithoutTrailingSlash();
+        // Daten aus Konfiguration holen
+        $server = $configuration->getPullserver();
+        $username = $configuration->getUsername();
+        $password = $configuration->getPassword();
+        
+        // URL in Teile zerlegen
+        $parts = parse_url($server);
+        // Username & Password trimmen falls nicht leer
+        if(trim($username) != ''){
+            $parts['user'] = $username;
+        }
+        if(trim($password) != ''){
+            $parts['pass'] = $password;
+        }
+        // Pfad mit User und PW wieder zusammensetzen
+        $pullServer = trim(HttpUtility::buildUrl($parts), '/');
+        
+        // Betriebssystem auslesen
         $os = get_browser()->platform;
 
+        // XML einlesen
         $data = $this->readXmlResourceList();
         
         foreach ($data as $resource) {
@@ -235,49 +246,14 @@ class XmlResourceService extends AbstractRepository {
                 GeneralUtility::mkdir_deep($path . '/' . $fold);
             }
 
-            if ($filesOverLimit === FALSE) {
-                // Nur Dateien <= 10 MB auf Dateiebene kopieren 
-                if ($file->getSize() <= $this->maxFileSize) {
-                    if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
-                        // falls Linux oder Mac das Betriebssystem ist über rsync
-                        $sourceDest = escapeshellcmd("$fileAdminPath/$fold/$filename $path/$fold/$filename");
-                        exec("rsync --compress --update --links --perms --max-size=$this->maxFileSize $sourceDest");
-                    } else {
-                        // ansonsten "normales" kopieren über PHP
-                        copy($fileAdminPath.'/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
-                    }
-                }
+            // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
+            if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
+                $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
+                // Parameter: Dateien bei Übertragung komprimieren, neuere Dateien nicht ersetzen,
+                // SymLinks als Syminks kopieren, Dateirechte beibehalten, Quellverzeichnis
+                exec("rsync --compress --update --links --perms $sourceDest");
             } else {
-                // Daten aus Konfiguration holen
-                /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
-                $configuration = new ConfigurationService();
-                $server = $configuration->getPullserver();
-                $username = $configuration->getUsername();
-                $password = $configuration->getPassword();
-                
-                // URL in Teile zerlegen
-                $parts = parse_url($server);
-
-                // Username & Password trimmen falls nicht leer
-                if(trim($username) != ''){
-                    $parts['user'] = $username;
-                }
-                if(trim($password) != ''){
-                    $parts['pass'] = $password;
-                }
-                
-                // Pfad mit User und PW wieder zusammensetzen
-                $pullServer = trim(HttpUtility::buildUrl($parts), '/');
-                
-                // Nur Dateien >= 10 MB auf Dateiebene kopieren 
-                if ($file->getSize() >= $this->maxFileSize) {
-                    if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
-                        $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
-                        exec("rsync --compress --update --links --perms --min-size=$this->maxFileSize $sourceDest");
-                    } else {
-                        copy($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
-                    }
-                }
+                copy($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
             }
         }
     }
@@ -359,22 +335,6 @@ class XmlResourceService extends AbstractRepository {
     }
 
     /**
-     * @return int
-     */
-    public function getMaxFileSize() {
-        return $this->maxFileSize;
-    }
-
-    /**
-     * @param int $maxFileSize
-     */
-    public function setMaxFileSize() {
-        /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
-        $configuration = new ConfigurationService();
-        (!empty($configuration)) ? $this->maxFileSize = $configuration->getMaxFileSize() : $this->maxFileSize = 10000000;
-    }
-
-    /**
      * @return \TYPO3\CMS\Core\Database\DatabaseConnection
      */
     protected function getDatabase() {
@@ -382,56 +342,3 @@ class XmlResourceService extends AbstractRepository {
     }
 
 }
-
-
-
-// FileReference
-
-//            // FileRefenrece einfügen
-//            $this->fileReference = $this->getFileReferenceFromTable($file->getUid());
-//            if($this->fileReference != null){
-//                $this->xmlwriter->startElement('fileReference');
-//                $this->xmlwriter->writeElement('tablenames', ($this->fileReference->getTablenames() == null) ? '' :  $this->fileReference->getTablenames());
-//                $this->xmlwriter->writeElement('fieldname', ($this->fileReference->getFieldname() == null) ? '' :  $this->fileReference->getFieldname());
-//                $this->xmlwriter->writeElement('title', ($this->fileReference->getTitle() == null) ? null :  $this->fileReference->getTitle());
-//                $this->xmlwriter->writeElement('description', ($this->fileReference->getDescription() == null) ? '' :  $this->fileReference->getDescription());
-//                $this->xmlwriter->writeElement('alternative', ($this->fileReference->getAlternative() == null) ? '' :  $this->fileReference->getAlternative());
-//                $this->xmlwriter->writeElement('link', ($this->fileReference->getLink() == null) ? '' :  $this->fileReference->getLink());
-//                $this->xmlwriter->writeElement('uuid', ($this->fileReference->getUuid() == null) ? '' :  $this->fileReference->getUuid());
-//                $this->xmlwriter->endElement();
-//            }
-//            $this->xmlwriter->endElement();
-
-
-
-
-    /**
-     * Gibt die referenzierten Daten für den übergebenen Datensatz zurück
-     * 
-     * @param string $uid
-     * @return \TYPO3\Deployment\Domain\Model\FileReference
-     */
-//    protected function getFileReferenceFromTable($uid){
-//        /** @var \TYPO3\Deployment\Domain\Repository\FileReferenceRepository $fileRefObj */
-//        $fileRefObj = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileReferenceRepository');
-//        /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $res */
-//        $res = $fileRefObj->findByUidForeign($uid);
-//
-//        return ($res != null) ? $res[0] : null;
-//    }
-
-
-
-    /**
-//     * @return \TYPO3\Deployment\Domain\Model\FileReference
-//     */
-//    public function getFileReference() {
-//        return $this->fileReference;
-//    }
-//
-//    /**
-//     * @param \TYPO3\Deployment\Domain\Model\FileReference $fileReference
-//     */
-//    public function setFileReference($fileReference) {
-//        $this->fileReference = $fileReference;
-//    }

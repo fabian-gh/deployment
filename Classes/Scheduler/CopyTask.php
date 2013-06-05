@@ -29,7 +29,7 @@ class CopyTask extends AbstractTask{
      */
     public function execute() {
         $this->resourceDataService = GeneralUtility::makeInstance('TYPO3\\Deployment\\Service\\ResourceDataService');
-        $this->resourceDataService->deployResources(true);
+        $this->resourceDataService->deployResources();
         return true;
     }
     

@@ -220,7 +220,7 @@ class DeploymentController extends ActionController {
         // Deploydaten setzen und XML erstellen
         $this->xmlDatabaseService->setDeployData(array_unique($deployData));
         $this->xmlDatabaseService->writeXML();
-        $this->xmlResourceService->deployResources();
+        //$this->xmlResourceService->deployResources();
 
         $this->flashMessageContainer->add('Daten wurden erstellt.', '', FlashMessage::OK);
         $this->redirect('index');
@@ -243,6 +243,12 @@ class DeploymentController extends ActionController {
         $contentSplit1 = $this->fileService->splitContent($resourceData);
         $result1 = $this->insertDataService->insertResourceDataIntoTable($contentSplit1);
         $validationContent1 = $this->fileService->splitContent($resourceData, true);
+        
+        // Dateien vom Quellsystem holen
+        $reg = $this->schedulerTask->checkIfTaskIsRegistered();
+        if($reg){
+            $this->schedulerTask->execute();
+        }
         
         // XML lesen
         $content = $this->xmlDatabaseService->readXML($tstamp);
