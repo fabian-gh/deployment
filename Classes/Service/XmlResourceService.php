@@ -297,22 +297,6 @@ class XmlResourceService extends AbstractRepository {
 
         return $uuid['uuid'];
     }
-    
-    
-    /**
-     * Gibt die uuid der übergebenen pid zurück
-     * 
-     * @param string $pid
-     * @return string
-     */
-    public function getPageUuid($pid){
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        $uuid = $con->exec_SELECTgetSingleRow('uuid', 'pages', 'uid = '.$pid);
-        
-        return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
-    }
-
    
     
     // ============================ Getter & Setter ================================

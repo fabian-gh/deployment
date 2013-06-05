@@ -116,41 +116,31 @@ class XmlDatabaseService extends AbstractDataService{
                     if($newkey != 'l18n_diffsource'){
                         // PID durch UUID ersetzen
                         if($newkey == 'pid'){
-                            $pageUuid = $this->getPageUuid($newval);
+                            $pageUuid = $this->getUuid($newval, 'pages');
                             $this->xmlwriter->writeElement('pid', $pageUuid);
                         } 
-                        // uid_local durch UUId ersetzen
-                        elseif($newkey == 'uid_local'){
-                            // normaler Fall, ohne tt_news
-                            if($cData->getTablename() != 'tt_news_related_mm' && $cData->getTablename() != 'tt_news_cat_mm'){
-                                $fileUuid = $this->getFileUuid($newval);
-                                $this->xmlwriter->writeElement('uid_local', $fileUuid);
-                            } 
-                            // Fallabdeckung für tt_news
-                            elseif($cData->getTablename() == 'tt_news_cat_mm') {
-                                $uuid = $this->getUuid($newval, 'tt_news');
-                                $this->xmlwriter->writeElement('uid_local', $uuid);
-                            } elseif($cData->getTablename() == 'tt_news_related_mm') {
-                                $uuid = $this->getUuid($newval, 'tt_news');
-                                $this->xmlwriter->writeElement('uid_local', $uuid);
-                            }
-                        }
                         // uid_foreign durch UUID ersetzen
                         elseif($newkey == 'uid_foreign'){
-                            // normaler Fall, ohne tt_news
-                            if($cData->getTablename() != 'tt_news_related_mm' && $cData->getTablename() != 'tt_news_cat_mm'){
-                                $contentUuid = $this->getContentUuid($newval);
-                                $this->xmlwriter->writeElement('uid_foreign', $contentUuid);
+                            // Dieses prinzip klappt immer, da 'tablenames' in jeder Relationstabelle vorhanden ist
+                            // Referenztabelle zur uid_local abfragen
+                            $table = $con->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign='.$newval);
+                            // UUID des Datensatzes abfragen
+                            $uuid_foreign = $this->getUuid($newval, $table['tablenames']);
+                            // Datensatz verarbeiten
+                            $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
+                        }
+                        // uid_local durch UUID ersetzen
+                        elseif($newkey == 'uid_local'){
+                            // hier muss unterschieden werden, da table_local nicht immer vorhanden ist
+                            if($cData->getTablename() == 'sys_file_reference'){
+                                $table = $con->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local='.$newval);
+                                $uuid_local = $this->getUuid($newval, $table['table_local']);
+                                $this->xmlwriter->writeElement('uid_local', $uuid_local);
                             } 
-                            // Fallabdeckung für tt_news
-                            elseif($cData->getTablename() == 'tt_news_cat_mm'){
-                                $table = $con->exec_SELECTgetSingleRow('uid_foreign, tablenames', 'tt_news_cat_mm', 'uid_local='.$newkey);
-                                $uuid_foreign = $this->getUuid($table['uid_foreign'], $table['tablenames']);
-                                $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
-                            } elseif($cData->getTablename() == 'tt_news_related_mm') {
-                                $table = $con->exec_SELECTgetSingleRow('uid_foreign, tablenames', 'tt_news_crelated_mm', 'uid_local='.$newkey);
-                                $uuid_foreign = $this->getUuid($table['uid_foreign'], $table['tablenames']);
-                                $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
+                            // Unterscheidung für tt_news
+                            elseif($cData->getTablename() == 'tt_news_cat_mm' || $cData->getTablename() == 'tt_news_related_mm'){
+                                    $uuid_local = $this->getUuid($newval, 'tt_news');
+                                    $this->xmlwriter->writeElement('uid_local', $uuid_local);
                             }
                         }
                         // header_link (tt_content) durch entsprechende UUID ersetzen
@@ -176,7 +166,7 @@ class XmlDatabaseService extends AbstractDataService{
                 // Einzelne Feldelemente schreiben
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
-                $this->xmlwriter->writeElement('pid', $this->getPageUuid($pid));
+                $this->xmlwriter->writeElement('pid', $this->getUuid($pid, 'pages'));
                 $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
                 $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
 
@@ -290,9 +280,9 @@ class XmlDatabaseService extends AbstractDataService{
         $split = explode(':', $link);
         
         if(is_numeric($link)){
-            return 'page:'.$this->getPageUuid($link);
+            return 'page:'.$this->getUuid($link, 'pages');
         } elseif($split[0] === 'file'){
-            $split[1] = $this->getFileUuid($split[1]);
+            $split[1] = $this->getUuid($split[1], 'sys_file');
             return implode(':', $split);
         } else {
             return $link;
@@ -423,70 +413,6 @@ class XmlDatabaseService extends AbstractDataService{
     }
     
     
-
-    
-    
-    /**
-     * Gibt die uuid der übergebenen pid aus der pages-Tabelle zurück
-     * 
-     * @param string $pid
-     * @return string
-     */
-    public function getPageUuid($pid){
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        $uuid = $con->exec_SELECTgetSingleRow('uuid', 'pages', 'uid = '.$pid);
-        
-        return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
-    }
-    
-    
-    /**
-     * Gibt die uuid der übergebenen uid aus der tt_content-Tabelle zurück
-     * 
-     * @param string $pid
-     * @return string
-     */
-    public function getContentUuid($uid){
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        $uuid = $con->exec_SELECTgetSingleRow('uuid', 'tt_content', 'uid = '.$uid);
-        
-        return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
-    }
-    
-    
-    /**
-     * Gibt die uuid der übergebenen uid aus der sys_file-Tabelle zurück
-     * 
-     * @param string $pid
-     * @return string
-     */
-    public function getFileUuid($uid){
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        $uuid = $con->exec_SELECTgetSingleRow('uuid', 'sys_file', 'uid = '.$uid);
-        
-        return (!empty($uuid['uuid'])) ? $uuid['uuid'] : 0;
-    }
-    
-    
-    /**
-     * Gibt die pid der übergebenen uid zurück
-     * 
-     * @param string $uid
-     * @param string $table
-     * @return int
-     */
-    public function getPid($uid, $table){
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = '.$uid);
-        
-        return (!empty($pid['pid'])) ? $pid['pid'] : 0;
-    }
-    
-    
     /**
      * Konvertiert neue Logeinträge, die noch nicht in der History Tabelle erfasst sind, 
      * zu HistoryData-Objekten
@@ -531,6 +457,22 @@ class XmlDatabaseService extends AbstractDataService{
                 return $hisdata;
             }
         }
+    }
+    
+    
+    /**
+     * Gibt die pid der übergebenen uid zurück
+     * 
+     * @param string $uid
+     * @param string $table
+     * @return int
+     */
+    public function getPid($uid, $table){
+        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        $con = $this->getDatabase();
+        $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = '.$uid);
+        
+        return (!empty($pid['pid'])) ? $pid['pid'] : 0;
     }
 
 
