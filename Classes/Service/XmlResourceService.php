@@ -249,11 +249,11 @@ class XmlResourceService extends AbstractRepository {
         $os = get_browser()->platform;
 
         // XML einlesen
-        $data = $this->readXmlResourceList();
-        
+        $data = $fileService->splitContent($this->readXmlResourceList());
+
         foreach ($data as $resource) {
             /** @var \TYPO3\CMS\Core\Resource\File $file */
-            $file = $resFact->getFileObject($resource['uid']);
+            $file = $resFact->getFileObject($this->getUid($resource['uuid'], $resource['tablename']));
             $split = explode('/', $file->getIdentifier());
             $filename = array_pop($split);
 
@@ -296,6 +296,20 @@ class XmlResourceService extends AbstractRepository {
         $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
 
         return $uuid['uuid'];
+    }
+    
+    
+    /**
+     * Gibt die entsprechende UID passend zum Datensatz zurück
+     * 
+     * @param string $uuid
+     * @param string $table
+     * @return string
+     */
+    protected function getUid($uuid, $table) {
+        $uid = $this->getDatabase()->exec_SELECTgetSingleRow('uid', $table, "uuid='".$uuid."'");
+
+        return (!empty($uid['uid'])) ? $uid['uid'] : 0;
     }
    
     

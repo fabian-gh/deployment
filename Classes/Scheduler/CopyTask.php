@@ -40,9 +40,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CopyTask extends AbstractTask{
     
     /**
-     * @var \TYPO3\Deployment\Service\ResourceDataService
+     * @var \TYPO3\Deployment\Service\XmlResourceService
      */
-    private $resourceDataService;
+    private $xmlResourceService;
     
     
     /**
@@ -51,8 +51,8 @@ class CopyTask extends AbstractTask{
      * @return boolean
      */
     public function execute() {
-        $this->resourceDataService = GeneralUtility::makeInstance('TYPO3\\Deployment\\Service\\ResourceDataService');
-        $this->resourceDataService->deployResources();
+        $this->xmlResourceService = GeneralUtility::makeInstance('TYPO3\\Deployment\\Service\\XmlResourceService');
+        $this->xmlResourceService->deployResources();
         return true;
     }
     

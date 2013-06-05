@@ -308,12 +308,14 @@ class DeploymentController extends ActionController {
         // Fehleinträge in Registry speichern
         $this->storeDataInRegistry($failures, 'storedFailures');
         $databaseEntries = $this->failureService->getFailureEntries($failures);
+        $diff = $this->failureService->getFailureDataDiff($failures, $databaseEntries);
         
         $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failure'           => $failure,
             'failureEntries'    => $failures,
-            'databaseEntries'   => $databaseEntries
+            'databaseEntries'   => $databaseEntries,
+            'diff'              => $diff
         ));
     }
     
