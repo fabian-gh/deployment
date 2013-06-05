@@ -83,6 +83,8 @@ class XmlDatabaseService extends AbstractDataService{
         $newInsert = array();
         /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
+        /** @var \TYPO3\Deployment\Service\FileService $fileService */
+        $fileService = new FileService();
         
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
@@ -204,7 +206,7 @@ class XmlDatabaseService extends AbstractDataService{
         $file = GeneralUtility::tempnam('deploy_');
         GeneralUtility::writeFile($file, $writeString);
 
-        $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/database/'.date('Y_m_d', time());
+        $folder = $fileService->getDeploymentDatabasePathWithTrailingSlash().date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
         
         GeneralUtility::upload_copy_move($file, $folder.'/'.date('H-i-s', time()).'_changes.xml');

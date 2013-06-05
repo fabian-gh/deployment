@@ -72,6 +72,8 @@ class XmlResourceService extends AbstractRepository {
     public function writeXmlResourceList() {
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
+        /** @var \TYPO3\Deployment\Service\FileService $fileService */
+        $fileService = new FileService();
         
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
@@ -136,7 +138,7 @@ class XmlResourceService extends AbstractRepository {
         $file = GeneralUtility::tempnam('resource_');
         GeneralUtility::writeFile($file, $writeString);
 
-        $folder = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/' . date('Y_m_d', time());
+        $folder = $fileService->getDeploymentMediaPathWithTrailingSlash().date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
 
         GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_resource.xml');

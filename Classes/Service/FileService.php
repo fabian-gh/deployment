@@ -199,6 +199,9 @@ class FileService extends AbstractDataService {
     public function deleteOlderFiles(){
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
         $configuration = new ConfigurationService();
+        /** @var \TYPO3\Deployment\Service\FileService $fileService */
+        $fileService = new FileService();
+        
         $deleteState = $configuration->getDeleteState();
         
         // falls Daten gelöscht werden sollen
@@ -207,7 +210,7 @@ class FileService extends AbstractDataService {
             $split  = array();
             $dateFolder = array();
             
-            $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/', '', true);
+            $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentPathWithTrailingSlash(), '', true);
         
             if ($filesAndFolders) {
                 // Dateipfad ausplitten
@@ -234,10 +237,10 @@ class FileService extends AbstractDataService {
                             $splitFile = explode('_', $filevalue);
                             $folder = ($splitFile[1] == 'changes.xml') ? 'database' : 'media';
 
-                            unlink(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$datekey.'/'.$filevalue);
+                            unlink($fileService->getDeploymentPathWithTrailingSlash().$folder.'/'.$datekey.'/'.$filevalue);
                         }
                         // Ordner selbst löschen
-                        rmdir(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/deployment/'.$folder.'/'.$datekey);
+                        rmdir($fileService->getDeploymentPathWithTrailingSlash().$folder.'/'.$datekey);
                     }
                 }
             }
