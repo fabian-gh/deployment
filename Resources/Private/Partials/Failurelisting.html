@@ -24,7 +24,14 @@
                         <f:if condition="{diffkey} == {itemIteration.index}">
                             <f:for each="{diffEntry}" as="entry" key="key">
                                 <tr>
-                                    <td><b>{key}: </td><td></b><f:format.raw>{entry}</f:format.raw></td> 
+                                    <f:if condition="{0:key} == {0:'tstamp'}">
+                                        <f:then>
+                                            <td><b>{key}: </b></td><td><b><f:format.raw>{entry}</f:format.raw></b></td> 
+                                        </f:then>
+                                        <f:else>
+                                            <td><b>{key}: </td><td></b><f:format.raw>{entry}</f:format.raw></td> 
+                                        </f:else>
+                                    </f:if>
                                 </tr>
                             </f:for>
                         </f:if>

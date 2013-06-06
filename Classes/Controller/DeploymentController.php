@@ -320,6 +320,7 @@ class DeploymentController extends ActionController {
         $this->view->assignMultiple(array(
             'failure'           => $failure,
             'failureEntries'    => $failures,
+            'databaseEntries'   => $databaseEntries,
             'diff'              => $diffData
         ));
     }
