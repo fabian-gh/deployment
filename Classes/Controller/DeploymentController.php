@@ -91,7 +91,7 @@ class DeploymentController extends ActionController {
     protected $fileService;
 
     /**
-     * @var \TYPO3\CMS\Core\Registry
+     * @var \TYPO3\Deployment\Service\RegistryService
      * @inject
      */
     protected $registry;
@@ -113,10 +113,8 @@ class DeploymentController extends ActionController {
      * IndexAction
      */
     public function indexAction() {
-        // Registry-Objekt erstellen und prüfen
-        /** @var \TYPO3\CMS\Core\Registry $registry */
-        $this->registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
-        $this->checkForRegistryEntry();
+        // Registry prüfen
+        $this->registry->checkForRegistryEntry();
 
         // prüfen ob Scheduler Task registiert ist
         $reg = $this->schedulerTask->checkIfTaskIsRegistered();
@@ -177,7 +175,7 @@ class DeploymentController extends ActionController {
             
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlDatabaseService->unserializeHistoryData($allHistoryEintries);
-            $this->storeDataInRegistry($unserializedHistoryData, 'storedHistoryData');
+            $this->registry->storeDataInRegistry($unserializedHistoryData, 'storedHistoryData');
             $diffData = $this->xmlDatabaseService->getHistoryDataDiff($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
@@ -313,7 +311,7 @@ class DeploymentController extends ActionController {
         }
        
         // Fehleinträge in Registry speichern
-        $this->storeDataInRegistry($failures, 'storedFailures');
+        $this->registry->storeDataInRegistry($failures, 'storedFailures');
         $databaseEntries = $this->failureService->getFailureEntries($failures);
         $diff = $this->failureService->getFailureDataDiff($databaseEntries, $failures);
        
@@ -345,32 +343,7 @@ class DeploymentController extends ActionController {
             $this->forward('listFailure', null, null, array('failures' => $storedFailures));
         }
     }
-
     
-    /**
-     * Prüft die Registry nach dem Eintrag. Falls nicht vorhanden wird dieser
-     * erstellt
-     */
-    protected function checkForRegistryEntry() {
-        $deploy = $this->registry->get('deployment', 'last_deploy');
-
-        if ($deploy == FALSE) {
-            $this->registry->set('deployment', 'last_deploy', time());
-        }
-    }
-    
-    
-    /**
-     * Persistiert Einträge in der Registry
-     * 
-     * @param mixed $data
-     * @param string $key
-     */
-    protected function storeDataInRegistry($data, $key) {
-        $storableData = serialize($data);
-        $this->registry->set('deployment', $key, $storableData);
-    }
-
     
     /**
      * Überschreiben der Fehlermeldung "An error occurred while trying to call ..."
