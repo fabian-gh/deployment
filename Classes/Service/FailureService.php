@@ -184,13 +184,21 @@ class FailureService extends AbstractDataService {
     public function convertTimestamps($diff){
         $arr = array();
         $count = 0;
-        /** @var \DateTime $dateTime */
-        $dateTime = new \DateTime();
         
         foreach($diff as $entry){
             foreach($entry as $key => $value){
                 if($key === 'tstamp' || $key === 'crdate' || $key === 'modification_date' || $key === 'creation_date'){
-                    $arr[$count][$key] = $dateTime->setTimestamp($value);
+                    // Zeichen bis zum ersten '>' entfernen. Dann von 1.-10. Zeichen zurückgeben -> date1
+                    $date1 = substr(strstr($value, '>'), 1, 10);
+                    // Alle Zeichen in Charlist entfernen -> date2
+                    $date2 = trim(trim($value, $date1), '</span class="diff-rg">');
+                    
+                    // Daten umwandeln und in Zeichenkette ersetzen, so dass die span-Tags erhalten bleiben
+                    $conDate1 = date('d.m.Y H:i:s', $date1);
+                    $conDate2 = date('d.m.Y H:i:s', $date2);
+                    $value = str_replace($date2, $conDate2, str_replace($date1, $conDate1, $value));
+                    
+                    $arr[$count][$key]= $value;
                 } else {
                     $arr[$count][$key] = $value;
                 }

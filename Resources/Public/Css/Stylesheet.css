@@ -70,13 +70,3 @@ table.typo3-dblist tr td{
     margin-left: 6px;
     margin-top: 6px;
 }
-
-.green{
-    vertical-align: inherit;
-    color: #59B300;
-}
-
-.red{
-    vertical-align: inherit;
-    color: #FF0000;
-}

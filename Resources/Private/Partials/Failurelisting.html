@@ -14,8 +14,8 @@
 
             <tr class="outertr-spacer">
             <td>
-                <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="failurecheckbox_{fEntry.uuid}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="green">green</span>)<br />
-                <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="databasecheckbox_{fEntry.uuid}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="red">red</span>/black)
+                <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="failurecheckbox_{fEntry.uuid}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
+                <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="databasecheckbox_{fEntry.uuid}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
             </td>
             <td>
                 <table class="table3">
@@ -24,42 +24,7 @@
                         <f:if condition="{diffkey} == {itemIteration.index}">
                             <f:for each="{diffEntry}" as="entry" key="key">
                                 <tr>
-                                    <f:if condition="{0:key} == {0:'tstamp'}">
-                                        <f:then>
-                                            <td><b><f:format.date format="d.m.Y H:i:s">@{entry}</f:format.date></b></td>
-                                        </f:then>
-                                        <f:else>
-                                            <f:if condition="{0:key} == {0:'crdate'}">
-                                                <f:then>
-                                                    <td><f:format.date format="d.m.Y H:i:s">@{entry}</f:format.date></td>
-                                                </f:then>
-                                                <f:else>
-                                                    <f:if condition="{0:key} == {0:'creation_date'}">
-                                                        <f:then>
-                                                            <td><f:format.date format="d.m.Y H:i:s">@{entry}</f:format.date></td>
-                                                        </f:then>
-                                                        <f:else>
-                                                            <f:if condition="{0:key} == {0:'modification_date'}">
-                                                                <f:then>
-                                                                    <td><f:format.date format="d.m.Y H:i:s">@{entry}</f:format.date></td>
-                                                                </f:then>
-                                                                <f:else>
-                                                                    <f:if condition="{0:key} == {0:'l10n_diffsource'}">
-                                                                        <f:then>
-                                                                            <td><f:format.crop maxCharacters="25" append="&nbsp;[...]">{entry}</f:format.crop></td>
-                                                                        </f:then>
-                                                                        <f:else>
-                                                                           <td><b>{key}: </td><td></b><f:format.raw>{entry}</f:format.raw></td> 
-                                                                        </f:else>
-                                                                    </f:if>
-                                                                </f:else>
-                                                            </f:if>
-                                                        </f:else>
-                                                    </f:if>
-                                                </f:else>
-                                            </f:if>
-                                        </f:else>
-                                    </f:if>
+                                    <td><b>{key}: </td><td></b><f:format.raw>{entry}</f:format.raw></td> 
                                 </tr>
                             </f:for>
                         </f:if>
