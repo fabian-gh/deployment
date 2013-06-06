@@ -24,7 +24,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 /**
- * Auto Publish Command Controller
+ * CopyResourcesCommandController
  *
  * @category   Extension
  * @package    Deployment
@@ -36,20 +36,20 @@ namespace TYPO3\Deployment\Command;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 /**
- * Auto Publish Command Controller
+ * ACopyResourcesCommandController
  *
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
-class AutoPublishCommandController extends CommandController {
+class CopyResourcesCommandController extends CommandController {
 
     /**
-     * Run the publish command
+     * Run the copy command
      *
      * @param int     $lastDeployments
      * @param boolean $dryRun
      */
-    public function publishCommand($lastDeployments, $dryRun) {
+    public function copyCommand($lastDeployments, $dryRun) {
         // todo: depyloment einlesen und ausführen
     }
 

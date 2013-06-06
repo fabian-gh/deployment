@@ -24,7 +24,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 /**
- * Task
+ * CopyService
  *
  * @category   Extension
  * @package    Deployment
@@ -32,48 +32,40 @@
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
-namespace TYPO3\Deployment\Scheduler;
+namespace TYPO3\Deployment\Service;
 
-use \TYPO3\CMS\Scheduler\Task\AbstractTask;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CopyTask extends AbstractTask{
+/**
+ * CopyService
+ *
+ * @package    Deployment
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+class CopyService extends AbstractDataService{
     
     /**
-     * @var \TYPO3\Deployment\Service\XmlResourceService
-     */
-    private $xmlResourceService;
-    
-    
-    /**
-     * Executes the Scheduler Task
+     * Prüft ob der Command Controller registiert ist
      * 
      * @return boolean
      */
-    public function execute() {
-        $this->xmlResourceService = GeneralUtility::makeInstance('TYPO3\\Deployment\\Service\\XmlResourceService');
-        $this->xmlResourceService->deployResources();
-        return true;
-    }
-    
-    
-    /**
-     * Prüft ob der Scheduler Task registiert ist
-     * 
-     * @return boolean
-     */
-    public function checkIfTaskIsRegistered(){
+    public function checkIfCommandControllerIsRegistered(){
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
-        $res = $con->exec_SELECTgetRows('serialized_task_object', 'tx_scheduler_task');
+        $result = $con->exec_SELECTgetRows('serialized_task_object', 'tx_scheduler_task');
         
-        foreach($res as $result){
-            $object = unserialize($result['serialized_task_object']);
-            if(is_a($object, 'TYPO3\Deployment\Scheduler\CopyTask')){
-                $obj = true;
+        foreach($result as $res){
+            $object = unserialize($res['serialized_task_object']);
+            $identifierParts = explode(':', $object->getCommandIdentifier());
+            
+            if($identifierParts[0] == 'deployment' && $identifierParts[1] == 'copyresources' && $identifierParts[2] == 'copy'){
+                DebuggerUtility::var_dump($object);
+                DebuggerUtility::var_dump($object->getTaskUid());
+                DebuggerUtility::var_dump($identifierParts);
             }
         }
-        
+        die();
         return ($obj === true) ? true : false;
     }
     
@@ -87,3 +79,5 @@ class CopyTask extends AbstractTask{
         return $GLOBALS['TYPO3_DB'];
     }
 }
+
+?>

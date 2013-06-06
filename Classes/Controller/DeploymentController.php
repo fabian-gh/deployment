@@ -103,10 +103,10 @@ class DeploymentController extends ActionController {
     protected $xmlResourceService;
 
     /**
-     * @var \TYPO3\Deployment\Scheduler\CopyTask
+     * @var \TYPO3\Deployment\Service\CopyService
      * @inject
      */
-    protected $schedulerTask;
+    protected $copyService;
 
     
     /**
@@ -116,10 +116,10 @@ class DeploymentController extends ActionController {
         // Registry prüfen
         $this->registry->checkForRegistryEntry();
 
-        // prüfen ob Scheduler Task registiert ist
-        $reg = $this->schedulerTask->checkIfTaskIsRegistered();
+        // prüfen ob Command Controller registiert ist
+        $reg = $this->copyService->checkIfCommandControllerIsRegistered();
         if ($reg === FALSE) {
-            $this->flashMessageContainer->add('Bitte erstellen Sie einen Scheduler Task', 'Scheduler Task fehlt.', FlashMessage::ERROR);
+            $this->flashMessageContainer->add('Bitte erstellen Sie im Scheduler-Modul einen Extbase Command Controller Task und deaktivieren sie diesen.', 'Command Controller fehlt.', FlashMessage::ERROR);
         }
 
         // Noch nicht indizierte Dateien indizieren
@@ -235,9 +235,9 @@ class DeploymentController extends ActionController {
         $validationContent1 = $this->fileService->splitContent($resourceData, true);
         
         // Dateien vom Quellsystem holen
-        $reg = $this->schedulerTask->checkIfTaskIsRegistered();
+        $reg = $this->copyService->checkIfTaskIsRegistered();
         if($reg){
-            $this->schedulerTask->execute();
+            $this->copyService->execute();
         }
         
         // XML lesen

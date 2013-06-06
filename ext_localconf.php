@@ -4,11 +4,11 @@ if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
 
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['TYPO3\Deployment\Scheduler\CopyTask'] = array(
+/*$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['TYPO3\Deployment\Scheduler\CopyTask'] = array(
     'extension'        => $_EXTKEY,
     'title'            => 'Dateien kopieren',
     'description'      => 'Dateien größer der festgelegten Grenze kopieren.'
-);
+);*/
 
 
 /** @var $autoLoader \TYPO3\Deployment\Service\AutoLoaderService */
