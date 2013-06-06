@@ -173,4 +173,31 @@ class FailureService extends AbstractDataService {
         
         return $fail2;
     }
+    
+    
+    /**
+     * Konvertiert Timestamps zur korrekten Darstellung
+     * 
+     * @param array $diff
+     * @return array
+     */
+    public function convertTimestamps($diff){
+        $arr = array();
+        $count = 0;
+        /** @var \DateTime $dateTime */
+        $dateTime = new \DateTime();
+        
+        foreach($diff as $entry){
+            foreach($entry as $key => $value){
+                if($key === 'tstamp' || $key === 'crdate' || $key === 'modification_date' || $key === 'creation_date'){
+                    $arr[$count][$key] = $dateTime->setTimestamp($value);
+                } else {
+                    $arr[$count][$key] = $value;
+                }
+            }
+            $count++;
+        }
+        
+        return $arr;
+    }
 }

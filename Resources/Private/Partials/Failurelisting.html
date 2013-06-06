@@ -1,58 +1,104 @@
 <f:form action="clearFailures" name="failure" object="{failure}">
     <br />
     <b>Zu überprüfende Einträge: </b><f:count>{failureEntries}</f:count><br /><br />
-   
+
     <table class="table2 typo3-dblist">
         <tr class="t3-row-header">
-            <th>Selection</th>
+            <th class="th-spacer3">Tablename &amp; Options</th>
             <th class="th-spacer3">Differences</th>
         </tr>
-        <f:for each="{diff}" as="diffEntry">
-            <tr>
-                <td>
-            <f:form.checkbox property="failureEntries" value="list.{diffEntry.tablename}.{diffEntry.uuid}" id="failurecheckbox_{diffEntry.uuid}" class="failure-checkbox" />&nbsp;Listeneintrag (<span class="green">grün</span>) verwenden<br />
-                    <f:form.checkbox property="failureEntries" value="database.{diffEntry.tablename}.{diffEntry.uuid}" id="databasecheckbox_{diffEntry.uuid}" class="database-checkbox" />&nbsp;Datenbankeintrag (<span class="red">rot</span>/schwarz) verwenden
-                </td>
+        <f:for each="{failureEntries}" as="fEntry" key="fKey" iteration="itemIteration">
+            <tr rowspan="2">
+                <td class="innertableheader-spacer" colspan="2"><b>Table: {fEntry.tablename}</b></td>
+            </tr>
+
+            <tr class="outertr-spacer">
+            <td>
+                <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="failurecheckbox_{fEntry.uuid}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="green">green</span>)<br />
+                <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="databasecheckbox_{fEntry.uuid}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="red">red</span>/black)
+            </td>
             <td>
                 <table class="table3">
-                    <f:for each="{diffEntry}" as="entry" key="key">
-                        <tr class="db_list_normal"><td><b>{key}: </b></td><td><f:format.raw>{entry}</f:format.raw></td></tr>
+                    <tr class="t3-row-header"><th class="th-spacer3">Coloumn</th><th class="th-spacer3">Value</th></tr>
+                    <f:for each="{diff}" as="diffEntry" key="diffkey">
+                        <f:if condition="{diffkey} == {itemIteration.index}">
+                            <f:for each="{diffEntry}" as="entry" key="key">
+                                <tr>
+                                    <f:if condition="{0:key} == {0:'tstamp'}">
+                                        <f:then>
+                                            <td><b><f:format.date format="d.m.Y H:i:s">@{entry}</f:format.date></b></td>
+                                        </f:then>
+                                        <f:else>
+                                            <f:if condition="{0:key} == {0:'crdate'}">
+                                                <f:then>
+                                                    <td><f:format.date format="d.m.Y H:i:s">@{entry}</f:format.date></td>
+                                                </f:then>
+                                                <f:else>
+                                                    <f:if condition="{0:key} == {0:'creation_date'}">
+                                                        <f:then>
+                                                            <td><f:format.date format="d.m.Y H:i:s">@{entry}</f:format.date></td>
+                                                        </f:then>
+                                                        <f:else>
+                                                            <f:if condition="{0:key} == {0:'modification_date'}">
+                                                                <f:then>
+                                                                    <td><f:format.date format="d.m.Y H:i:s">@{entry}</f:format.date></td>
+                                                                </f:then>
+                                                                <f:else>
+                                                                    <f:if condition="{0:key} == {0:'l10n_diffsource'}">
+                                                                        <f:then>
+                                                                            <td><f:format.crop maxCharacters="25" append="&nbsp;[...]">{entry}</f:format.crop></td>
+                                                                        </f:then>
+                                                                        <f:else>
+                                                                           <td><b>{key}: </td><td></b><f:format.raw>{entry}</f:format.raw></td> 
+                                                                        </f:else>
+                                                                    </f:if>
+                                                                </f:else>
+                                                            </f:if>
+                                                        </f:else>
+                                                    </f:if>
+                                                </f:else>
+                                            </f:if>
+                                        </f:else>
+                                    </f:if>
+                                </tr>
+                            </f:for>
+                        </f:if>
                     </f:for>
                 </table>
             </td>
             </tr>
         </f:for>
     </table>
-    <f:form.submit value="Einträge korrigieren" /> 
+    <f:form.submit value="Einträge korrigieren" />  
 </f:form>
 
 
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
 
-$.noConflict();
-jQuery('document').ready(function() {
-    
-    jQuery('.failure-checkbox').click(function() {
-        var failuresplit = jQuery(this).attr('id').split('_');
-        var uuid = failuresplit[1];
-        if(jQuery('#databasecheckbox_'+uuid).attr('disabled') == 'disabled'){
-            jQuery('#databasecheckbox_'+uuid).removeAttr('disabled');
-        } else {
-            jQuery('#databasecheckbox_'+uuid).attr('disabled', 'disabled');
-        }
+    $.noConflict();
+    jQuery('document').ready(function() {
+
+        jQuery('.failure-checkbox').click(function() {
+            var failuresplit = jQuery(this).attr('id').split('_');
+            var uuid = failuresplit[1];
+            if (jQuery('#databasecheckbox_' + uuid).attr('disabled') == 'disabled') {
+                jQuery('#databasecheckbox_' + uuid).removeAttr('disabled');
+            } else {
+                jQuery('#databasecheckbox_' + uuid).attr('disabled', 'disabled');
+            }
+        });
+
+        jQuery('.database-checkbox').click(function() {
+            var split = jQuery(this).attr('id').split('_');
+            var uuid = split[1];
+            if (jQuery('#failurecheckbox_' + uuid).attr('disabled') == 'disabled') {
+                jQuery('#failurecheckbox_' + uuid).removeAttr('disabled');
+            } else {
+                jQuery('#failurecheckbox_' + uuid).attr('disabled', 'disabled');
+            }
+        });
+
     });
-    
-    jQuery('.database-checkbox').click(function() {
-        var split = jQuery(this).attr('id').split('_');
-        var uuid = split[1];
-        if(jQuery('#failurecheckbox_'+uuid).attr('disabled') == 'disabled'){
-            jQuery('#failurecheckbox_'+uuid).removeAttr('disabled');
-        } else {
-            jQuery('#failurecheckbox_'+uuid).attr('disabled', 'disabled');
-        }
-    });
-    
-});
 
 </script>

@@ -4,6 +4,11 @@
     border: 1px solid #000;
     max-width: 500px;
 }
+
+table.typo3-dblist tr td{
+    padding: 5px 0;
+}
+
 .column{
     border: 1px solid #000;
     padding: 0 10px 10px 10px;
@@ -29,7 +34,9 @@
 }
 
 .innertableheader-spacer{
-    padding-top: 5px;
+    color: #FFFEED;
+    background-color: #59B300;
+    padding: 5px 0;
 }
 
 .th-spacer{
@@ -65,9 +72,11 @@
 }
 
 .green{
-    color: #00EE00;
+    vertical-align: inherit;
+    color: #59B300;
 }
 
 .red{
+    vertical-align: inherit;
     color: #FF0000;
 }

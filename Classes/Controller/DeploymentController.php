@@ -314,13 +314,13 @@ class DeploymentController extends ActionController {
         $this->registry->storeDataInRegistry($failures, 'storedFailures');
         $databaseEntries = $this->failureService->getFailureEntries($failures);
         $diff = $this->failureService->getFailureDataDiff($databaseEntries, $failures);
-       
+        $diffData = $this->failureService->convertTimestamps($diff);
+        
         $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failure'           => $failure,
             'failureEntries'    => $failures,
-            'databaseEntries'   => $databaseEntries,
-            'diff'              => $diff
+            'diff'              => $diffData
         ));
     }
     
