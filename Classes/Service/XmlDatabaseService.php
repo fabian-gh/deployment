@@ -40,6 +40,7 @@ use \TYPO3\Deployment\Domain\Model\LogData;
 use \TYPO3\Deployment\Domain\Model\HistoryData;
 use \TYPO3\Deployment\Domain\Model\History;
 use \TYPO3\Deployment\Service\FileService;
+use \TYPO3\Deployment\Service\RegistryService;
 
 /**
  * XmlDatabaseService
@@ -448,9 +449,9 @@ class XmlDatabaseService extends AbstractDataService{
      * @return \TYPO3\Deployment\Domain\Model\HistoryData
      */
     public function compareDataWithRegistry($uid){
-        /** @var \TYPO3\CMS\Core\Registry $registry */
-        $registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
-        $data = unserialize($registry->get('deployment', 'storedHistoryData'));
+        /** @var \TYPO3\Deployment\Service\RegistryService $registry */
+        $registry = new RegistryService();
+        $data = unserialize($registry->getStoredHistoryEntries());
         
         foreach($data as $hisdata){
             if($hisdata->getUid() == $uid){

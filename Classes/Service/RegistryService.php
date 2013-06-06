@@ -74,6 +74,45 @@ class RegistryService extends AbstractDataService{
         $storableData = serialize($data);
         $registry->set('deployment', $key, $storableData);
     }
+    
+    
+    /**
+     * Gibt den letzten Deploymentstand zurück
+     * 
+     * @return string
+     */
+    public function getLastDeploy(){
+        /** @var \TYPO3\CMS\Core\Registry $registry */
+        $registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
+        
+        return $registry->get('deployment', 'last_deploy');
+    }
+    
+    
+    /**
+     * Gibt die gespeicherten Fehler zurück
+     * 
+     * @return array
+     */
+    public function getStoredFailures(){
+        /** @var \TYPO3\CMS\Core\Registry $registry */
+        $registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
+        
+        return $registry->get('deployment', 'storedFailures');
+    }
+    
+    
+    /**
+     * Gibt die gespeicherten Historyeinträge zurück
+     * 
+     * @return array
+     */
+    public function getStoredHistoryEntries(){
+        /** @var \TYPO3\CMS\Core\Registry $registry */
+        $registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
+        
+        return $registry->get('deployment', 'storedHistoryData');
+    }
 }
 
 ?>

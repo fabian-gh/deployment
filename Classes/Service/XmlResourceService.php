@@ -158,12 +158,12 @@ class XmlResourceService extends AbstractRepository {
         $contentArr = array();
         $exFaf = array();
         $splittedDateTime = array();
-        /** @var \TYPO3\CMS\Core\Registry $registry */
-        $registry = GeneralUtility::makeInstance('t3lib_Registry');
+        /** @var \TYPO3\Deployment\Service\RegistryService $registry */
+        $registry = new RegistryService();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
         
-        $timestamp = $registry->get('deployment', 'last_deploy', time());
+        $timestamp = $registry->getLastDeploy();
         $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentMediaPathWithTrailingSlash());
 
         if ($filesAndFolders) {

@@ -144,7 +144,7 @@ class DeploymentController extends ActionController {
         $historyEntries = array();
 
         // Registry Eintrag holen
-        $date = $this->registry->get('deployment', 'last_deploy');
+        $date = $this->registry->getLastDeploy();
 
         $logEntries = $this->logRepository->findYoungerThen($date);
         
@@ -203,7 +203,7 @@ class DeploymentController extends ActionController {
         $this->fileService->createDirectories();
 
         // Mediendaten erstellen
-        $date = $this->registry->get('deployment', 'last_deploy', time());
+        $date = $this->registry->getLastDeploy();
         $resourceData = $this->fileRepository->findYoungerThen($date);
         $this->xmlResourceService->setFileList($resourceData);
         $this->xmlResourceService->writeXmlResourceList();
@@ -224,7 +224,7 @@ class DeploymentController extends ActionController {
         $result1 = array();
         $result2 = array();
         // letztes Deployment-Datum lesen
-        $tstamp = $this->registry->get('deployment', 'last_deploy');
+        $tstamp = $this->registry->getLastDeploy();
         
         //Mediendaten lesen
         $resourceData = $this->xmlResourceService->readXmlResourceList();
@@ -332,7 +332,7 @@ class DeploymentController extends ActionController {
      * @dontvalidate $failures
      */
     public function clearFailuresAction(Failure $failure){
-        $storedFailures = $this->registry->get('deployment', 'storedFailures');
+        $storedFailures = $this->registry->getStoredFailures();
         $res = $this->failureService->proceedFailureEntries($failure->getFailureEntries(), $storedFailures);
         
         if($res){
