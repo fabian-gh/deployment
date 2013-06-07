@@ -47,8 +47,6 @@ class ConfigurationService extends AbstractDataService {
     
     /**
      * Überprüft ob tt_content & pages im Array vorhanden und gibt dieses zurück
-     * 
-     * @return array
      */
     public function checkTableEntries(){
         $tables = $this->getDeploymentTables();
