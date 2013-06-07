@@ -64,7 +64,7 @@ class CopyService extends AbstractDataService{
         if($this->allPrecautionsSet()){
             $path = $this->getCliPath();
             $taskUid = $this->getTaskUid();
-            exec("$path scheduler -force -i $taskUid");
+            exec(escapeshellcmd("$path scheduler -force -i $taskUid"));
         }
     }
     
@@ -113,13 +113,15 @@ class CopyService extends AbstractDataService{
         $con = $this->getDatabase();
         $result = $con->exec_SELECTgetRows('username', 'be_users', "username='_cli_scheduler'");
         
-        foreach($result as $res){
-            if($res['username'] == '_cli_scheduler'){
-                return true;
+        if(!empty($result)){
+            foreach($result as $res){
+                if($res['username'] == '_cli_scheduler'){
+                    return true;
+                }
             }
+        } else {
+            return false;
         }
-        
-        return false;
     }
     
     

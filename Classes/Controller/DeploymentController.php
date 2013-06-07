@@ -120,8 +120,8 @@ class DeploymentController extends ActionController {
         if(!$this->copyService->checkIfCommandControllerIsRegistered()){
             $this->flashMessageContainer->add('Bitte erstellen Sie im Scheduler-Modul einen Extbase Command Controller Task und deaktivieren sie diesen.', 'Kein Command Controller vorhanden', FlashMessage::ERROR);
         }
-        if($this->copyService->checkIfCliUserIsRegistered()){
-            $this->flashMessageContainer->add("Bitte erstellen Sie im Scheduler-Modul den Menüpunkt 'Setup Check' einen CLI-User.", 'CLI Benutzer nicht vorhanden', FlashMessage::ERROR);
+        if(!$this->copyService->checkIfCliUserIsRegistered()){
+            $this->flashMessageContainer->add("Bitte erstellen Sie im Scheduler-Modul unter dem Menüpunkt 'Setup Check' einen CLI-User.", 'CLI Benutzer nicht vorhanden', FlashMessage::ERROR);
         }
 
         // Noch nicht indizierte Dateien indizieren
