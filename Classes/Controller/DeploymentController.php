@@ -123,6 +123,9 @@ class DeploymentController extends ActionController {
         if(!$this->copyService->checkIfCliUserIsRegistered()){
             $this->flashMessageContainer->add("Bitte erstellen Sie im Scheduler-Modul unter dem Menüpunkt 'Setup Check' einen CLI-User.", 'CLI Benutzer nicht vorhanden', FlashMessage::ERROR);
         }
+        if($this->copyService->getDisable() == '0'){
+            $this->flashMessageContainer->add('', 'Bitte deaktivieren Sie den Command Controller Task', FlashMessage::ERROR);
+        }
 
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->fileService->getNotIndexedFiles();

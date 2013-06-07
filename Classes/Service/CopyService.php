@@ -55,6 +55,11 @@ class CopyService extends AbstractDataService{
      */
     protected $taskUid;
     
+    /**
+     * @var string
+     */
+    protected $disable;
+    
     
     
     /**
@@ -64,6 +69,7 @@ class CopyService extends AbstractDataService{
         if($this->allPrecautionsSet()){
             $path = $this->getCliPath();
             $taskUid = $this->getTaskUid();
+            // TODO: Ausführung funktioniert nicht, evtl. shebang-line beachten
             exec(escapeshellcmd("$path scheduler -force -i $taskUid"));
         }
     }
@@ -86,11 +92,12 @@ class CopyService extends AbstractDataService{
     public function checkIfCommandControllerIsRegistered(){
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
-        $result = $con->exec_SELECTgetRows('serialized_task_object', 'tx_scheduler_task');
+        $result = $con->exec_SELECTgetRows('serialized_task_object, disable', 'tx_scheduler_task');
         
         foreach($result as $res){
             /** @var \TYPO3\CMS\Extbase\Scheduler\Task $object */
             $object = unserialize($res['serialized_task_object']);
+            $this->setDisable($res['disable']);
             $this->taskUid = $object->getTaskUid();
             $identParts = explode(':', $object->getCommandIdentifier());
             
@@ -202,9 +209,10 @@ class CopyService extends AbstractDataService{
      * @return boolean
      */
     public function allPrecautionsSet(){
-        if($this->checkIfCommandControllerIsRegistered() && $this->checkIfCliUserIsRegistered()){
+        if($this->checkIfCommandControllerIsRegistered() && $this->checkIfCliUserIsRegistered() && $this->getDisable() == '1'){
             return true;
         }
+        return false;
     }
     
     
@@ -230,5 +238,19 @@ class CopyService extends AbstractDataService{
      */
     public function getTaskUid() {
         return $this->taskUid;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getDisable() {
+        return $this->disable;
+    }
+    
+    /**
+     * @param string $disable
+     */
+    public function setDisable($disable) {
+        $this->disable = $disable;
     }
 }
