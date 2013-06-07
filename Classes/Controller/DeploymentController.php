@@ -116,10 +116,12 @@ class DeploymentController extends ActionController {
         // Registry prüfen
         $this->registry->checkForRegistryEntry();
 
-        // prüfen ob Command Controller registiert ist
-        $reg = $this->copyService->checkIfCommandControllerIsRegistered();
-        if ($reg === FALSE) {
-            $this->flashMessageContainer->add('Bitte erstellen Sie im Scheduler-Modul einen Extbase Command Controller Task und deaktivieren sie diesen.', 'Command Controller fehlt.', FlashMessage::ERROR);
+        // prüfen ob Command Controller & Benutzer registiert ist
+        if(!$this->copyService->checkIfCommandControllerIsRegistered()){
+            $this->flashMessageContainer->add('Bitte erstellen Sie im Scheduler-Modul einen Extbase Command Controller Task und deaktivieren sie diesen.', 'Kein Command Controller vorhanden', FlashMessage::ERROR);
+        }
+        if($this->copyService->checkIfCliUserIsRegistered()){
+            $this->flashMessageContainer->add("Bitte erstellen Sie im Scheduler-Modul den Menüpunkt 'Setup Check' einen CLI-User.", 'CLI Benutzer nicht vorhanden', FlashMessage::ERROR);
         }
 
         // Noch nicht indizierte Dateien indizieren
@@ -235,10 +237,7 @@ class DeploymentController extends ActionController {
         $validationContent1 = $this->fileService->splitContent($resourceData, true);
         
         // Dateien vom Quellsystem holen
-        $reg = $this->copyService->checkIfTaskIsRegistered();
-        if($reg){
-            $this->copyService->execute();
-        }
+        $this->copyService->trigger();
         
         // XML lesen
         $content = $this->xmlDatabaseService->readXML($tstamp);

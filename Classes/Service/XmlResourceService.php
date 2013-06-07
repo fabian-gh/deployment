@@ -34,7 +34,6 @@
 
 namespace TYPO3\Deployment\Service;
 
-use TYPO3\CMS\Core\Utility\HttpUtility;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
@@ -158,6 +157,7 @@ class XmlResourceService extends AbstractRepository {
         $contentArr = array();
         $exFaf = array();
         $splittedDateTime = array();
+        $validationResult = array();
         /** @var \TYPO3\Deployment\Service\RegistryService $registry */
         $registry = new RegistryService();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
@@ -213,75 +213,6 @@ class XmlResourceService extends AbstractRepository {
         }
         return array_merge($contentArr, $validationResult);
     }
-    
-    
-    /**
-     * Dateien aus der sys_file-Tabelle über die XML-Datei einlesen und diese
-     * mittels des Scheduler Task vom Quellsystem kopieren
-     */
-    public function deployResources(){
-        /** @var \TYPO3\Deployment\Service\FileService $fileService */
-        $fileService = new FileService();
-        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
-        $resFact = ResourceFactory::getInstance();
-        /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
-        $configuration = new ConfigurationService();
-        
-        $path = $fileService->getDeploymentResourcePathWithoutTrailingSlash();
-        // Daten aus Konfiguration holen
-        $server = $configuration->getPullserver();
-        $username = $configuration->getUsername();
-        $password = $configuration->getPassword();
-        
-        // URL in Teile zerlegen
-        $parts = parse_url($server);
-        // Username & Password trimmen falls nicht leer
-        if(trim($username) != ''){
-            $parts['user'] = $username;
-        }
-        if(trim($password) != ''){
-            $parts['pass'] = $password;
-        }
-        // Pfad mit User und PW wieder zusammensetzen
-        $pullServer = trim(HttpUtility::buildUrl($parts), '/');
-        
-        // Betriebssystem auslesen
-        $os = get_browser()->platform;
-
-        // XML einlesen
-        $data = $fileService->splitContent($this->readXmlResourceList());
-
-        foreach ($data as $resource) {
-            /** @var \TYPO3\CMS\Core\Resource\File $file */
-            $file = $resFact->getFileObject($this->getUid($resource['uuid'], $resource['tablename']));
-            $split = explode('/', $file->getIdentifier());
-            $filename = array_pop($split);
-
-            // Pfad wieder zusammensetzen
-            $folder = '';
-            foreach ($split as $sp) {
-                if ($sp != '' && $sp != 'fileadmin') {
-                    $folder = $folder . '/' . $sp;
-                }
-            }
-
-            // erste Slash entfernen und Ordnerstruktur erstellen
-            $fold = substr($folder, 1);
-            if (!is_dir($path . '/' . $fold)) {
-                GeneralUtility::mkdir_deep($path . '/' . $fold);
-            }
-
-            // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
-            if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
-                $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
-                // Parameter: Dateien bei Übertragung komprimieren, neuere Dateien nicht ersetzen,
-                // SymLinks als Syminks kopieren, Dateirechte beibehalten, Quellverzeichnis
-                exec("rsync --compress --update --links --perms $sourceDest");
-            } else {
-                copy($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
-            }
-        }
-    }
 
     
     /**
@@ -291,12 +222,12 @@ class XmlResourceService extends AbstractRepository {
      * @param string $table
      * @return string
      */
-    protected function getUuid($uid, $table) {
-        $con = $this->getDatabase();
-        $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
-
-        return $uuid['uuid'];
-    }
+//    protected function getUuid($uid, $table) {
+//        $con = $this->getDatabase();
+//        $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
+//
+//        return $uuid['uuid'];
+//    }
     
     
     /**
@@ -306,7 +237,7 @@ class XmlResourceService extends AbstractRepository {
      * @param string $table
      * @return string
      */
-    protected function getUid($uuid, $table) {
+    public function getUid($uuid, $table) {
         $uid = $this->getDatabase()->exec_SELECTgetSingleRow('uid', $table, "uuid='".$uuid."'");
 
         return (!empty($uid['uid'])) ? $uid['uid'] : 0;

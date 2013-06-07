@@ -34,9 +34,10 @@
 namespace TYPO3\Deployment\Command;
 
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+use TYPO3\Deployment\Service\CopyService;
 
 /**
- * ACopyResourcesCommandController
+ * CopyResourcesCommandController
  *
  * @package    Deployment
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
@@ -44,13 +45,11 @@ use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 class CopyResourcesCommandController extends CommandController {
 
     /**
-     * Run the copy command
-     *
-     * @param int     $lastDeployments
-     * @param boolean $dryRun
+     * Execute the copying task
      */
-    public function copyCommand($lastDeployments, $dryRun) {
-        // todo: depyloment einlesen und ausführen
+    public function copyCommand(){
+        /** @var TYPO3\Deployment\Service\CopyService $copyService */
+        $copyService = new CopyService();
+        $copyService->execute();
     }
-
 }
