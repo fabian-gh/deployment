@@ -114,5 +114,3 @@ class RegistryService extends AbstractDataService{
         return $registry->get('deployment', 'storedHistoryData');
     }
 }
-
-?>
