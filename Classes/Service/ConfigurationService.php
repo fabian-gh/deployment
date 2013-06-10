@@ -157,15 +157,4 @@ class ConfigurationService extends AbstractDataService {
         $configuration = $this->getAllEntries();
         return $configuration['password'];
     }
-    
-    
-    /**
-     * Gibt die maximale Dateigröße zurück
-     * 
-     * @return int
-     */
-    public function getMaxFileSize(){
-        $configuration = $this->getAllEntries();
-        return $configuration['maxFileSize'];
-    }
 }
