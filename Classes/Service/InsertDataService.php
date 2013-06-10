@@ -124,12 +124,12 @@ class InsertDataService extends AbstractDataService {
                 unset($entry['fieldlist']);
                 unset($entry['uid']);
 
-                //$con->exec_INSERTquery($table, $entry);
+                $con->exec_INSERTquery($table, $entry);
 
                 return true;
             }
             // wenn Eintrag älter ist als der zu aktualisierende
-            elseif ($lastModified['tstamp'] < $entry['tstamp']) {
+            elseif ($lastModified['tstamp'] <= $entry['tstamp']) {
                 // Tabellennamen vor Löschung merken
                 $table = $entry['tablename'];
 
@@ -189,7 +189,7 @@ class InsertDataService extends AbstractDataService {
                 unset($entry['uid']);
 
                 // Daten aktualisieren
-                //$con->exec_UPDATEquery($table, 'uuid='.$entry['uuid'], $entry);
+                $con->exec_UPDATEquery($table, 'uuid='.$entry['uuid'], $entry);
 
                 return true;
             }
@@ -344,7 +344,7 @@ class InsertDataService extends AbstractDataService {
                     $entry['tstamp'] = time();
 
                     // Daten einfügen
-                    //$con->exec_INSERTquery('sys_file', $entry);
+                    $con->exec_INSERTquery('sys_file', $entry);
                 }
                 // wenn Eintrag älter ist als der zu aktualisierende
                 elseif ($lastModified['tstamp'] < $entry['tstamp']) {
@@ -352,7 +352,7 @@ class InsertDataService extends AbstractDataService {
                     $entry['tstamp'] = time();
 
                     // Daten aktualisieren
-                    //$con->exec_UPDATEquery('sys_file', 'uuid='.$entry['uuid'], $entry);
+                    $con->exec_UPDATEquery('sys_file', 'uuid='.$entry['uuid'], $entry);
                 }
                 // wenn letzte Aktualisierung jünger ist als einzutragender Stand
                 elseif ($lastModified['tstamp'] > $entry['tstamp']) {

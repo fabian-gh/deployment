@@ -54,20 +54,20 @@
         jQuery('.failure-checkbox').click(function() {
             var failuresplit = jQuery(this).attr('id').split('_');
             var uuid = failuresplit[1];
-            if (jQuery('#databasecheckbox_' + uuid).attr('disabled') == 'disabled') {
-                jQuery('#databasecheckbox_' + uuid).removeAttr('disabled');
+            if (jQuery('#databasecheckbox_'+uuid).attr('disabled') == 'disabled') {
+                jQuery('#databasecheckbox_'+uuid).removeAttr('disabled');
             } else {
-                jQuery('#databasecheckbox_' + uuid).attr('disabled', 'disabled');
+                jQuery('#databasecheckbox_'+uuid).attr('disabled', 'disabled');
             }
         });
 
         jQuery('.database-checkbox').click(function() {
             var split = jQuery(this).attr('id').split('_');
             var uuid = split[1];
-            if (jQuery('#failurecheckbox_' + uuid).attr('disabled') == 'disabled') {
-                jQuery('#failurecheckbox_' + uuid).removeAttr('disabled');
+            if (jQuery('#failurecheckbox_'+uuid).attr('disabled') == 'disabled') {
+                jQuery('#failurecheckbox_'+uuid).removeAttr('disabled');
             } else {
-                jQuery('#failurecheckbox_' + uuid).attr('disabled', 'disabled');
+                jQuery('#failurecheckbox_'+uuid).attr('disabled', 'disabled');
             }
         });
 

@@ -52,7 +52,9 @@ class FailureService extends AbstractDataService {
      * @return array
      */
     public function getFailureEntries($failures){
-        $failureEntries = array();
+        $failuresFromDatabase = array();
+        $usedFailureEntries = array();
+        $allEntries = array();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
@@ -70,11 +72,33 @@ class FailureService extends AbstractDataService {
                 // Liste erstellen
                 $keyList = implode(',', $keyListArr);
                 
-                $failureEntries[] = $con->exec_SELECTgetSingleRow($keyList, $failure['tablename'], "uuid='".$failure['uuid']."'");
+                $res = $con->exec_SELECTgetSingleRow($keyList, $failure['tablename'], "uuid='".$failure['uuid']."'");
+                if($res != null){
+                    $usedFailureEntries[] = $failure;
+                    $failuresFromDatabase[] = $res;
+                }
             }
         }
+        $allEntries['usedFailures'] = $usedFailureEntries;
+        $allEntries['fromDatabase'] = $failuresFromDatabase;
         
-        return $failureEntries;
+        return $allEntries;
+    }
+    
+    
+    /**
+     * Splittet das übergebene Array zur Weiterverarbeitung
+     * 
+     * @param array $entries
+     * @param boolean $failurePart
+     * @return array
+     */
+    public function splitEntries($entries, $failurePart = false){
+        if(!$failurePart){
+            return $entries['fromDatabase'];
+        } else {
+            return $entries['usedFailures'];
+        }
     }
     
     
