@@ -8,7 +8,7 @@ class CopyServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
      * @test 
      */
     function testCheckIfCommandControllerIsRegistered(){
-        /** @var TYPO3\Deployment\Service\ConpyService $con */
+        /** @var TYPO3\Deployment\Service\CopyService $con */
         $copy = new TYPO3\Deployment\Service\CopyService();
         
         $this->assertTrue($copy->checkIfCommandControllerIsRegistered());
@@ -18,7 +18,7 @@ class CopyServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
      * @test 
      */
     function testCheckIfCliUserIsRegistered(){
-        /** @var TYPO3\Deployment\Service\ConpyService $con */
+        /** @var TYPO3\Deployment\Service\CopyService $con */
         $copy = new TYPO3\Deployment\Service\CopyService();
         
         $this->assertTrue($copy->checkIfCliUserIsRegistered());
@@ -28,7 +28,7 @@ class CopyServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
      * @test 
      */
     function testGetTaskUidNotEmpty(){
-        /** @var TYPO3\Deployment\Service\ConpyService $con */
+        /** @var TYPO3\Deployment\Service\CopyService $con */
         $copy = new TYPO3\Deployment\Service\CopyService();
         
         $this->assertNotEmpty($copy->getTaskUid());
@@ -38,7 +38,7 @@ class CopyServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
      * @test 
      */
     function testGetDisable(){
-        /** @var TYPO3\Deployment\Service\ConpyService $con */
+        /** @var TYPO3\Deployment\Service\CopyService $con */
         $copy = new TYPO3\Deployment\Service\CopyService();
         
         $this->assertEquals(1, $copy->getDisable());
@@ -48,7 +48,7 @@ class CopyServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
      * @test 
      */
     function testGetDisableNotEmpty(){
-        /** @var TYPO3\Deployment\Service\ConpyService $con */
+        /** @var TYPO3\Deployment\Service\CopyService $con */
         $copy = new TYPO3\Deployment\Service\CopyService();
         
         $this->assertNotEmpty($copy->getDisable());
@@ -58,7 +58,7 @@ class CopyServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
      * @test 
      */
     function testAllPrecausionsSet(){
-        /** @var TYPO3\Deployment\Service\ConpyService $con */
+        /** @var TYPO3\Deployment\Service\CopyService $con */
         $copy = new TYPO3\Deployment\Service\CopyService();
         
         $this->assertTrue($copy->allPrecautionsSet());
@@ -67,8 +67,18 @@ class CopyServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
     /**
      * @test 
      */
+    function testGetCliPathIsString(){
+        /** @var TYPO3\Deployment\Service\CopyService $con */
+        $copy = new TYPO3\Deployment\Service\CopyService();
+        
+        $this->assertInternalType('string', $copy->getCliPath());
+    }
+    
+    /**
+     * @test 
+     */
     function testGetCliPath(){
-        /** @var TYPO3\Deployment\Service\ConpyService $con */
+        /** @var TYPO3\Deployment\Service\CopyService $con */
         $copy = new TYPO3\Deployment\Service\CopyService();
         
         $this->assertEquals(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'typo3/cli_dispatch.phpsh', $copy->getCliPath());

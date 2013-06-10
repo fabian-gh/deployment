@@ -1,6 +1,6 @@
 <?php
 
-class FailureServiceTest {
+class FailureServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
     
     /**
      * Überprüfen inwieweit hier Test durchgeführt werden können, da alle 
