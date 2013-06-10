@@ -5,15 +5,6 @@ class ConfigurationServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
     /**
      * @test 
      */
-    function testCheckTableEntries(){
-        /** @var TYPO3\Deployment\Service\ConfigurationService $con */
-        $con = new TYPO3\Deployment\Service\ConfigurationService();
-        $con->checkTableEntries();
-    }
-    
-    /**
-     * @test 
-     */
     function testFilterEntriesAreEmpty(){
         /** @var TYPO3\Deployment\Service\ConfigurationService $con */
         $con = new TYPO3\Deployment\Service\ConfigurationService();
@@ -26,11 +17,51 @@ class ConfigurationServiceTest extends Tx_Extbase_Tests_Unit_BaseTestCase {
     /**
      * @test 
      */
-    function testGetDeploymentTablesHasKeyZero(){
+    function testGetDeploymentTablesHasKey(){
         /** @var TYPO3\Deployment\Service\ConfigurationService $con */
         $con = new TYPO3\Deployment\Service\ConfigurationService();
         
         $this->assertArrayHasKey(0, $con->getDeploymentTables());
+    }
+    
+    /**
+     * @test 
+     */
+    function testGetDeploymentTablesNull(){
+        /** @var TYPO3\Deployment\Service\ConfigurationService $con */
+        $con = new TYPO3\Deployment\Service\ConfigurationService();
+        
+        $this->assertNull($con->getDeploymentTables());
+    }
+    
+    /**
+     * @test 
+     */
+    function testGetDeploymentTablesNotNull(){
+        /** @var TYPO3\Deployment\Service\ConfigurationService $con */
+        $con = new TYPO3\Deployment\Service\ConfigurationService();
+        
+        $this->assertNotNull($con->getDeploymentTables());
+    }
+    
+    /**
+     * @test 
+     */
+    function testGetDeploymentTablesContainsTtContent(){
+        /** @var TYPO3\Deployment\Service\ConfigurationService $con */
+        $con = new TYPO3\Deployment\Service\ConfigurationService();
+        
+        $this->assertContains('tt_content', $con->getDeploymentTables());
+    }
+    
+    /**
+     * @test 
+     */
+    function testGetDeploymentTablesCotainsPages(){
+        /** @var TYPO3\Deployment\Service\ConfigurationService $con */
+        $con = new TYPO3\Deployment\Service\ConfigurationService();
+        
+        $this->assertContains('pages', $con->getDeploymentTables());
     }
     
     /**
