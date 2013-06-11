@@ -289,7 +289,7 @@ class DeploymentController extends ActionController {
     /**
      * Leert den Cache aller registrierten Seiten
      */
-    public function clearPageCacheAction() {
+    public function clearCacheAction() {
         /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
         $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
         // Datahandler initialiseren
