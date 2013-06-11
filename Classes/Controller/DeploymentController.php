@@ -157,7 +157,6 @@ class DeploymentController extends ActionController {
             if ($deploy === NULL) {
                 $deploy = new Deploy();
             }
-            $this->view->assign('deploy', $deploy);
 
             $unserializedLogData = $this->xmlDatabaseService->unserializeLogData($logEntries);
             
@@ -184,6 +183,7 @@ class DeploymentController extends ActionController {
             $diffData = $this->xmlDatabaseService->getHistoryDataDiff($unserializedHistoryData);
             
             $this->view->assignMultiple(array(
+                'deploy'            => $deploy,
                 'historyEntries'    => $unserializedHistoryData,
                 'diffData'          => $diffData
             ));
@@ -251,7 +251,7 @@ class DeploymentController extends ActionController {
         $validationContent = array_merge($validationContent1, $validationContent2);
         
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
-        $this->fileService->checkIfFileExists();
+        //$this->fileService->checkIfFileExists();
         
         if($result1 === true && $result2 === true){
             // letzten Deployment-Stand registrieren

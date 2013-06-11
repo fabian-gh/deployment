@@ -139,6 +139,7 @@ class FailureService extends AbstractDataService {
      */
     public function proceedFailureEntries($failures, $storedFailures){
         $fails = array();
+        $res = array();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
@@ -169,9 +170,15 @@ class FailureService extends AbstractDataService {
                         $unFail['tstamp'] = time();
                         
                         // In DB updaten
-                        //$con->exec_UPDATEquery($entry[1], 'uuid='.$entry[2]);
+                        $res[] = $con->exec_UPDATEquery($entry[1], 'uuid='.$entry[2]);
                     }
                 }
+            }
+        }
+        
+        foreach($res as $result){
+            if($result === false){
+                return false;
             }
         }
         return true;
