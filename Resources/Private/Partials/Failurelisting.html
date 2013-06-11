@@ -14,8 +14,8 @@
 
             <tr class="outertr-spacer">
             <td>
-                <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="failurecheckbox_{fEntry.uuid}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
-                <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="databasecheckbox_{fEntry.uuid}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
+                <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
+                <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
             </td>
             <td>
                 <table class="table3">
@@ -54,20 +54,20 @@
         jQuery('.failure-checkbox').click(function() {
             var failuresplit = jQuery(this).attr('id').split('_');
             var uuid = failuresplit[1];
-            if (jQuery('#databasecheckbox_'+uuid).attr('disabled') == 'disabled') {
-                jQuery('#databasecheckbox_'+uuid).removeAttr('disabled');
+            if (jQuery('#dCheckbox_'+uuid).attr('disabled') === 'disabled') {
+                jQuery('#dCheckbox_'+uuid).removeAttr('disabled');
             } else {
-                jQuery('#databasecheckbox_'+uuid).attr('disabled', 'disabled');
+                jQuery('#dCheckbox_'+uuid).attr('disabled', 'disabled');
             }
         });
 
         jQuery('.database-checkbox').click(function() {
             var split = jQuery(this).attr('id').split('_');
             var uuid = split[1];
-            if (jQuery('#failurecheckbox_'+uuid).attr('disabled') == 'disabled') {
-                jQuery('#failurecheckbox_'+uuid).removeAttr('disabled');
+            if (jQuery('#fCheckbox_'+uuid).attr('disabled') === 'disabled') {
+                jQuery('#fCheckbox_'+uuid).removeAttr('disabled');
             } else {
-                jQuery('#failurecheckbox_'+uuid).attr('disabled', 'disabled');
+                jQuery('#fCheckbox_'+uuid).attr('disabled', 'disabled');
             }
         });
 
