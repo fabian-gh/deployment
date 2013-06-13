@@ -1,10 +1,20 @@
 <?php
 
+/**
+ * ArrayConverter
+ *
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Domain\Property\TypeConverter
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Property\TypeConverter;
 
 use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
+ * ArrayConverter
  * Converter which transforms arrays to arrays.
  * 
  * @package    Deployment

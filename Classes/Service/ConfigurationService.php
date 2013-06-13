@@ -31,10 +31,11 @@ class ConfigurationService extends AbstractDataService {
     public function getDeploymentTables() {
         $configuration = $this->getAllEntries();
         $tables = GeneralUtility::trimExplode(',', $configuration['deploymentTables'], TRUE);
-        // HDNET
+
         array_push($tables, 'tt_content');
         array_push($tables, 'pages');
         array_unique($tables);
+        
         return $tables;
     }
 

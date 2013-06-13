@@ -11,7 +11,7 @@
 
 namespace TYPO3\Deployment\Domain\Model\Request;
 
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use \TYPO3\Deployment\Domain\Model\AbstractModel;
 
 /**
  * Deploy
@@ -23,7 +23,7 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * @subpackage Domain\Model\Request
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
-class Deploy extends AbstractEntity {
+class Deploy extends AbstractModel{
 
     /**
      * @var array

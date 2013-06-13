@@ -36,7 +36,6 @@ class RadioViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Form\RadioViewHelper 
      * Renders the checkbox.
      *
      * @param boolean $checked Specifies that the input element should be preselected
-     *
      * @return string
      * @api
      */
@@ -56,18 +55,14 @@ class RadioViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Form\RadioViewHelper 
             $checked = $propertyValue == $valueAttribute;
         }
 
-
-        // Changed by HDNET
+        // =====  Neu: Erweiterung der Radio Buttons um Arrays anhängen zu können ====
         if ($this->isObjectAccessorMode()) {
-
-            // Ausgabe prüfen vgl. http://stackoverflow.com/questions/2619163/radio-buttons-array-elements
-
             $propertyValue = $this->getPropertyValue();
             if (is_array($propertyValue)) {
                 $nameAttribute .= '[' . $this->arguments['radioIndex'] . ']';
             }
         }
-
+        // ============================================================================
 
         $this->registerFieldNameForFormTokenGeneration($nameAttribute);
         $this->tag->addAttribute('name', $nameAttribute);

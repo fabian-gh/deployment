@@ -11,7 +11,7 @@
 
 namespace TYPO3\Deployment\Domain\Model\Request;
 
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use \TYPO3\Deployment\Domain\Model\AbstractModel;
 
 /**
  * Failure
@@ -20,7 +20,7 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * @subpackage Domain\Model\Request
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
-class Failure extends AbstractEntity {
+class Failure extends AbstractModel {
 
     /**
      * @var array

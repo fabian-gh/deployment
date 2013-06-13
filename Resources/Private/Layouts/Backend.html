@@ -1,7 +1,7 @@
 <link type="text/css" href="{f:uri.resource(path:'Css/Stylesheet.css')}" rel="stylesheet" />
 
 <f:be.container loadExtJs="true">
-    
+
     <div class="typo3-fullDoc">
         <div id="typo3-docheader">
             <div id="typo3-docheader-row1">
@@ -27,7 +27,8 @@
         <div id="typo3-docbody">
             <div id="typo3-inner-docbody">
 
-	            <!-- jQuery hier laden HNDET?! -->
+                <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+                <script text="text/javascript">$.noConflict();</script>
 
                 <f:flashMessages class="tx-extbase-flash-message" renderMode="div" />
                 <f:render section="content" />

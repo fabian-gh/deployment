@@ -16,14 +16,13 @@
 
             <tr class="outertr-spacer">
             <td>
+                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
+                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
 
-	            <f:commet>
-		            <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
-		            <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
-	            </f:commet>
-
-                <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
-                <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
+                <f:comment>
+                    <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
+                    <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
+                </f:comment>
             </td>
             <td>
                 <table class="table3">
@@ -32,14 +31,14 @@
                         <f:if condition="{diffkey} == {itemIteration.index}">
                             <f:for each="{diffEntry}" as="entry" key="key">
                                 <tr>
-                                    <f:if condition="{0:key} == {0:'tstamp'}">
-                                        <f:then>
-                                            <td><b>{key}: </b></td><td><b><f:format.raw>{entry}</f:format.raw></b></td> 
-                                        </f:then>
-                                        <f:else>
-                                            <td><b>{key}: </td><td></b><f:format.raw>{entry}</f:format.raw></td> 
-                                        </f:else>
-                                    </f:if>
+                                <f:if condition="{0:key} == {0:'tstamp'}">
+                                    <f:then>
+                                        <td><b>{key}: </b></td><td><b><f:format.raw>{entry}</f:format.raw></b></td> 
+                                    </f:then>
+                                    <f:else>
+                                        <td><b>{key}: </td><td></b><f:format.raw>{entry}</f:format.raw></td> 
+                                    </f:else>
+                                </f:if>
                                 </tr>
                             </f:for>
                         </f:if>
@@ -51,34 +50,3 @@
     </table>
     <f:form.submit value="Einträge korrigieren" />  
 </f:form>
-
-
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script type="text/javascript">
-
-    $.noConflict();
-    jQuery('document').ready(function() {
-
-        jQuery('.failure-checkbox').click(function() {
-            var failuresplit = jQuery(this).attr('id').split('_');
-            var uuid = failuresplit[1];
-            if (jQuery('#dCheckbox_'+uuid).attr('disabled') === 'disabled') {
-                jQuery('#dCheckbox_'+uuid).removeAttr('disabled');
-            } else {
-                jQuery('#dCheckbox_'+uuid).attr('disabled', 'disabled');
-            }
-        });
-
-        jQuery('.database-checkbox').click(function() {
-            var split = jQuery(this).attr('id').split('_');
-            var uuid = split[1];
-            if (jQuery('#fCheckbox_'+uuid).attr('disabled') === 'disabled') {
-                jQuery('#fCheckbox_'+uuid).removeAttr('disabled');
-            } else {
-                jQuery('#fCheckbox_'+uuid).attr('disabled', 'disabled');
-            }
-        });
-
-    });
-
-</script>

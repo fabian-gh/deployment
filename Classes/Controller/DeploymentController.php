@@ -122,7 +122,7 @@ class DeploymentController extends ActionController {
     
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
-     * @dontvalidate $deploy
+     * @dontvalidate                                        $deploy
      */
     public function listAction(Deploy $deploy = NULL) {
         $newHistoryEntries = array();
@@ -178,7 +178,7 @@ class DeploymentController extends ActionController {
     
     /**
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
-     * @dontvalidate $deploy
+     * @dontvalidate                                        $deploy
      */
     public function createDeployAction(Deploy $deploy) {
         $deployData = array();
@@ -287,7 +287,7 @@ class DeploymentController extends ActionController {
      *
      * @param array                                          $failures
      * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failure
-     * @dontvalidate $failures
+     * @dontvalidate                                         $failures
      */
     public function listFailureAction($failures, Failure $failure = NULL) {
         if ($failure === NULL) {
@@ -316,7 +316,7 @@ class DeploymentController extends ActionController {
      * Fehlerbehebung
      *
      * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failure
-     * @dontvalidate $failures
+     * @dontvalidate                                         $failures
      */
     public function clearFailuresAction(Failure $failure) {
         $storedFailures = $this->registry->getStoredFailures();
