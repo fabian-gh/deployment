@@ -1,33 +1,12 @@
 <?php
-/***************************************************************
-*  Copyright notice
-*
-*  (c) 2013 Fabian Martinovic <fabian.martinovic(at)t-online.de>
-*  All rights reserved
-*
-*  This script is part of the TYPO3 project. The TYPO3 project is
-*  free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  The GNU General Public License can be found at
-*  http://www.gnu.org/copyleft/gpl.html.
-*  A copy is found in the textfile GPL.txt and important notices to the license
-*  from the author is found in LICENSE.txt distributed with these scripts.
-*
-*  This script is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  This copyright notice MUST APPEAR in all copies of the script!
-***************************************************************/
+
 /**
  * AutoLoader Service
  *
  * @category   Extension
  * @package    Deployment
+ * @subpackage Domain\Service
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
 namespace TYPO3\Deployment\Service;
@@ -39,12 +18,13 @@ use TYPO3\Deployment\Utility\Arrays;
 
 /**
  * AutoLoader Service
- *
  * Controller Abstraction for the ExtBase framework
  *
  * @package    Deployment
+ * @subpackage Domain\Service
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
-class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
+class AutoLoaderService {
 
     /**
      * The Extension key
@@ -58,8 +38,11 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
      */
     protected $signalSlotDispatcher;
 
+    
     /**
      * @param string $extensionKey
+     *
+     * @throws \Exception
      */
     public function __construct($extensionKey) {
         if (!ExtensionManagementUtility::isLoaded($extensionKey)) {
@@ -69,6 +52,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         $this->extensionKey = $extensionKey;
     }
 
+    
     /**
      * Load slot by the Slot directory and bind them to the dispatcher
      *
@@ -100,6 +84,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         return $this;
     }
 
+    
     /**
      * Load Static TypoScripts for the ext_tables.php file
      *
@@ -125,6 +110,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         return $this;
     }
 
+    
     /**
      * Load all hooks from the Hook dir and checked classes and functions if there is a Tag like: [at]hook TYPO3_CONF_VARS|SC_OPTIONS|tslib/class.tslib_content.php|stdWrap
      *
@@ -165,6 +151,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         return $this;
     }
 
+    
     /**
      * AutoLoader for all XClasses
      *
@@ -190,6 +177,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         return $this;
     }
 
+    
     /**
      * Load FlexForms in relation to the plugin name
      *
@@ -209,6 +197,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         return $this;
     }
 
+    
     /**
      * Load CommandController by filename
      *
@@ -227,6 +216,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         return $this;
     }
 
+    
     /**
      * Set smart Xclass logic
      *
@@ -242,6 +232,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         );
     }
 
+    
     /**
      * Add a hook
      *
@@ -254,6 +245,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         Arrays::setNodes(array(implode('|', $location) => $configuration), $GLOBALS);
     }
 
+    
     /**
      * Add a Slot dispatcher
      *
@@ -267,6 +259,7 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
         $this->signalSlotDispatcher->connect($signalClassName, $signalName, $slotClassNameOrObject, $slotMethodName, $passSignalInformation);
     }
 
+    
     /**
      * Get all base filenames in the given directory with the given file extension
      * Check also if the directory exists
@@ -288,4 +281,3 @@ class AutoLoaderService implements \TYPO3\CMS\Core\SingletonInterface {
     }
 
 }
-

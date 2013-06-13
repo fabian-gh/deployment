@@ -1,34 +1,11 @@
 <?php
-/***************************************************************
-*  Copyright notice
-*
-*  (c) 2013 Fabian Martinovic <fabian.martinovic(at)t-online.de>
-*  All rights reserved
-*
-*  This script is part of the TYPO3 project. The TYPO3 project is
-*  free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  The GNU General Public License can be found at
-*  http://www.gnu.org/copyleft/gpl.html.
-*  A copy is found in the textfile GPL.txt and important notices to the license
-*  from the author is found in LICENSE.txt distributed with these scripts.
-*
-*  This script is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  This copyright notice MUST APPEAR in all copies of the script!
-***************************************************************/
+
 /**
  * FileService
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Service
+ * @subpackage Domain\Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -43,13 +20,14 @@ use \TYPO3\Deployment\Service\FileService;
  * FileService
  *
  * @package    Deployment
+ * @subpackage Domain\Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class FileService extends AbstractDataService {
-    
+
     /**
      * Schreibt eine Dateiliste des Fileadmins, ohne Deploymentdateien
-     * 
+     *
      * @return array
      */
     public function readFilesInFileadmin() {
@@ -69,13 +47,12 @@ class FileService extends AbstractDataService {
 
         return $newArr;
     }
-    
-    
+
     
     /**
      * Filtert alle nicht indizierten Dateien und fügt diese in die sys-file Tabelle ein
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getNotIndexedFiles() {
         $fileArr = array();
@@ -111,7 +88,7 @@ class FileService extends AbstractDataService {
 
         return $notIndexedFiles;
     }
-    
+
     
     /**
      * Prüft ob die Dateien im resource-Ordner innerhalb des fileadmins vorhanden
@@ -122,7 +99,7 @@ class FileService extends AbstractDataService {
         $path = $this->getFileadminPathWithTrailingSlash();
         $resPath = $this->getDeploymentResourcePathWithTrailingSlash();
 
-        // Dateilisten 
+        // Dateilisten
         $fileadminFiles = $this->readFilesInFileadmin();
         $fileList = GeneralUtility::getAllFilesAndFoldersInPath($resourceFiles, $resPath);
 
@@ -141,45 +118,45 @@ class FileService extends AbstractDataService {
             }
         }
     }
-    
+
     
     /**
      * Nicht indizierte Daten in Tabelle eintragen
-     * 
+     *
      * @param array $fileArr
      */
-    public function processNotIndexedFiles($fileArr){
+    public function processNotIndexedFiles($fileArr) {
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
-        
-        foreach($fileArr as $file){
-            $res = $resFact->getFileObjectFromCombinedIdentifier('/fileadmin/'.$file);
+
+        foreach ($fileArr as $file) {
+            $res = $resFact->getFileObjectFromCombinedIdentifier('/fileadmin/' . $file);
             // automatische Indizierung sobald mit $res gearbeitet wird
             $res->isIndexed();
         }
 
-        if($con->isConnected()){
+        if ($con->isConnected()) {
             $fileRep = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
             $res = $fileRep->findByIdentifierWithoutHeadingSlash('/fileadmin/');
-            
-            foreach($res as $file){
+
+            foreach ($res as $file) {
                 // File-Objekt über UID des Ergebnisses erzeugen
                 $File = $resFact->getFileObject($file->getUid());
                 // Identifier des Objekts abfragen
                 $identifier = $File->getIdentifier();
-                
-                if(strstr($identifier, '/fileadmin') != false){
+
+                if (strstr($identifier, '/fileadmin') != FALSE) {
                     $croppedIdentifier = substr($identifier, 10);
-                    $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $croppedIdentifier));
+                    $con->exec_UPDATEquery('sys_file', 'uid=' . $file->getUid(), array('identifier' => $croppedIdentifier));
                 } else {
-                    $con->exec_UPDATEquery('sys_file', 'uid='.$file->getUid(), array('identifier' => $identifier));
+                    $con->exec_UPDATEquery('sys_file', 'uid=' . $file->getUid(), array('identifier' => $identifier));
                 }
             }
         }
     }
-    
+
     
     /**
      * Generiert eine UUID
@@ -187,31 +164,29 @@ class FileService extends AbstractDataService {
      * @return string
      */
     public function generateUuid() {
-        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, 
-            mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
     }
-    
+
     
     /**
      * Löscht alle XML-Dateien und Ordner, die älter als ein halbes Jahr sind
      */
-    public function deleteOlderFiles(){
+    public function deleteOlderFiles() {
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
         $configuration = new ConfigurationService();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
-        
+
         $deleteState = $configuration->getDeleteState();
-        
+
         // falls Daten gelöscht werden sollen
-        if($deleteState == 1){
-            $fileArr  = array();
-            $split  = array();
+        if ($deleteState == 1) {
+            $fileArr = array();
+            $split = array();
             $dateFolder = array();
-            
-            $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentPathWithTrailingSlash(), '', true);
-        
+
+            $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentPathWithTrailingSlash(), '', TRUE);
+
             if ($filesAndFolders) {
                 // Dateipfad ausplitten
                 foreach ($filesAndFolders as $faf) {
@@ -226,38 +201,40 @@ class FileService extends AbstractDataService {
                 }
 
                 // Datum splitten und löschen
-                foreach($dateFolder as $datekey => $files){
+                foreach ($dateFolder as $datekey => $files) {
                     $split = explode('_', $datekey);
                     $splitdate = mktime(0, 0, 0, $split[1], $split[2], $split[0]);
 
                     // falls Ordner älter als halbes Jahr
-                    if($splitdate+(6*30*24*60*60) < time()){
+                    if ($splitdate + (6 * 30 * 24 * 60 * 60) < time()) {
                         // dann Dateien in Ordner löschen
-                        foreach($files as $filevalue){
+                        foreach ($files as $filevalue) {
                             $splitFile = explode('_', $filevalue);
                             $folder = ($splitFile[1] == 'changes.xml') ? 'database' : 'media';
 
-                            unlink($fileService->getDeploymentPathWithTrailingSlash().$folder.'/'.$datekey.'/'.$filevalue);
+                            unlink($fileService->getDeploymentPathWithTrailingSlash() . $folder . '/' . $datekey . '/' . $filevalue);
                         }
                         // Ordner selbst löschen
-                        rmdir($fileService->getDeploymentPathWithTrailingSlash().$folder.'/'.$datekey);
+                        rmdir($fileService->getDeploymentPathWithTrailingSlash() . $folder . '/' . $datekey);
                     }
                 }
             }
         }
     }
-    
+
     
     /**
      * Erstellt die Verzeichnisstruktur falls diese nicht bereits vorhanden sein sollte
      */
-    public function createDirectories(){
+    public function createDirectories() {
         $exFold = array();
         /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
         $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
-        
+
+        // neue Instanz?!?! FileService vs. $this HDNET
+
         $exFold[] = $folder->folderExists($fileService->getDeploymentPathWithTrailingSlash());
         $exFold[] = $folder->folderExists($fileService->getDeploymentDatabasePathWithTrailingSlash());
         $exFold[] = $folder->folderExists($fileService->getDeploymentMediaPathWithTrailingSlash());
@@ -268,135 +245,137 @@ class FileService extends AbstractDataService {
                 switch ($ergkey) {
                     case 0:
                         GeneralUtility::mkdir($ergvalue);
-                    break;
+                        break;
 
                     case 1:
                         GeneralUtility::mkdir($ergvalue);
-                    break;
+                        break;
 
                     case 2:
                         GeneralUtility::mkdir($ergvalue);
-                    break;
+                        break;
 
                     case 3:
                         GeneralUtility::mkdir($ergvalue);
-                    break;
+                        break;
                 }
             }
         }
     }
-    
+
     
     /**
      * Validiert die übergebene Datei
-     * 
+     *
      * @param XML-File $file
+     *
      * @return boolean
      */
-    public function xmlValidation($file){
+    public function xmlValidation($file) {
         $dom = new \DOMDocument;
         $dom->load($file);
-        
-        if($dom->validate()){
-            return true;
+
+        if ($dom->validate()) {
+            return TRUE;
         } else {
-            return false;
+            return FALSE;
         }
     }
-    
+
     
     /**
      * Splittet die Validierung von den Daten
-     * 
+     *
      * @param array $content
-     * @param array $validation
+     * @param bool  $validation
+     *
      * @return array
      */
-    public function splitContent($content, $validation = false){
+    public function splitContent($content, $validation = FALSE) {
         $newArr = array();
-        
-        if(!$validation){
-            foreach($content as $key => $value){
-                if($key != 'validation'){
-                    $newArr[] = $value;
-                }
-            }
-            return $newArr;
-        } else {
+
+        if ($validation) {
             return $content['validation'];
         }
+
+        foreach ($content as $key => $value) {
+            if ($key != 'validation') {
+                $newArr[] = $value;
+            }
+        }
+        return $newArr;
     }
-    
+
     
     // ======================================= Getter ===============================================
-    
+
     /**
      * @return string
      */
-    public function getFileadminPathWithoutTrailingSlash(){
-        return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin';
+    public function getFileadminPathWithoutTrailingSlash() {
+        return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin';
     }
-    
+
     /**
      * @return string
      */
-    public function getFileadminPathWithTrailingSlash(){
-        return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT').GeneralUtility::getIndpEnv('TYPO3_SITE_PATH').'fileadmin/';
+    public function getFileadminPathWithTrailingSlash() {
+        return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/';
     }
-    
+
     /**
      * @return string
      */
-    public function getDeploymentPathWithoutTrailingSlash(){
+    public function getDeploymentPathWithoutTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment';
     }
-    
+
     /**
      * @return string
      */
-    public function getDeploymentPathWithTrailingSlash(){
+    public function getDeploymentPathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/';
     }
-    
+
     /**
      * @return string
      */
-    public function getDeploymentDatabasePathWithoutTrailingSlash(){
+    public function getDeploymentDatabasePathWithoutTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/database';
     }
-    
+
     /**
      * @return string
      */
-    public function getDeploymentDatabasePathWithTrailingSlash(){
+    public function getDeploymentDatabasePathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/database/';
     }
-    
+
     /**
      * @return string
      */
-    public function getDeploymentMediaPathWithoutTrailingSlash(){
+    public function getDeploymentMediaPathWithoutTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media';
     }
-    
+
     /**
      * @return string
      */
-    public function getDeploymentMediaPathWithTrailingSlash(){
+    public function getDeploymentMediaPathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/';
     }
-    
+
     /**
      * @return string
      */
-    public function getDeploymentResourcePathWithoutTrailingSlash(){
+    public function getDeploymentResourcePathWithoutTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource';
     }
-    
+
     /**
      * @return string
      */
-    public function getDeploymentResourcePathWithTrailingSlash(){
+    public function getDeploymentResourcePathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/';
     }
 }

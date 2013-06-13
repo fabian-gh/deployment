@@ -1,34 +1,11 @@
 <?php
-/***************************************************************
-*  Copyright notice
-*
-*  (c) 2013 Fabian Martinovic <fabian.martinovic(at)t-online.de>
-*  All rights reserved
-*
-*  This script is part of the TYPO3 project. The TYPO3 project is
-*  free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  The GNU General Public License can be found at
-*  http://www.gnu.org/copyleft/gpl.html.
-*  A copy is found in the textfile GPL.txt and important notices to the license
-*  from the author is found in LICENSE.txt distributed with these scripts.
-*
-*  This script is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  This copyright notice MUST APPEAR in all copies of the script!
-***************************************************************/
+
 /**
  * XmlResourceService
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Service
+ * @subpackage Domain\Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -36,6 +13,7 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\Deployment\Domain\Model\File;
 use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
 use \TYPO3\Deployment\Service\FileService;
@@ -44,9 +22,10 @@ use \TYPO3\Deployment\Service\FileService;
  * XmlResourceService
  *
  * @package    Deployment
+ * @subpackage Domain\Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
-class XmlResourceService extends AbstractRepository {
+class XmlResourceService extends AbstractDataService {
 
     /**
      * @var \TYPO3\Deployment\Domain\Model\File
@@ -69,11 +48,12 @@ class XmlResourceService extends AbstractRepository {
      * ohne Pfadangabe zum Fileadmin
      */
     public function writeXmlResourceList() {
+
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
-        
+
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
 
@@ -107,6 +87,7 @@ class XmlResourceService extends AbstractRepository {
         $this->xmlwriter->startElement('resourcelist');
 
         foreach ($this->fileList as $file) {
+            /** @var File $file */
             $FileObj = $resFact->getFileObject($file->getUid());
             $this->xmlwriter->startElement('file');
             $this->xmlwriter->writeElement('tablename', 'sys_file');
@@ -137,7 +118,7 @@ class XmlResourceService extends AbstractRepository {
         $file = GeneralUtility::tempnam('resource_');
         GeneralUtility::writeFile($file, $writeString);
 
-        $folder = $fileService->getDeploymentMediaPathWithTrailingSlash().date('Y_m_d', time());
+        $folder = $fileService->getDeploymentMediaPathWithTrailingSlash() . date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
 
         GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_resource.xml');
@@ -162,7 +143,7 @@ class XmlResourceService extends AbstractRepository {
         $registry = new RegistryService();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
-        
+
         $timestamp = $registry->getLastDeploy();
         $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentMediaPathWithTrailingSlash());
 
@@ -198,9 +179,9 @@ class XmlResourceService extends AbstractRepository {
                 // wenn Datei-Timestamp später als letztes Deployment,
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
-                    $validationResult['validation']['database/'.$folder.'/'.$file] = $fileService->xmlValidation($fileService->getDeploymentMediaPathWithTrailingSlash().$folder.'/'.$file);
-                    $xmlString = file_get_contents($fileService->getDeploymentMediaPathWithTrailingSlash().$folder.'/'.$file);
-                    
+                    $validationResult['validation']['database/' . $folder . '/' . $file] = $fileService->xmlValidation($fileService->getDeploymentMediaPathWithTrailingSlash() . $folder . '/' . $file);
+                    $xmlString = file_get_contents($fileService->getDeploymentMediaPathWithTrailingSlash() . $folder . '/' . $file);
+
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->file as $fileset) {
                         foreach ($fileset as $key => $value) {
@@ -214,22 +195,7 @@ class XmlResourceService extends AbstractRepository {
         return array_merge($contentArr, $validationResult);
     }
 
-    
-    /**
-     * Gibt die entsprechende UUID passend zum Datensatz zurück
-     * 
-     * @param string $uid
-     * @param string $table
-     * @return string
-     */
-//    protected function getUuid($uid, $table) {
-//        $con = $this->getDatabase();
-//        $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
-//
-//        return $uuid['uuid'];
-//    }
-    
-    
+
     /**
      * Gibt die entsprechende UID passend zum Datensatz zurück
      * 
@@ -238,12 +204,11 @@ class XmlResourceService extends AbstractRepository {
      * @return string
      */
     public function getUid($uuid, $table) {
-        $uid = $this->getDatabase()->exec_SELECTgetSingleRow('uid', $table, "uuid='".$uuid."'");
+        $uid = $this->getDatabase()->exec_SELECTgetSingleRow('uid', $table, "uuid='" . $uuid . "'");
 
         return (!empty($uid['uid'])) ? $uid['uid'] : 0;
     }
-   
-    
+
     // ============================ Getter & Setter ================================
 
     /**

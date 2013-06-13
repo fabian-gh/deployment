@@ -1,28 +1,5 @@
 <?php
-/***************************************************************
-*  Copyright notice
-*
-*  (c) 2013 Fabian Martinovic <fabian.martinovic(at)t-online.de>
-*  All rights reserved
-*
-*  This script is part of the TYPO3 project. The TYPO3 project is
-*  free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  The GNU General Public License can be found at
-*  http://www.gnu.org/copyleft/gpl.html.
-*  A copy is found in the textfile GPL.txt and important notices to the license
-*  from the author is found in LICENSE.txt distributed with these scripts.
-*
-*  This script is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  This copyright notice MUST APPEAR in all copies of the script!
-***************************************************************/
+
 /**
  * Repository
  *
@@ -36,7 +13,9 @@ namespace TYPO3\Deployment\Domain\Repository;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\Deployment\Domain\Model\Log;
 use \TYPO3\Deployment\Service\ConfigurationService;
+
 /**
  * Log Repository
  *
@@ -46,42 +25,63 @@ use \TYPO3\Deployment\Service\ConfigurationService;
  */
 class LogRepository extends AbstractRepository {
 
-    /**
-     * Gibt alle noch nicht deployeten Datensätze zurück
-     * 
-     * @param string $timestamp
-     * @return array<\TYPO3\Deployment\Domain\Model\Log>
-     */
-    public function findYoungerThen($timestamp) {
-        $query = $this->createQuery();
-        
-        $configuration = new ConfigurationService();
-        $configuration->checkTableEntries();
-        
-        $constraints = array();
-        $constraints[] = $query->greaterThanOrEqual('tstamp', $timestamp);
-        $constraints[] = $query->equals('error', '0');
-        $constraints[] = $query->greaterThan('action', '0');
-        $constraints[] = $query->logicalNot($query->equals('tablename', ''));
-        
-        $query->matching($query->logicalAnd($constraints));
-        $result = $query->execute();
-        
-        // Filterung von Datensätzen die in Tabellen stehen, die auch in der 
-        // Konfiguration aufgelistet sind
-        return $configuration->filterEntries($result);
-    }
+	/**
+	 * Gibt alle noch nicht deployeten Datensätze zurück
+	 *
+	 * @param string $timestamp
+	 *
+	 * @return array<\TYPO3\Deployment\Domain\Model\Log>
+	 */
+	public function findYoungerThen($timestamp) {
+		$query = $this->createQuery();
 
-    /**
-     * Beispiel für individuelle Abfrage. Bitte in find* umbennnen und korrigieren
-     */
-    /*public function customQuery() {
-        /** @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-        /*$query = $this->createQuery();
+		$constraints = array();
+		$constraints[] = $query->greaterThanOrEqual('tstamp', $timestamp);
+		$constraints[] = $query->equals('error', '0');
+		$constraints[] = $query->greaterThan('action', '0');
+		$constraints[] = $query->logicalNot($query->equals('tablename', ''));
 
-        $query->statement('SELECT sys_log.* FROM sys_log');
+		$query->matching($query->logicalAnd($constraints));
+		$result = $query->execute();
 
-        return $query->execute();
-    }*/
+		// Filterung von Datensätzen die in Tabellen stehen, die auch in der
+		// Konfiguration aufgelistet sind
+		return $this->filterEntries($result);
+	}
+
+	/**
+	 * Filtert alle Einträge heraus, die aus Tabellen kommen, die nicht deployed
+	 * werden sollen
+	 *
+	 * @param \TYPO3\CMS\Extbase\Persistence\Generic\QueryResult $result
+	 *
+	 * @return \TYPO3\CMS\Extbase\Persistence\Generic\QueryResult
+	 */
+	public function filterEntries($result) {
+		$count = 0;
+		$config = new ConfigurationService();
+		$tables = $config->getDeploymentTables();
+
+		foreach ($result as $count => $res) {
+			/** @var $res Log */
+			if (!in_array($res->getTablename(), $tables)) {
+				unset($result[$count]);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Beispiel für individuelle Abfrage. Bitte in find* umbennnen und korrigieren
+	 */
+	/*public function customQuery() {
+		/** @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
+	/*$query = $this->createQuery();
+
+	$query->statement('SELECT sys_log.* FROM sys_log');
+
+	return $query->execute();
+}*/
 
 }

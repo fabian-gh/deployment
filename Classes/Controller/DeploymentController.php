@@ -1,33 +1,11 @@
 <?php
-/***************************************************************
-*  Copyright notice
-*
-*  (c) 2013 Fabian Martinovic <fabian.martinovic(at)t-online.de>
-*  All rights reserved
-*
-*  This script is part of the TYPO3 project. The TYPO3 project is
-*  free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  The GNU General Public License can be found at
-*  http://www.gnu.org/copyleft/gpl.html.
-*  A copy is found in the textfile GPL.txt and important notices to the license
-*  from the author is found in LICENSE.txt distributed with these scripts.
-*
-*  This script is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  This copyright notice MUST APPEAR in all copies of the script!
-***************************************************************/
+
 /**
  * Deployment
  *
  * @category   Extension
  * @package    Deployment
+ * @subpackage Domain\Controller
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -35,6 +13,8 @@ namespace TYPO3\Deployment\Controller;
 
 use \TYPO3\CMS\Core\Messaging\FlashMessage;
 use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
+use TYPO3\Deployment\Domain\Model\Log;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\Deployment\Domain\Model\Request\Failure;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
@@ -44,6 +24,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
  * Deployment
  *
  * @package    Deployment
+ * @subpackage Domain\Controller
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class DeploymentController extends ActionController {
@@ -77,16 +58,16 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $insertDataService;
-    
+
     /**
      * @var \TYPO3\Deployment\Service\FailureService
      * @inject
      */
     protected $failureService;
-    
+
     /**
      * @var \TYPO3\Deployment\Service\FileService
-     * @inject 
+     * @inject
      */
     protected $fileService;
 
@@ -117,20 +98,20 @@ class DeploymentController extends ActionController {
         $this->registry->checkForRegistryEntry();
 
         // prüfen ob Command Controller & Benutzer registiert ist
-        if(!$this->copyService->checkIfCommandControllerIsRegistered()){
-            $this->flashMessageContainer->add('Bitte erstellen Sie im Scheduler-Modul einen Extbase Command Controller Task und deaktivieren sie diesen.', 'Kein Command Controller vorhanden', FlashMessage::ERROR);
+        if (!$this->copyService->checkIfCommandControllerIsRegistered()) {
+            $this->addFlashMessage('Bitte erstellen Sie im Scheduler-Modul einen Extbase Command Controller Task und deaktivieren sie diesen.', 'Kein Command Controller vorhanden', FlashMessage::ERROR);
         }
-        if(!$this->copyService->checkIfCliUserIsRegistered()){
-            $this->flashMessageContainer->add("Bitte erstellen Sie im Scheduler-Modul unter dem Menüpunkt 'Setup Check' einen CLI-User.", 'CLI Benutzer nicht vorhanden', FlashMessage::ERROR);
+        if (!$this->copyService->checkIfCliUserIsRegistered()) {
+            $this->addFlashMessage("Bitte erstellen Sie im Scheduler-Modul unter dem Menüpunkt 'Setup Check' einen CLI-User.", 'CLI Benutzer nicht vorhanden', FlashMessage::ERROR);
         }
-        if($this->copyService->getDisable() == '0'){
-            $this->flashMessageContainer->add('', 'Bitte deaktivieren Sie den Command Controller Task', FlashMessage::ERROR);
+        if ($this->copyService->getDisable() == '0') {
+            $this->addFlashMessage('', 'Bitte deaktivieren Sie den Command Controller Task', FlashMessage::ERROR);
         }
 
         // Noch nicht indizierte Dateien indizieren
         $notIndexed = $this->fileService->getNotIndexedFiles();
         $this->fileService->processNotIndexedFiles($notIndexed);
-        
+
         // prüft ob die Spalte UUID & der Wert existieren
         $this->insertDataService->checkIfUuidExists();
 
@@ -151,44 +132,46 @@ class DeploymentController extends ActionController {
         // Registry Eintrag holen
         $date = $this->registry->getLastDeploy();
 
+        /** @var QueryResultInterface $logEntries */
         $logEntries = $this->logRepository->findYoungerThen($date);
-        
+
         if ($logEntries->getFirst() != NULL) {
             if ($deploy === NULL) {
                 $deploy = new Deploy();
             }
 
             $unserializedLogData = $this->xmlDatabaseService->unserializeLogData($logEntries);
-            
-            // Einträge durchlaufen, falls Action == 1 dann handelt es sich um einen komplett 
-            // neuen Datensatz, der zu einem Historyeintrag umgewandelt wird, damit dieser 
+
+            // Einträge durchlaufen, falls Action == 1 dann handelt es sich um einen komplett
+            // neuen Datensatz, der zu einem Historyeintrag umgewandelt wird, damit dieser
             // widerum dargestellt werden kann
             foreach ($unserializedLogData as $entry) {
+                /** @var Log $entry */
                 if ($entry->getAction() == '1') {
                     $newHistoryEntries[] = $this->xmlDatabaseService->convertFromLogDataToHistory($entry);
                 } else {
                     /** @var \TYPO3\Deployment\Domain\Model\History $result */
                     $result = $this->historyRepository->findHistoryData($entry);
-                    
+
                     if ($result !== NULL) {
                         $result->setTstamp($result->getTstamp());
                         $historyEntries[] = $result;
                     }
                 }
             }
-            
+
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlDatabaseService->unserializeHistoryData($allHistoryEintries);
             $this->registry->storeDataInRegistry($unserializedHistoryData, 'storedHistoryData');
             $diffData = $this->xmlDatabaseService->getHistoryDataDiff($unserializedHistoryData);
-            
+
             $this->view->assignMultiple(array(
-                'deploy'            => $deploy,
-                'historyEntries'    => $unserializedHistoryData,
-                'diffData'          => $diffData
+                'deploy' => $deploy,
+                'historyEntries' => $unserializedHistoryData,
+                'diffData' => $diffData
             ));
         } else {
-            $this->flashMessageContainer->add('Keine Einträge gefunden', '', FlashMessage::ERROR);
+            $this->addFlashMessage('Keine Einträge gefunden', '', FlashMessage::ERROR);
         }
     }
 
@@ -203,7 +186,7 @@ class DeploymentController extends ActionController {
         foreach ($deploy->getDeployEntries() as $uid) {
             $deployData[] = $this->xmlDatabaseService->compareDataWithRegistry($uid);
         }
-        
+
         // falls deployment-Ordner noch nicht existieren, dann erstellen
         $this->fileService->createDirectories();
 
@@ -217,7 +200,7 @@ class DeploymentController extends ActionController {
         $this->xmlDatabaseService->setDeployData(array_unique($deployData));
         $this->xmlDatabaseService->writeXML();
 
-        $this->flashMessageContainer->add('Daten wurden erstellt.', '', FlashMessage::OK);
+        $this->addFlashMessage('Daten wurden erstellt.', '', FlashMessage::OK);
         $this->redirect('index');
     }
 
@@ -230,135 +213,136 @@ class DeploymentController extends ActionController {
         $result2 = array();
         // letztes Deployment-Datum lesen
         $tstamp = $this->registry->getLastDeploy();
-        
+
         //Mediendaten lesen
         $resourceData = $this->xmlResourceService->readXmlResourceList();
         // Gelesene Daten splitten, da sowohl die Resultate als auch die Ergebnisse
         // der Validierung in einem Array stehen
         $contentSplit1 = $this->fileService->splitContent($resourceData);
         $result1 = $this->insertDataService->insertResourceDataIntoTable($contentSplit1);
-        $validationContent1 = $this->fileService->splitContent($resourceData, true);
-        
+        $validationContent1 = $this->fileService->splitContent($resourceData, TRUE);
+
         // Dateien vom Quellsystem holen
         $this->copyService->trigger();
-        
+
         // XML lesen
         $content = $this->xmlDatabaseService->readXML($tstamp);
         $contentSplit2 = $this->fileService->splitContent($content);
         $result2 = $this->insertDataService->insertDataIntoTable($contentSplit2);
-        $validationContent2 = $this->fileService->splitContent($content, true);
-        
+        $validationContent2 = $this->fileService->splitContent($content, TRUE);
+
         $validationContent = array_merge($validationContent1, $validationContent2);
-        
+
         // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
         //$this->fileService->checkIfFileExists();
-        
-        if($result1 === true && $result2 === true){
+
+        if ($result1 === TRUE && $result2 === TRUE) {
             // letzten Deployment-Stand registrieren
             //$this->registry->set('deployment', 'last_deploy', time());
-            
             // Bestätigung ausgeben
-            $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
-            
+            $this->addFlashMessage('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
+
             // Warnung falls XML nicht valide
-            if(in_array(false, $validationContent)){
-                $this->flashMessageContainer->add('Das Deployment wurde dennoch fortgesetzt', 'XML-Datei nicht valide', FlashMessage::WARNING);
+            if (in_array(FALSE, $validationContent)) {
+                $this->addFlashMessage('Das Deployment wurde dennoch fortgesetzt', 'XML-Datei nicht valide', FlashMessage::WARNING);
             }
-            
+
             // Redirect auf Hauptseite
             $this->redirect('index');
-        } 
-        elseif(is_array($result1) || is_array($result2)) {
-            if(!is_array($result1)){
+        } elseif (is_array($result1) || is_array($result2)) {
+            if (!is_array($result1)) {
                 $result1 = array();
             }
-            if(!is_array($result2)){
+            if (!is_array($result2)) {
                 $result2 = array();
             }
-            
+
             $failures = array_merge($result1, $result2);
-            
+
             // leere Einträge entfernen
             $fail = $this->failureService->deleteEmptyEntries($failures);
-            
-            $this->forward('listFailure', null, null, array('failures' => $fail));
+
+            $this->forward('listFailure', NULL, NULL, array('failures' => $fail));
         }
     }
-    
+
     
     /**
      * Leert den Cache aller registrierten Seiten
      */
     public function clearCacheAction() {
-        /** @var TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+        /** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
         $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
         // Datahandler initialiseren
-        $dataHandler->start();
+
+        $dataHandler->start(NULL, NULL);
         // ALLE Caches löschen (typo3temp/Cache + Tabellen)
         $dataHandler->clear_cacheCmd('all');
         $this->redirect('index');
     }
-    
+
     
     /**
      * Fehlerbehandlung
-     * 
-     * @param array $failures
+     *
+     * @param array                                          $failures
      * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failure
      * @dontvalidate $failures
      */
-    public function listFailureAction($failures, Failure $failure = null){
-        if ($failure === null) {
+    public function listFailureAction($failures, Failure $failure = NULL) {
+        if ($failure === NULL) {
             $failure = new Failure();
         }
-       
+
         // Fehleinträge in Registry speichern
         $this->registry->storeDataInRegistry($failures, 'storedFailures');
         $entries = $this->failureService->getFailureEntries($failures);
-        $failureEntries = $this->failureService->splitEntries($entries, true);
+        $failureEntries = $this->failureService->splitEntries($entries, TRUE);
         $databaseEntries = $this->failureService->splitEntries($entries);
         $diff = $this->failureService->getFailureDataDiff($databaseEntries, $failureEntries);
         $diffData = $this->failureService->convertTimestamps($diff);
-        
-        $this->flashMessageContainer->add('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
+
+        $this->addFlashMessage('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
-            'failure'           => $failure,
-            'failureEntries'    => $failureEntries,
-            'databaseEntries'   => $databaseEntries,
-            'diff'              => $diffData
+            'failure' => $failure,
+            'failureEntries' => $failureEntries,
+            'databaseEntries' => $databaseEntries,
+            'diff' => $diffData
         ));
     }
-    
+
     
     /**
      * Fehlerbehebung
-     * 
+     *
      * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failure
      * @dontvalidate $failures
      */
-    public function clearFailuresAction(Failure $failure){
+    public function clearFailuresAction(Failure $failure) {
         $storedFailures = $this->registry->getStoredFailures();
         $res = $this->failureService->proceedFailureEntries($failure->getFailureEntries(), $storedFailures);
-        
-        if($res){
+
+        if ($res) {
             //$this->registry->set('deployment', 'last_deploy', time());
             $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
             $this->redirect('index');
         } else {
-            $this->forward('listFailure', null, null, array('failures' => $storedFailures));
+            $this->forward('listFailure', NULL, NULL, array('failures' => $storedFailures));
         }
     }
-    
+
     
     /**
-     * Überschreiben der Fehlermeldung "An error occurred while trying to call ..."
-     * 
-     * @return TYPO3\CMS\Core\Messaging\FlashMessage
+     * Add a flash message
+     *
+     * @param string $message
+     * @param string $title
+     * @param string $mode
      */
-    protected function getErrorFlashMessage() {
-        if ($this->actionMethodName == 'createDeployAction') {
-            return false;
-        }
+    protected function addFlashMessage($message, $title, $mode) {
+        $this->controllerContext
+                ->getFlashMessageQueue()
+                ->addMessage(new FlashMessage($message, $title, $mode));
     }
 
 }

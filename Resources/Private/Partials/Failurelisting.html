@@ -1,3 +1,5 @@
+{namespace d=TYPO3\Deployment\ViewHelpers}
+
 <f:form action="clearFailures" name="failure" object="{failure}">
     <br />
     <b>Zu überprüfende Einträge: </b><f:count>{failureEntries}</f:count><br /><br />
@@ -14,6 +16,12 @@
 
             <tr class="outertr-spacer">
             <td>
+
+	            <f:commet>
+		            <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
+		            <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
+	            </f:commet>
+
                 <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
                 <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
             </td>

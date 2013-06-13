@@ -1,34 +1,11 @@
 <?php
-/***************************************************************
-*  Copyright notice
-*
-*  (c) 2013 Fabian Martinovic <fabian.martinovic(at)t-online.de>
-*  All rights reserved
-*
-*  This script is part of the TYPO3 project. The TYPO3 project is
-*  free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  The GNU General Public License can be found at
-*  http://www.gnu.org/copyleft/gpl.html.
-*  A copy is found in the textfile GPL.txt and important notices to the license
-*  from the author is found in LICENSE.txt distributed with these scripts.
-*
-*  This script is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  This copyright notice MUST APPEAR in all copies of the script!
-***************************************************************/
+
 /**
  * XmlDatabaseService
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Service
+ * @subpackage Domain\Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -36,6 +13,7 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\Deployment\Domain\Model\Log;
 use \TYPO3\Deployment\Domain\Model\LogData;
 use \TYPO3\Deployment\Domain\Model\HistoryData;
 use \TYPO3\Deployment\Domain\Model\History;
@@ -46,9 +24,10 @@ use \TYPO3\Deployment\Service\RegistryService;
  * XmlDatabaseService
  *
  * @package    Deployment
+ * @subpackage Domain\Services
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
-class XmlDatabaseService extends AbstractDataService{
+class XmlDatabaseService extends AbstractDataService {
 
     /**
      * @var \TYPO3\Deployment\Domain\Model\HistoryData
@@ -56,7 +35,7 @@ class XmlDatabaseService extends AbstractDataService{
     protected $historyData;
 
     /**
-     * @var \TYPO3\Deployment\Domain\Model\LogData 
+     * @var \TYPO3\Deployment\Domain\Model\LogData
      */
     protected $logData;
 
@@ -82,18 +61,18 @@ class XmlDatabaseService extends AbstractDataService{
      */
     public function writeXML() {
         $newInsert = array();
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
-        
+
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
 
         // Dokumenteneigenschaften
-        $this->xmlwriter->openMemory();                         // Daten in Speicher schreiben
-        $this->xmlwriter->setIndent(TRUE);                      // Einzug aktivieren
-        $this->xmlwriter->startDocument('1.0');                 // Document-Tag erzeugen
+        $this->xmlwriter->openMemory(); // Daten in Speicher schreiben
+        $this->xmlwriter->setIndent(TRUE); // Einzug aktivieren
+        $this->xmlwriter->startDocument('1.0'); // Document-Tag erzeugen
         // Document Type Definition (DTD)
         $this->xmlwriter->startDtd('changeSet');
         $this->xmlwriter->writeDtdElement('changeSet', '(data)');
@@ -104,48 +83,45 @@ class XmlDatabaseService extends AbstractDataService{
         $this->xmlwriter->startElement('changeSet');
 
         foreach ($this->deployData as $cData) {
+            /** @var HistoryData $cData */
             // Alle neuen Datensätze abfragen
-            if($cData->getSysLogUid() == 'NEW' && $cData->getFieldlist() == '*'){
-                $newInsert = $con->exec_SELECTgetSingleRow('*', $cData->getTablename(), 'uid='.$cData->getUid());
-                
+            if ($cData->getSysLogUid() == 'NEW' && $cData->getFieldlist() == '*') {
+                $newInsert = $con->exec_SELECTgetSingleRow('*', $cData->getTablename(), 'uid=' . $cData->getUid());
+
                 // für jeden Datensatz ein neues data-Element mit UID als Attribut
                 $this->xmlwriter->startElement('data');
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', '*');
-                
-                foreach($newInsert as $newkey => $newval){
-                    if($newkey != 'l18n_diffsource'){
+
+                foreach ($newInsert as $newkey => $newval) {
+                    if ($newkey != 'l18n_diffsource') {
                         // PID durch UUID ersetzen
-                        if($newkey == 'pid'){
+                        if ($newkey == 'pid') {
                             $pageUuid = $this->getUuid($newval, 'pages');
                             $this->xmlwriter->writeElement('pid', $pageUuid);
-                        } 
-                        // uid_foreign durch UUID ersetzen
-                        elseif($newkey == 'uid_foreign'){
+                        } // uid_foreign durch UUID ersetzen
+                        elseif ($newkey == 'uid_foreign') {
                             // Dieses prinzip klappt immer, da 'tablenames' in jeder Relationstabelle vorhanden ist
                             // Referenztabelle zur uid_local abfragen
-                            $table = $con->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign='.$newval);
+                            $table = $con->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign=' . $newval);
                             // UUID des Datensatzes abfragen
                             $uuid_foreign = $this->getUuid($newval, $table['tablenames']);
                             // Datensatz verarbeiten
                             $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
-                        }
-                        // uid_local durch UUID ersetzen
-                        elseif($newkey == 'uid_local'){
+                        } // uid_local durch UUID ersetzen
+                        elseif ($newkey == 'uid_local') {
                             // hier muss unterschieden werden, da table_local nicht immer vorhanden ist
-                            if($cData->getTablename() == 'sys_file_reference'){
-                                $table = $con->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local='.$newval);
+                            if ($cData->getTablename() == 'sys_file_reference') {
+                                $table = $con->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local=' . $newval);
                                 $uuid_local = $this->getUuid($newval, $table['table_local']);
                                 $this->xmlwriter->writeElement('uid_local', $uuid_local);
-                            } 
-                            // Unterscheidung für tt_news
-                            elseif($cData->getTablename() == 'tt_news_cat_mm' || $cData->getTablename() == 'tt_news_related_mm'){
-                                    $uuid_local = $this->getUuid($newval, 'tt_news');
-                                    $this->xmlwriter->writeElement('uid_local', $uuid_local);
+                            } // Unterscheidung für tt_news
+                            elseif ($cData->getTablename() == 'tt_news_cat_mm' || $cData->getTablename() == 'tt_news_related_mm') {
+                                $uuid_local = $this->getUuid($newval, 'tt_news');
+                                $this->xmlwriter->writeElement('uid_local', $uuid_local);
                             }
-                        }
-                        // header_link (tt_content) durch entsprechende UUID ersetzen
-                        elseif($newkey == 'header_link' || $newkey == 'link') {
+                        } // header_link (tt_content) durch entsprechende UUID ersetzen
+                        elseif ($newkey == 'header_link' || $newkey == 'link') {
                             $substring = $this->checkLinks($newval);
                             $this->xmlwriter->writeElement($newkey, $substring);
                         } else {
@@ -153,14 +129,13 @@ class XmlDatabaseService extends AbstractDataService{
                         }
                     }
                 }
-                
+
                 $this->xmlwriter->endElement();
-            } 
-            // Veränderte Datensätze erstellen
+            } // Veränderte Datensätze erstellen
             else {
                 // pid abfragen
                 $pid = $this->getPid($cData->getRecuid(), $cData->getTablename());
-                
+
                 // für jeden Datensatz ein neues data-Element mit UID als Attribut
                 $this->xmlwriter->startElement('data');
 
@@ -168,14 +143,16 @@ class XmlDatabaseService extends AbstractDataService{
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
                 $this->xmlwriter->writeElement('pid', $this->getUuid($pid, 'pages'));
-                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
+                $this->xmlwriter->writeElement('tstamp', $cData
+                                ->getTstamp()
+                                ->getTimestamp());
                 $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
 
                 // geänderte Historydaten durchlaufen
                 foreach ($cData->getHistoryData() as $datakey => $data) {
                     if ($datakey == 'newRecord') {
                         foreach ($data as $key => $value) {
-                            if($key === 'header_link' || $key == 'link'){
+                            if ($key === 'header_link' || $key == 'link') {
                                 $substring = $this->checkLinks($value);
                                 $this->xmlwriter->writeElement($key, $substring);
                             } else {
@@ -188,26 +165,27 @@ class XmlDatabaseService extends AbstractDataService{
                 $this->xmlwriter->endElement();
             }
         }
-        
+
         //$this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument(); // Dokument schließen
         $writeString = $this->xmlwriter->outputMemory();
-        
+
         $file = GeneralUtility::tempnam('deploy_');
         GeneralUtility::writeFile($file, $writeString);
 
-        $folder = $fileService->getDeploymentDatabasePathWithTrailingSlash().date('Y_m_d', time());
+        $folder = $fileService->getDeploymentDatabasePathWithTrailingSlash() . date('Y_m_d', time());
         GeneralUtility::mkdir($folder);
-        
-        GeneralUtility::upload_copy_move($file, $folder.'/'.date('H-i-s', time()).'_changes.xml');
+
+        GeneralUtility::upload_copy_move($file, $folder . '/' . date('H-i-s', time()) . '_changes.xml');
     }
 
     
     /**
      * Liest alle noch nicht deployeten XML-Datensätze
-     * 
-     * @param $string $timestamp
+     *
+     * @param string $timestamp
+     *
      * @return array
      */
     public function readXML($timestamp) {
@@ -219,26 +197,27 @@ class XmlDatabaseService extends AbstractDataService{
         $exFaf = array();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
-        
+
         $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentDatabasePathWithTrailingSlash());
-        
+
         if ($filesAndFolders) {
             // Dateipfad ausplitten
             foreach ($filesAndFolders as $faf) {
                 $exFaf[] = str_replace('database/', '', strstr($faf, 'database'));
             }
-            
+
             // Datum und Uhrzeit splitten
-            foreach($exFaf as $dateTime){
+            $splittedDateTime = array();
+            foreach ($exFaf as $dateTime) {
                 $splittedDateTime[] = explode('/', $dateTime);
             }
-            
+
             // pro Ordner/Datum ein Array mit allen Dateinamen darin
-            foreach($splittedDateTime as $dateTime){
+            foreach ($splittedDateTime as $dateTime) {
                 $dateFolder[$dateTime[0]][] = $dateTime[1];
             }
         }
-        
+
         //Dateien einlesen
         foreach ($dateFolder as $folder => $filename) {
             // Datum aus Ordner extrahieren
@@ -254,8 +233,8 @@ class XmlDatabaseService extends AbstractDataService{
                 // wenn Datei-Timestamp später als letztes Deployment,
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
-                    $validationResult['validation']['database/'.$folder.'/'.$file] = $fileService->xmlValidation($fileService->getDeploymentDatabasePathWithTrailingSlash().$folder.'/'.$file);
-                    $xmlString = file_get_contents($fileService->getDeploymentDatabasePathWithTrailingSlash().$folder.'/'.$file);
+                    $validationResult['validation']['database/' . $folder . '/' . $file] = $fileService->xmlValidation($fileService->getDeploymentDatabasePathWithTrailingSlash() . $folder . '/' . $file);
+                    $xmlString = file_get_contents($fileService->getDeploymentDatabasePathWithTrailingSlash() . $folder . '/' . $file);
 
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->data as $dataset) {
@@ -269,68 +248,72 @@ class XmlDatabaseService extends AbstractDataService{
         }
         return array_merge($contentArr, $validationResult);
     }
-    
+
     
     /**
      * Ersetzt die uid im übergebenen Link durch die UUID
-     * 
+     *
      * @param string $link
+     *
      * @return string
      */
-    public function checkLinks($link){
+    public function checkLinks($link) {
         $split = explode(':', $link);
-        
-        if(is_numeric($link)){
-            return 'page:'.$this->getUuid($link, 'pages');
-        } elseif($split[0] === 'file'){
+
+        if (is_numeric($link)) {
+            return 'page:' . $this->getUuid($link, 'pages');
+        } elseif ($split[0] === 'file') {
             $split[1] = $this->getUuid($split[1], 'sys_file');
             return implode(':', $split);
         } else {
             return $link;
         }
     }
-    
+
     
     /**
      * Gibt die Differenzen der Daten zurück
-     * 
+     *
      * @param \TYPO3\Deployment\Domain\Model\HistoryData $historyData
+     *
      * @return string
      */
-    public function getHistoryDataDiff($historyData){
+    public function getHistoryDataDiff($historyData) {
         $data = array();
         $differences = array();
         /** @var $diff \TYPO3\CMS\Core\Utility\DiffUtility */
         $diff = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
-        
+
         // Daten pro Datensatz in einem Array organisieren
-        foreach($historyData as $hisData){
-            foreach($hisData->getHistoryData() as $records){
-                foreach($records as $reckey => $recval){
+        foreach ($historyData as $hisData) {
+            /** @var HistoryData $hisData */
+            foreach ($hisData->getHistoryData() as $records) {
+                foreach ($records as $reckey => $recval) {
                     $data[$hisData->getRecuid()][$reckey][$hisData->getRecuid()][] = $recval;
                 }
             }
         }
-        
+
         // Array durchwandern und Differenz aus old/newRecord erstellen
-        foreach($data as $dat){
-            foreach($dat as $columnkey => $cloumnval){
-                foreach($cloumnval as $recuid => $dataArr){
-                    if($columnkey != 'l18n_diffsource'){
+        foreach ($data as $dat) {
+            foreach ($dat as $columnkey => $cloumnval) {
+                foreach ($cloumnval as $recuid => $dataArr) {
+                    if ($columnkey != 'l18n_diffsource') {
                         $differences[$recuid][$columnkey][] = $diff->makeDiffDisplay($dataArr[0], $dataArr[1]);
                     }
                 }
             }
         }
-        
+
         return $differences;
     }
 
     
     /**
      * Deserialisiert die übergebenen Log-Daten
-     * 
+     *
      * @param \TYPO3\Deployment\Domain\Model\Log $logData
+     *
      * @return array<\TYPO3\Deployment\Domain\Model\LogData> $data
      */
     public function unserializeLogData($logData) {
@@ -344,14 +327,14 @@ class XmlDatabaseService extends AbstractDataService{
                 $this->logData->setUid($log->getUid());
                 $this->logData->setAction($log->getAction());
                 $unlogdata = unserialize($log->getLogData());
-                
+
                 $tableAndId = explode(':', $unlogdata[1]);
                 $this->logData->setData($unlogdata[0]);
                 $this->logData->setTable($tableAndId[0]);
                 $this->logData->setRecuid($tableAndId[1]);
                 $this->logData->setTstamp($date->setTimestamp($log->getTstamp()));
-                
-               if($log->getAction() == '1'){
+
+                if ($log->getAction() == '1') {
                     $this->logData->setPid($unlogdata[3]);
                 }
 
@@ -367,8 +350,9 @@ class XmlDatabaseService extends AbstractDataService{
     
     /**
      * Deserialisiert die übergebenen History-Daten
-     * 
+     *
      * @param array<\TYPO3\Deployment\Domain\Model\History> $historyData
+     *
      * @return array<\TYPO3\Deployment\Domain\Model\HistoryData> $data
      */
     public function unserializeHistoryData($historyData) {
@@ -376,14 +360,15 @@ class XmlDatabaseService extends AbstractDataService{
 
         if ($historyData != NULL) {
             foreach ($historyData as $his) {
+                /** @var HistoryData $his */
                 if ($his != NULL) {
                     $this->historyData = new HistoryData();
                     $this->historyData->setPid($his->getPid());
                     $this->historyData->setUid($his->getUid());
                     $this->historyData->setSysLogUid($his->getSysLogUid());
-                    
+
                     $unlogdata = unserialize($his->getHistoryData());
-                    
+
                     // wird benötigt um das l18n_diffsource-Feld zu deserialisieren
                     foreach ($unlogdata as $key => $value) {
                         $data = array();
@@ -412,21 +397,22 @@ class XmlDatabaseService extends AbstractDataService{
             return $hisData = array();
         }
     }
-    
+
     
     /**
-     * Konvertiert neue Logeinträge, die noch nicht in der History Tabelle erfasst sind, 
+     * Konvertiert neue Logeinträge, die noch nicht in der History Tabelle erfasst sind,
      * zu HistoryData-Objekten
-     * 
+     *
      * @param \TYPO3\Deployment\Domain\Model\LogData $entry
+     *
      * @return \TYPO3\Deployment\Domain\Model\History
      */
-    public function convertFromLogDataToHistory($entry){
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+    public function convertFromLogDataToHistory($entry) {
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
-        $res = $con->exec_SELECTgetSingleRow('*', $entry->getTable(), 'uid='.$entry->getRecuid());
+        $res = $con->exec_SELECTgetSingleRow('*', $entry->getTable(), 'uid=' . $entry->getRecuid());
         $sRes = serialize($res);
-        
+
         /** @var \TYPO3\Deployment\Domain\Model\History $history */
         $history = new History();
         $history->setUid($entry->getRecuid());
@@ -437,46 +423,49 @@ class XmlDatabaseService extends AbstractDataService{
         $history->setTablename($entry->getTable());
         $history->setTstamp($entry->getTstamp());
         $history->setPid($res['pid']);
-        
+
         return $history;
     }
-    
+
     
     /**
      * Sucht die übergebene UID innerhalb der in der Registry gespeicherten History Daten
-     * 
+     *
      * @param string $uid
+     *
      * @return \TYPO3\Deployment\Domain\Model\HistoryData
      */
-    public function compareDataWithRegistry($uid){
+    public function compareDataWithRegistry($uid) {
         /** @var \TYPO3\Deployment\Service\RegistryService $registry */
         $registry = new RegistryService();
         $data = unserialize($registry->getStoredHistoryEntries());
-        
-        foreach($data as $hisdata){
-            if($hisdata->getUid() == $uid){
+
+        foreach ($data as $hisdata) {
+            /** @var HistoryData $hisdata */
+            if ($hisdata->getUid() == $uid) {
                 return $hisdata;
             }
         }
     }
-    
+
     
     /**
      * Gibt die pid der übergebenen uid zurück
-     * 
+     *
      * @param string $uid
      * @param string $table
+     *
      * @return int
      */
-    public function getPid($uid, $table){
-        /** @var TYPO3\CMS\Core\Database\DatabaseConnection $con */
+    public function getPid($uid, $table) {
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
         $con = $this->getDatabase();
-        $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = '.$uid);
-        
+        $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = ' . $uid);
+
         return (!empty($pid['pid'])) ? $pid['pid'] : 0;
     }
 
-
+    
     /**
      * @return Array $logdata
      */
@@ -492,7 +481,7 @@ class XmlDatabaseService extends AbstractDataService{
     }
 
     /**
-     * @return \TYPO3\Deployment\Domain\Model\LogData 
+     * @return \TYPO3\Deployment\Domain\Model\LogData
      */
     public function getLogData() {
         return $this->logData;
@@ -546,5 +535,5 @@ class XmlDatabaseService extends AbstractDataService{
     public function setXmlreader(\SimpleXml $xmlreader) {
         $this->xmlreader = $xmlreader;
     }
-    
+
 }

@@ -1,6 +1,10 @@
 {namespace deployment=\TYPO3\Deployment\ViewHelpers}
 
-<f:layout name="Backend_Listing"/>
+<f:layout name="Backend" />
+
+<f:section name="iconButtons">
+    <f:be.buttons.icon uri="{f:uri.action(action:'index')}" icon="actions-document-close" title="Close this site" />
+</f:section>
 
 <f:section name="content">
 
@@ -11,6 +15,8 @@
         </div>
     </f:form.errors>
 
-    <f:render partial="Listing" arguments="{_all}"/>
-    
+    <f:render partial="Listing" arguments="{_all}" />
+
 </f:section>
+
+

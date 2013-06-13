@@ -7,7 +7,7 @@ username =
 # cat=Access; type=password; label=Password: Password for login on pull server
 password = 
 
-# cat=Datahandling; type=text; label=Additional Deployment Tables: The list of deplyoment tables (tt_content and pages are standard)
+# cat=Datahandling; type=text; label=Additional Deployment Tables: The list of deplyoment tables (tt_content and pages are default tables)
 deploymentTables = sys_file, sys_file_reference
 
 #cat=Datahandling; type=boolean; label=Delete files older than 1/2 year?
