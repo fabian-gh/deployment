@@ -28,9 +28,39 @@ class AbstractDataService {
      *
      * @return string
      */
-    public function getUuid($uid, $table) {
+    public function getUuidByUid($uid, $table) {
         $uuid = $this->getDatabase()->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
         return $uuid['uuid'];
+    }
+    
+    
+    /**
+     * Gibt anhand der Parameter die UID zurück
+     *
+     * @param string $uuid
+     * @param string $table
+     *
+     * @return int
+     */
+    public function getUidByUuid($uuid, $table) {
+        $uid = $this->getDatabase()->exec_SELECTgetSingleRow('uid', $table, "uuid='" . $uuid . "'");
+
+        return (!empty($uid['uid'])) ? $uid['uid'] : 0;
+    }
+    
+    
+    /**
+     * Gibt anhand der Parameter die PID zurück
+     *
+     * @param string $uuid
+     * @param string $table
+     *
+     * @return int
+     */
+    public function getPidByUuid($uuid, $table) {
+        $pid = $this->getDatabase()->exec_SELECTgetSingleRow('pid', $table, "uuid='" . $uuid . "'");
+
+        return (!empty($pid['pid'])) ? $pid['pid'] : 0;
     }
 
     

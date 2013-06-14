@@ -68,20 +68,28 @@ class DatabaseService extends AbstractDataService {
 
     
     /**
-     *
+     * Prüfen ob Verbindungsdaten existieren
      */
     public function connectTestDatabaseIfExistInternal() {
-
-        // Configuration
-        // wenn Test daten konfiguriert sind dann
-        // wenn keine Testdaten, nichts machen, ansonsten: $this->connect();
+        if($this->host === '' && $this->user === '' && $this->pass === '' && $this->db === ''){
+            $this->connect($this->host, $this->user, $this->pass, $this->db);
+        }
     }
 
     
-    protected function connect($host, $name, $pass, $db) {
-        #$this->getDatabase()->
-        #$this->getDatabase()->setDatabaseHost();
-        #$this->getDatabase()->setDatabaseName();
+    /**
+     * Mit Testdatenbank verbinden
+     * 
+     * @param string $host
+     * @param string $user
+     * @param string $pass
+     * @param string $db
+     */
+    protected function connect($host, $user, $pass, $db) {
+        $this->getDatabase()->setDatabaseHost($host);
+        $this->getDatabase()->setDatabaseUsername($user);
+        $this->getDatabase()->setDatabasePassword($pass);
+        $this->getDatabase()->setDatabaseName($db);
     }
 
 }

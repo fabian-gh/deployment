@@ -55,46 +55,42 @@ class InsertDataService extends AbstractDataService {
             } // falls neuer Eintrag in andere Tabelle
             else {
                 // dann wieder die entsprechende PID abfragen und ersetzen
-                $entry['pid'] = $this->getUid($entry['pid'], 'pages');
+                $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
 
                 // Link abfragen und ersetzen
                 if ($entry['header_link'] != '') {
                     $split = explode(':', $entry['header_link']);
 
                     if ($split[0] === 'file') {
-                        $split[1] = $this->getUid($split[1], 'sys_file');
+                        $split[1] = $this->getUidByUuid($split[1], 'sys_file');
                         $entry['header_link'] = implode(':', $split);
                     } elseif ($split[0] === 'page') {
-                        $entry['header_link'] = $this->getUid($split[1], 'pages');
+                        $entry['header_link'] = $this->getUidByUuid($split[1], 'pages');
                     }
                 } elseif ($entry['link'] != '') {
                     $split = explode(':', $entry['link']);
 
                     if ($split[0] === 'file') {
-                        $split[1] = $this->getUid($split[1], 'sys_file');
+                        $split[1] = $this->getUidByUuid($split[1], 'sys_file');
                         $entry['link'] = implode(':', $split);
                     } elseif ($split[0] === 'page') {
-                        $entry['link'] = $this->getUid($split[1], 'pages');
+                        $entry['link'] = $this->getUidByUuid($split[1], 'pages');
                     }
                 }
                 // uid_foreign & uid_local durch UID ersetzen
                 if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
                     if ($entry['tablename'] == 'sys_file_reference') {
-                        $entry['uid_foreign'] = $this->getUid($entry['uid_foreign'], 'tt_content');
-                        $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_content');
+                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
+                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
                     } // Fall für tt_news
                     elseif ($entry['tablename'] == 'tt_news_cat_mm') {
-                        $table = $this
-                                ->getDatabase()
-                                ->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                        $entry['uid_foreign'] = $this->getUid($entry['uid_foreign'], $table['tablenames']);
-                        $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_news');
+                        $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
+                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                     } elseif ($entry['tablename'] == 'tt_news_related_mm') {
-                        $table = $this
-                                ->getDatabase()
-                                ->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                        $entry['uid_foreign'] = $this->getUid($entry['uid_foreign'], $table['tablenames']);
-                        $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_news');
+                        $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
+                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                     }
                 }
             }
@@ -115,48 +111,46 @@ class InsertDataService extends AbstractDataService {
 
             if ($flag === TRUE) {
                 // entsprechende pid herausfinden
-                $uid = $this->getUid($entry['pid'], 'pages');
-                $entry['pid'] = $uid;
+                $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
             } else {
-                $pid = $this->getPid($entry['pid'], 'pages');
-                $entry['pid'] = $pid;
+                $entry['pid'] = $this->getPidByUuid($entry['pid'], 'pages');
 
                 // Link abfragen und ersetzen
                 if ($entry['header_link'] != '') {
                     $split = explode(':', $entry['header_link']);
 
                     if ($split[0] === 'file') {
-                        $split[1] = $this->getUid($split[1], 'sys_file');
+                        $split[1] = $this->getUidByUuid($split[1], 'sys_file');
                         $entry['header_link'] = implode(':', $split);
                     } elseif ($split[0] === 'page') {
-                        $uid = $this->getUid($split[1], 'pages');
+                        $uid = $this->getUidByUuid($split[1], 'pages');
                         $entry['header_link'] = $uid;
                     }
                 } elseif ($entry['link'] != '') {
                     $split = explode(':', $entry['link']);
 
                     if ($split[0] === 'file') {
-                        $split[1] = $this->getUid($split[1], 'sys_file');
+                        $split[1] = $this->getUidByUuid($split[1], 'sys_file');
                         $entry['link'] = implode(':', $split);
                     } elseif ($split[0] === 'page') {
-                        $uid = $this->getUid($split[1], 'pages');
+                        $uid = $this->getUidByUuid($split[1], 'pages');
                         $entry['link'] = $uid;
                     }
                 }
                 // uid_foreign & uid_local durch UID ersetzen
                 if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
                     if ($entry['tablename'] == 'sys_file_reference') {
-                        $entry['uid_foreign'] = $this->getUid($entry['uid_foreign'], 'tt_content');
-                        $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_content');
+                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
+                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
                     } // Fall für tt_news
                     elseif ($entry['tablename'] == 'tt_news_cat_mm') {
                         $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                        $entry['uid_foreign'] = $this->getUid($entry['uid_foreign'], $table['tablenames']);
-                        $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_news');
+                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                     } elseif ($entry['tablename'] == 'tt_news_related_mm') {
                         $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                        $entry['uid_foreign'] = $this->getUid($entry['uid_foreign'], $table['tablenames']);
-                        $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_news');
+                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                     }
                 }
             }
@@ -391,39 +385,4 @@ class InsertDataService extends AbstractDataService {
             }
         }
     }
-    
-
-    /**
-     * Gibt anhand der Parameter die UID zurück
-     *
-     * @param string $uuid
-     * @param string $table
-     *
-     * @return int
-     */
-    public function getUid($uuid, $table) {
-        $uid = $this
-                ->getDatabase()
-                ->exec_SELECTgetSingleRow('uid', $table, "uuid='" . $uuid . "'");
-
-        return (!empty($uid['uid'])) ? $uid['uid'] : 0;
-    }
-
-    
-    /**
-     * Gibt anhand der Parameter die PID zurück
-     *
-     * @param string $uuid
-     * @param string $table
-     *
-     * @return int
-     */
-    public function getPid($uuid, $table) {
-        $pid = $this
-                ->getDatabase()
-                ->exec_SELECTgetSingleRow('pid', $table, "uuid='" . $uuid . "'");
-
-        return (!empty($pid['pid'])) ? $pid['pid'] : 0;
-    }
-
 }

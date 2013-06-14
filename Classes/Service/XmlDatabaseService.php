@@ -95,15 +95,15 @@ class XmlDatabaseService extends AbstractDataService {
                     if ($newkey != 'l18n_diffsource') {
                         // PID durch UUID ersetzen
                         if ($newkey == 'pid') {
-                            $pageUuid = $this->getUuid($newval, 'pages');
+                            $pageUuid = $this->getUuidByUid($newval, 'pages');
                             $this->xmlwriter->writeElement('pid', $pageUuid);
                         } // uid_foreign durch UUID ersetzen
                         elseif ($newkey == 'uid_foreign') {
-                            // Dieses prinzip klappt immer, da 'tablenames' in jeder Relationstabelle vorhanden ist
+                            // Dieses Prinzip klappt immer, da 'tablenames' in jeder Relationstabelle vorhanden ist
                             // Referenztabelle zur uid_local abfragen
                             $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign=' . $newval);
                             // UUID des Datensatzes abfragen
-                            $uuid_foreign = $this->getUuid($newval, $table['tablenames']);
+                            $uuid_foreign = $this->getUuidByUid($newval, $table['tablenames']);
                             // Datensatz verarbeiten
                             $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
                         } // uid_local durch UUID ersetzen
@@ -111,11 +111,11 @@ class XmlDatabaseService extends AbstractDataService {
                             // hier muss unterschieden werden, da table_local nicht immer vorhanden ist
                             if ($cData->getTablename() == 'sys_file_reference') {
                                 $table = $this->getDatabase()->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local=' . $newval);
-                                $uuid_local = $this->getUuid($newval, $table['table_local']);
+                                $uuid_local = $this->getUuidByUid($newval, $table['table_local']);
                                 $this->xmlwriter->writeElement('uid_local', $uuid_local);
                             } // Unterscheidung für tt_news
                             elseif ($cData->getTablename() == 'tt_news_cat_mm' || $cData->getTablename() == 'tt_news_related_mm') {
-                                $uuid_local = $this->getUuid($newval, 'tt_news');
+                                $uuid_local = $this->getUuidByUid($newval, 'tt_news');
                                 $this->xmlwriter->writeElement('uid_local', $uuid_local);
                             }
                         } // header_link (tt_content) durch entsprechende UUID ersetzen
@@ -140,11 +140,9 @@ class XmlDatabaseService extends AbstractDataService {
                 // Einzelne Feldelemente schreiben
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
-                $this->xmlwriter->writeElement('pid', $this->getUuid($pid, 'pages'));
-                $this->xmlwriter->writeElement('tstamp', $cData
-                                ->getTstamp()
-                                ->getTimestamp());
-                $this->xmlwriter->writeElement('uuid', $this->getUuid($cData->getRecuid(), $cData->getTablename()));
+                $this->xmlwriter->writeElement('pid', $this->getUuidByUid($pid, 'pages'));
+                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
+                $this->xmlwriter->writeElement('uuid', $this->getUuidByUid($cData->getRecuid(), $cData->getTablename()));
 
                 // geänderte Historydaten durchlaufen
                 foreach ($cData->getHistoryData() as $datakey => $data) {
@@ -259,9 +257,9 @@ class XmlDatabaseService extends AbstractDataService {
         $split = explode(':', $link);
 
         if (is_numeric($link)) {
-            return 'page:' . $this->getUuid($link, 'pages');
+            return 'page:' . $this->getUuidByUid($link, 'pages');
         } elseif ($split[0] === 'file') {
-            $split[1] = $this->getUuid($split[1], 'sys_file');
+            $split[1] = $this->getUuidByUid($split[1], 'sys_file');
             return implode(':', $split);
         } else {
             return $link;

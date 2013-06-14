@@ -233,9 +233,6 @@ class DeploymentController extends ActionController {
 
         $validationContent = array_merge($validationContent1, $validationContent2);
 
-        // Prüfen ob Dateien aus resource-Ordner im fileadmnin vorhanden sind
-        //$this->fileService->checkIfFileExists();
-
         if ($result1 === TRUE && $result2 === TRUE) {
             // letzten Deployment-Stand registrieren
             //$this->registry->set('deployment', 'last_deploy', time());
@@ -261,7 +258,7 @@ class DeploymentController extends ActionController {
 
             // leere Einträge entfernen
             $fail = $this->failureService->deleteEmptyEntries($failures);
-
+            // Einträge an Action weiterleiten
             $this->forward('listFailure', NULL, NULL, array('failures' => $fail));
         }
     }
@@ -274,7 +271,6 @@ class DeploymentController extends ActionController {
         /** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
         $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
         // Datahandler initialiseren
-
         $dataHandler->start(NULL, NULL);
         // ALLE Caches löschen (typo3temp/Cache + Tabellen)
         $dataHandler->clear_cacheCmd('all');

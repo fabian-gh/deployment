@@ -195,20 +195,6 @@ class XmlResourceService extends AbstractDataService {
         return array_merge($contentArr, $validationResult);
     }
 
-
-    /**
-     * Gibt die entsprechende UID passend zum Datensatz zurück
-     * 
-     * @param string $uuid
-     * @param string $table
-     * @return string
-     */
-    public function getUid($uuid, $table) {
-        $uid = $this->getDatabase()->exec_SELECTgetSingleRow('uid', $table, "uuid='" . $uuid . "'");
-
-        return (!empty($uid['uid'])) ? $uid['uid'] : 0;
-    }
-
     // ============================ Getter & Setter ================================
 
     /**
