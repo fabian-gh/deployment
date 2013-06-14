@@ -14,7 +14,6 @@ namespace TYPO3\Deployment\Service;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
-use \TYPO3\Deployment\Service\FileService;
 
 /**
  * FileService
@@ -31,7 +30,8 @@ class FileService extends AbstractDataService {
      * @return array
      */
     public function readFilesInFileadmin() {
-        $fileArr = $newArr = array();
+        $fileArr = array();
+        $newArr = array();
 
         // direktes auslesen des Ordners, da evtl. nicht alle Dateien in Tabellen indexiert sind
         $path = $this->getFileadminPathWithTrailingSlash();
@@ -93,6 +93,8 @@ class FileService extends AbstractDataService {
     /**
      * Prüft ob die Dateien im resource-Ordner innerhalb des fileadmins vorhanden
      * sind. Falls nein werden diese kopiert.
+     * 
+     * @deprecated since version 2
      */
     public function checkIfFileExists() {
         $resourceFiles = $newArr = $newFileList = array();
@@ -174,8 +176,6 @@ class FileService extends AbstractDataService {
     public function deleteOlderFiles() {
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
         $configuration = new ConfigurationService();
-        /** @var \TYPO3\Deployment\Service\FileService $fileService */
-        $fileService = new FileService();
 
         $deleteState = $configuration->getDeleteState();
 
@@ -185,7 +185,7 @@ class FileService extends AbstractDataService {
             $split = array();
             $dateFolder = array();
 
-            $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentPathWithTrailingSlash(), '', TRUE);
+            $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $this->getDeploymentPathWithTrailingSlash(), '', TRUE);
 
             if ($filesAndFolders) {
                 // Dateipfad ausplitten
@@ -212,10 +212,10 @@ class FileService extends AbstractDataService {
                             $splitFile = explode('_', $filevalue);
                             $folder = ($splitFile[1] == 'changes.xml') ? 'database' : 'media';
 
-                            unlink($fileService->getDeploymentPathWithTrailingSlash() . $folder . '/' . $datekey . '/' . $filevalue);
+                            unlink($this->getDeploymentPathWithTrailingSlash() . $folder . '/' . $datekey . '/' . $filevalue);
                         }
                         // Ordner selbst löschen
-                        rmdir($fileService->getDeploymentPathWithTrailingSlash() . $folder . '/' . $datekey);
+                        rmdir($this->getDeploymentPathWithTrailingSlash() . $folder . '/' . $datekey);
                     }
                 }
             }
@@ -230,15 +230,11 @@ class FileService extends AbstractDataService {
         $exFold = array();
         /** @var \TYPO3\CMS\Core\Resource\Driver\LocalDriver $folder */
         $folder = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Driver\\LocalDriver');
-        /** @var \TYPO3\Deployment\Service\FileService $fileService */
-        $fileService = new FileService();
 
-        // neue Instanz?!?! FileService vs. $this HDNET
-
-        $exFold[] = $folder->folderExists($fileService->getDeploymentPathWithTrailingSlash());
-        $exFold[] = $folder->folderExists($fileService->getDeploymentDatabasePathWithTrailingSlash());
-        $exFold[] = $folder->folderExists($fileService->getDeploymentMediaPathWithTrailingSlash());
-        $exFold[] = $folder->folderExists($fileService->getDeploymentResourcePathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($this->getDeploymentPathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($this->getDeploymentDatabasePathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($this->getDeploymentMediaPathWithTrailingSlash());
+        $exFold[] = $folder->folderExists($this->getDeploymentResourcePathWithTrailingSlash());
 
         foreach ($exFold as $ergkey => $ergvalue) {
             if (!$ergvalue) {
@@ -364,9 +360,11 @@ class FileService extends AbstractDataService {
     public function getDeploymentMediaPathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/';
     }
-
+    
     /**
      * @return string
+     * 
+     * @deprecated since version 2
      */
     public function getDeploymentResourcePathWithoutTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource';
@@ -374,6 +372,8 @@ class FileService extends AbstractDataService {
 
     /**
      * @return string
+     * 
+     * @deprecated since version 2
      */
     public function getDeploymentResourcePathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/';

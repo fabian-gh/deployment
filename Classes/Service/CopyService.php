@@ -140,6 +140,7 @@ class CopyService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\XmlResourceService $xmlResourceService */
         $xmlResourceService = new XmlResourceService();
 
+        // @todo: Pfad zu fileadmin ändern
         $path = $fileService->getDeploymentResourcePathWithoutTrailingSlash();
         // Daten aus Konfiguration holen
         $server = $configuration->getPullserver();
@@ -157,9 +158,6 @@ class CopyService extends AbstractDataService {
         }
         // Pfad mit User und PW wieder zusammensetzen
         $pullServer = trim(HttpUtility::buildUrl($parts), '/');
-
-        // Betriebssystem auslesen
-        $os = get_browser()->platform;
 
         // XML einlesen
         $data = $fileService->splitContent($xmlResourceService->readXmlResourceList());
@@ -185,13 +183,15 @@ class CopyService extends AbstractDataService {
             }
 
             // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
-            if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
+            //if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
+            if (TYPO3_OS == 'Linux'|| TYPO3_OS == 'Mac') {
                 $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                 // Parameter: Dateien bei Übertragung komprimieren, neuere Dateien nicht ersetzen,
                 // SymLinks als Syminks kopieren, Dateirechte beibehalten, Quellverzeichnis
                 exec("rsync --compress --update --links --perms $sourceDest");
             } else {
-                copy($pullServer . '/fileadmin/' . $fold . '/' . $filename, $path . '/' . $fold . '/' . $filename);
+                //@todo: Pfad ändern
+                GeneralUtility::upload_copy_move($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
             }
         }
     }
