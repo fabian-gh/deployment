@@ -98,13 +98,13 @@ class DeploymentController extends ActionController {
         $this->registry->checkForRegistryEntry();
 
         // prüfen ob Command Controller & Benutzer registiert ist
-        if (!$this->copyService->checkIfCommandControllerIsRegistered()) {
+        if(!$this->copyService->checkIfCommandControllerIsRegistered()) {
             $this->addFlashMessage('Bitte erstellen Sie im Scheduler-Modul einen Extbase Command Controller Task und deaktivieren sie diesen.', 'Kein Command Controller vorhanden', FlashMessage::ERROR);
         }
-        if (!$this->copyService->checkIfCliUserIsRegistered()) {
+        if(!$this->copyService->checkIfCliUserIsRegistered()) {
             $this->addFlashMessage("Bitte erstellen Sie im Scheduler-Modul unter dem Menüpunkt 'Setup Check' einen CLI-User.", 'CLI Benutzer nicht vorhanden', FlashMessage::ERROR);
         }
-        if ($this->copyService->getDisable() == '0') {
+        if($this->copyService->getDisable() == '0') {
             $this->addFlashMessage('', 'Bitte deaktivieren Sie den Command Controller Task', FlashMessage::ERROR);
         }
 
@@ -230,11 +230,12 @@ class DeploymentController extends ActionController {
         $contentSplit2 = $this->fileService->splitContent($content);
         $result2 = $this->insertDataService->insertDataIntoTable($contentSplit2);
         $validationContent2 = $this->fileService->splitContent($content, TRUE);
-
+        
         $validationContent = array_merge($validationContent1, $validationContent2);
-
+        
         if ($result1 === TRUE && $result2 === TRUE) {
             // letzten Deployment-Stand registrieren
+            // TODO: Entkommentieren
             //$this->registry->set('deployment', 'last_deploy', time());
             // Bestätigung ausgeben
             $this->addFlashMessage('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
@@ -317,10 +318,11 @@ class DeploymentController extends ActionController {
     public function clearFailuresAction(Failure $failure) {
         $storedFailures = $this->registry->getStoredFailures();
         $res = $this->failureService->proceedFailureEntries($failure->getFailureEntries(), $storedFailures);
-
+        
         if ($res) {
+            // TODO: Entkomentieren
             //$this->registry->set('deployment', 'last_deploy', time());
-            $this->flashMessageContainer->add('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
+            $this->addFlashMessage('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
             $this->redirect('index');
         } else {
             $this->forward('listFailure', NULL, NULL, array('failures' => $storedFailures));
@@ -336,9 +338,7 @@ class DeploymentController extends ActionController {
      * @param string $mode
      */
     protected function addFlashMessage($message, $title, $mode) {
-        $this->controllerContext
-                ->getFlashMessageQueue()
-                ->addMessage(new FlashMessage($message, $title, $mode));
+        $this->controllerContext->getFlashMessageQueue()->addMessage(new FlashMessage($message, $title, $mode));
     }
 
 }

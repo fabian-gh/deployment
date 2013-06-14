@@ -288,7 +288,7 @@ class InsertDataService extends AbstractDataService {
         
         // Testdatenbankverbindung zurücksetzen
         DatabaseService::reset();
-
+        
         return (empty($entryCollection)) ? TRUE : $entryCollection;
     }
 
@@ -331,7 +331,10 @@ class InsertDataService extends AbstractDataService {
                     $entryCollection[] = $entry;
                 }
             }
-
+            
+            // Testdatenbankverbindung zurücksetzen
+            DatabaseService::reset();
+            
             return (empty($entryCollection)) ? TRUE : $entryCollection;
         }
     }

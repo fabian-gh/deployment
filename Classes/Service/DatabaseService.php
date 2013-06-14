@@ -45,8 +45,8 @@ class DatabaseService extends AbstractDataService {
      * Schnellzugriff auf die Testdatenbank
      */
     public static function connectTestDatabaseIfExist() {
-        $dbSerice = new DatabaseService();
-        $dbSerice->connectTestDatabaseIfExistInternal();
+        $dbService = new DatabaseService();
+        $dbService->connectTestDatabaseIfExistInternal();
     }
 
     
@@ -54,8 +54,8 @@ class DatabaseService extends AbstractDataService {
      * Verbindung zur Datenbank zurück setzen
      */
     public static function reset() {
-        $dbSerice = new DatabaseService();
-        $dbSerice->resetInternal();
+        $dbService = new DatabaseService();
+        $dbService->resetInternal();
     }
 
     
@@ -63,7 +63,11 @@ class DatabaseService extends AbstractDataService {
      * Verbindung zur Datenbank zurück setzen
      */
     public function resetInternal() {
-        $this->getDatabase();
+        $this->getDatabase()->setDatabaseHost(TYPO3_db_host);
+        $this->getDatabase()->setDatabaseUsername(TYPO3_db_username);
+        $this->getDatabase()->setDatabasePassword(TYPO3_db_password);
+        $this->getDatabase()->setDatabaseName(TYPO3_db);
+        $this->getDatabase()->connectDB();
     }
 
     

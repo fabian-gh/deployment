@@ -122,11 +122,8 @@ class FailureService extends AbstractDataService {
     public function proceedFailureEntries($failures, $storedFailures) {
         $fails = array();
         $res = array();
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        //$con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
-        // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
-        //$con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
         
+        // Verbindung mit testdatenbank aufbauen
         DatabaseService::connectTestDatabaseIfExist();
 
         // Fehler aus Registry deserialisieren
@@ -136,6 +133,8 @@ class FailureService extends AbstractDataService {
         foreach ($failures as $fail) {
             $fails[] = explode('.', $fail);
         }
+        
+        // TODO: Verarbeitung doppelter UUIDs in den Einträgen
 
         // wenn 'list' ausgewählt wurde dann update, bei database nichts tun
         foreach ($fails as $entry) {
@@ -159,6 +158,8 @@ class FailureService extends AbstractDataService {
                 }
             }
         }
+        
+        DatabaseService::reset();
         
         if(in_array(false, $res)){
             return false;

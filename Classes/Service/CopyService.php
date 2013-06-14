@@ -49,13 +49,10 @@ class CopyService extends AbstractDataService {
         if ($this->allPrecautionsSet()) {
             $path = $this->getCliPath();
             $taskUid = $this->getTaskUid();
-            // /var/www/public/typo3/cli_dispatch.phpsh scheduler -i 13 -f
-            // HDNET
-            #\TYPO3\CMS\Core\Utility\CommandUtility::exec('....');
             #CommandUtility::getCommand('..', '..') // php -> /usr/var/php -f
             // '/usr/local/bin/php5-53STABLE-CLI -f '
             
-            exec(escapeshellcmd("$path scheduler -f -i $taskUid"));
+            CommandUtility::exec(escapeshellcmd("$path scheduler -f -i $taskUid"));
         }
     }
 
@@ -64,7 +61,7 @@ class CopyService extends AbstractDataService {
      * Führt das Kopieren aus
      */
     public function execute() {
-        if ($this->allPrecautionsSet()) {
+        if($this->allPrecautionsSet()) {
             $this->deployResources();
         }
     }
@@ -76,47 +73,45 @@ class CopyService extends AbstractDataService {
      * @return boolean
      */
     public function checkIfCommandControllerIsRegistered() {
-        $pageSelection = new PageRepository();
+        $identParts = array();
+        
         $result = $this->getDatabase()->exec_SELECTgetRows('serialized_task_object, disable', 'tx_scheduler_task', '1=1');
-
-        // HDNET
-        # return FALSE;
-
+        
         foreach ($result as $res) {
             /** @var \TYPO3\CMS\Extbase\Scheduler\Task $object */
             $object = unserialize($res['serialized_task_object']);
-            if ($object instanceof AbstractTask) {
-                $this->setDisable($res['disable']);
-                $this->taskUid = $object->getTaskUid();
-                $identParts = explode(':', $object->getCommandIdentifier());
-
-                if ($identParts[0] == 'deployment' && $identParts[1] == 'copyresources' && $identParts[2] == 'copy') {
-                    return TRUE;
+            
+            if($object instanceof AbstractTask) {
+                if($object->getCommandIdentifier() !== '' || $object->getCommandIdentifier() !== null){
+                    $this->setDisable($res['disable']);
+                    $this->taskUid = $object->getTaskUid();
+                    $identParts = explode(':', $object->getCommandIdentifier());
+                    
+                    if($identParts[0] === 'deployment' && $identParts[1] === 'copyresources' && $identParts[2] === 'copy') {
+                        return TRUE;
+                    }
                 }
             }
         }
-
         return FALSE;
     }
 
     
     /**
-     * Prüft ob der benötigte _cli_scheduler-User vorhanden ist
+     * Prüft ob der benötigter _cli_scheduler-User vorhanden ist
      *
      * @return boolean
      */
     public function checkIfCliUserIsRegistered() {
-        $result = $this->getDatabase()->exec_SELECTgetRows('username', 'be_users', "username='_cli_scheduler'");
-
-        if (!empty($result)) {
-            foreach ($result as $res) {
-                if ($res['username'] == '_cli_scheduler') {
-                    return TRUE;
-                }
+        if($this->getDatabase()->isConnected()){
+            $result = $this->getDatabase()->exec_SELECTgetSingleRow('username', 'be_users', "username='_cli_scheduler'");
+            
+            if(!empty($result) && $result['username'] == '_cli_scheduler') {
+                return TRUE;
             }
-        } else {
-            return FALSE;
         }
+        
+        return FALSE;
     }
 
     
@@ -179,12 +174,12 @@ class CopyService extends AbstractDataService {
             // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
             //if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
             if (TYPO3_OS == 'Linux'|| TYPO3_OS == 'Mac') {
-                $sourceDest = escapeshellcmd("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
+                $sourceDest = CommandUtility::checkCommand("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                 // Parameter: Dateien bei Übertragung komprimieren, neuere Dateien nicht ersetzen,
                 // SymLinks als Syminks kopieren, Dateirechte beibehalten, Quellverzeichnis
-                exec("rsync --compress --update --links --perms $sourceDest");
+                CommandUtility::exec("rsync --compress --update --links --perms $sourceDest");
             } else {
-                //@todo: Pfad ändern
+                //TODO: Pfad ändern
                 GeneralUtility::upload_copy_move($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
             }
         }
