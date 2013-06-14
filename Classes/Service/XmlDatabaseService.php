@@ -61,8 +61,6 @@ class XmlDatabaseService extends AbstractDataService {
      */
     public function writeXML() {
         $newInsert = array();
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
 
@@ -75,7 +73,7 @@ class XmlDatabaseService extends AbstractDataService {
         $this->xmlwriter->startDocument('1.0'); // Document-Tag erzeugen
         // Document Type Definition (DTD)
         $this->xmlwriter->startDtd('changeSet');
-        $this->xmlwriter->writeDtdElement('changeSet', '(data)');
+        $this->xmlwriter->writeDtdElement('changeSet', '(data)+');
         $this->xmlwriter->writeDtdElement('data', 'ANY');
         $this->xmlwriter->endDtd();
 
@@ -86,7 +84,7 @@ class XmlDatabaseService extends AbstractDataService {
             /** @var HistoryData $cData */
             // Alle neuen Datensätze abfragen
             if ($cData->getSysLogUid() == 'NEW' && $cData->getFieldlist() == '*') {
-                $newInsert = $con->exec_SELECTgetSingleRow('*', $cData->getTablename(), 'uid=' . $cData->getUid());
+                $newInsert = $this->getDatabase()->exec_SELECTgetSingleRow('*', $cData->getTablename(), 'uid=' . $cData->getUid());
 
                 // für jeden Datensatz ein neues data-Element mit UID als Attribut
                 $this->xmlwriter->startElement('data');
@@ -103,7 +101,7 @@ class XmlDatabaseService extends AbstractDataService {
                         elseif ($newkey == 'uid_foreign') {
                             // Dieses prinzip klappt immer, da 'tablenames' in jeder Relationstabelle vorhanden ist
                             // Referenztabelle zur uid_local abfragen
-                            $table = $con->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign=' . $newval);
+                            $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign=' . $newval);
                             // UUID des Datensatzes abfragen
                             $uuid_foreign = $this->getUuid($newval, $table['tablenames']);
                             // Datensatz verarbeiten
@@ -112,7 +110,7 @@ class XmlDatabaseService extends AbstractDataService {
                         elseif ($newkey == 'uid_local') {
                             // hier muss unterschieden werden, da table_local nicht immer vorhanden ist
                             if ($cData->getTablename() == 'sys_file_reference') {
-                                $table = $con->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local=' . $newval);
+                                $table = $this->getDatabase()->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local=' . $newval);
                                 $uuid_local = $this->getUuid($newval, $table['table_local']);
                                 $this->xmlwriter->writeElement('uid_local', $uuid_local);
                             } // Unterscheidung für tt_news
@@ -408,9 +406,7 @@ class XmlDatabaseService extends AbstractDataService {
      * @return \TYPO3\Deployment\Domain\Model\History
      */
     public function convertFromLogDataToHistory($entry) {
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        $res = $con->exec_SELECTgetSingleRow('*', $entry->getTable(), 'uid=' . $entry->getRecuid());
+        $res = $this->getDatabase()->exec_SELECTgetSingleRow('*', $entry->getTable(), 'uid=' . $entry->getRecuid());
         $sRes = serialize($res);
 
         /** @var \TYPO3\Deployment\Domain\Model\History $history */
@@ -458,9 +454,7 @@ class XmlDatabaseService extends AbstractDataService {
      * @return int
      */
     public function getPid($uid, $table) {
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        $pid = $con->exec_SELECTgetSingleRow('pid', $table, 'uid = ' . $uid);
+        $pid = $this->getDatabase()->exec_SELECTgetSingleRow('pid', $table, 'uid = ' . $uid);
 
         return (!empty($pid['pid'])) ? $pid['pid'] : 0;
     }

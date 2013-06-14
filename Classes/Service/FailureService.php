@@ -34,11 +34,13 @@ class FailureService extends AbstractDataService {
         $usedFailureEntries = array();
         $allEntries = array();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
+        //$con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
-        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
+        //$con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
+        
+        DatabaseService::connectTestDatabaseIfExist();
 
-        if ($con->isConnected()) {
+        if ($this->getDatabase()->isConnected()) {
             foreach ($failures as $failure) {
                 $keyListArr = array();
                 // Array mit Schlüsseln erstellen
@@ -50,7 +52,7 @@ class FailureService extends AbstractDataService {
                 // Liste erstellen
                 $keyList = implode(',', $keyListArr);
 
-                $res = $con->exec_SELECTgetSingleRow($keyList, $failure['tablename'], "uuid='" . $failure['uuid'] . "'");
+                $res = $this->getDatabase()->exec_SELECTgetSingleRow($keyList, $failure['tablename'], "uuid='" . $failure['uuid'] . "'");
                 if ($res != null) {
                     $usedFailureEntries[] = $failure;
                     $failuresFromDatabase[] = $res;
@@ -59,6 +61,8 @@ class FailureService extends AbstractDataService {
         }
         $allEntries['usedFailures'] = $usedFailureEntries;
         $allEntries['fromDatabase'] = $failuresFromDatabase;
+        
+        DatabaseService::reset();
 
         return $allEntries;
     }
@@ -119,9 +123,11 @@ class FailureService extends AbstractDataService {
         $fails = array();
         $res = array();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
+        //$con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
-        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
+        //$con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
+        
+        DatabaseService::connectTestDatabaseIfExist();
 
         // Fehler aus Registry deserialisieren
         $unserializedFailures = unserialize($storedFailures);
@@ -148,20 +154,14 @@ class FailureService extends AbstractDataService {
                         $unFail['tstamp'] = time();
 
                         // In DB updaten
-                        // @todo HDNET ist $unFail hier richtig?
-                        $res[] = $con->exec_UPDATEquery($entry[1], 'uuid=' . $entry[2], $unFail);
+                        $res[] = $this->getDatabase()->exec_UPDATEquery($entry[1], 'uuid=' . $entry[2], $unFail);
                     }
                 }
             }
         }
-
-        // HDNET
-        # return !in_array(false, $res);
-
-        foreach ($res as $result) {
-            if ($result === false) {
-                return false;
-            }
+        
+        if(in_array(false, $res)){
+            return false;
         }
         return true;
     }

@@ -29,8 +29,7 @@ class AbstractDataService {
      * @return string
      */
     public function getUuid($uid, $table) {
-        $con = $this->getDatabase();
-        $uuid = $con->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
+        $uuid = $this->getDatabase()->exec_SELECTgetSingleRow('uuid', $table, 'uid = ' . $uid);
         return $uuid['uuid'];
     }
 

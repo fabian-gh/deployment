@@ -63,7 +63,7 @@ class XmlResourceService extends AbstractDataService {
         $this->xmlwriter->startDocument('1.0');
         // Document Type Definition (DTD)
         $this->xmlwriter->startDtd('resourcelist');
-        $this->xmlwriter->writeDtdElement('resourcelist', '(file)');
+        $this->xmlwriter->writeDtdElement('resourcelist', '(file)+');
         $this->xmlwriter->writeDtdElement('file', '(tstamp,crdate,type,storage,identifier,extension,mime_type,name,title,sha1,size,creation_date,modification_date,width,height,uuid)');
         $this->xmlwriter->writeDtdElement('tstamp', '(#PCDATA)');
         $this->xmlwriter->writeDtdElement('crdate', '(#PCDATA)');

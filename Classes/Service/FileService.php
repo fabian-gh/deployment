@@ -129,7 +129,7 @@ class FileService extends AbstractDataService {
      */
     public function processNotIndexedFiles($fileArr) {
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
+        //$con = $this->getDatabase();
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
 
@@ -139,7 +139,7 @@ class FileService extends AbstractDataService {
             $res->isIndexed();
         }
 
-        if ($con->isConnected()) {
+        if ($this->getDatabase()->isConnected()) {
             $fileRep = GeneralUtility::makeInstance('TYPO3\\Deployment\\Domain\\Repository\\FileRepository');
             $res = $fileRep->findByIdentifierWithoutHeadingSlash('/fileadmin/');
 
@@ -151,9 +151,9 @@ class FileService extends AbstractDataService {
 
                 if (strstr($identifier, '/fileadmin') != FALSE) {
                     $croppedIdentifier = substr($identifier, 10);
-                    $con->exec_UPDATEquery('sys_file', 'uid=' . $file->getUid(), array('identifier' => $croppedIdentifier));
+                    $this->getDatabase()->exec_UPDATEquery('sys_file', 'uid=' . $file->getUid(), array('identifier' => $croppedIdentifier));
                 } else {
-                    $con->exec_UPDATEquery('sys_file', 'uid=' . $file->getUid(), array('identifier' => $identifier));
+                    $this->getDatabase()->exec_UPDATEquery('sys_file', 'uid=' . $file->getUid(), array('identifier' => $identifier));
                 }
             }
         }

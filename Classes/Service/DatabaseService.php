@@ -19,9 +19,30 @@ namespace TYPO3\Deployment\Service;
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class DatabaseService extends AbstractDataService {
-
+    
     /**
-     * quick access databse function
+     * @var string
+     */
+    protected $host = 'localhost';
+    
+    /**
+     * @var string
+     */
+    protected $user = 'root';
+    
+    /**
+     * @var string
+     */
+    protected $pass = 'root';
+    
+    /**
+     * @var string
+     */
+    protected $db = 't3masterdeploy2';
+
+    
+    /**
+     * Schnellzugriff auf die Testdatenbank
      */
     public static function connectTestDatabaseIfExist() {
         $dbSerice = new DatabaseService();
@@ -30,7 +51,7 @@ class DatabaseService extends AbstractDataService {
 
     
     /**
-     * quick access databse function
+     * Verbindung zur Datenbank zurück setzen
      */
     public static function reset() {
         $dbSerice = new DatabaseService();
@@ -38,11 +59,11 @@ class DatabaseService extends AbstractDataService {
     }
 
     
+    /**
+     * Verbindung zur Datenbank zurück setzen
+     */
     public function resetInternal() {
-        // Verbindet mit der Datenbank aus
-        // $GLOBALS['TYPO3_CONF_VARS']['DB']
-        // Orgainal verbidungdaten ermitteln
-        # $this->connect();
+        $this->getDatabase();
     }
 
     

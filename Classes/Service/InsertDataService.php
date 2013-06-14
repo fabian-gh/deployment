@@ -42,9 +42,7 @@ class InsertDataService extends AbstractDataService {
         DatabaseService::connectTestDatabaseIfExist();
 
         // letzte Aktualisierung abfragen
-        $lastModified = $this
-                ->getDatabase()
-                ->exec_SELECTgetSingleRow('tstamp', $entry['tablename'], "uuid = '" . $entry['uuid'] . "'");
+        $lastModified = $this->getDatabase()->exec_SELECTgetSingleRow('tstamp', $entry['tablename'], "uuid = '" . $entry['uuid'] . "'");
 
         // falls Datensatz noch nicht exisitert, dann einfügen
         if ($lastModified === FALSE) {
@@ -107,9 +105,7 @@ class InsertDataService extends AbstractDataService {
             unset($entry['fieldlist']);
             unset($entry['uid']);
 
-            $this
-                    ->getDatabase()
-                    ->exec_INSERTquery($table, $entry);
+            $this->getDatabase()->exec_INSERTquery($table, $entry);
 
             return TRUE;
         } // wenn Eintrag älter ist als der zu aktualisierende
@@ -154,15 +150,11 @@ class InsertDataService extends AbstractDataService {
                         $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_content');
                     } // Fall für tt_news
                     elseif ($entry['tablename'] == 'tt_news_cat_mm') {
-                        $table = $this
-                                ->getDatabase()
-                                ->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
+                        $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
                         $entry['uid_foreign'] = $this->getUid($entry['uid_foreign'], $table['tablenames']);
                         $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_news');
                     } elseif ($entry['tablename'] == 'tt_news_related_mm') {
-                        $table = $this
-                                ->getDatabase()
-                                ->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
+                        $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
                         $entry['uid_foreign'] = $this->getUid($entry['uid_foreign'], $table['tablenames']);
                         $entry['uid_local'] = $this->getUid($entry['uid_local'], 'tt_news');
                     }
@@ -176,20 +168,13 @@ class InsertDataService extends AbstractDataService {
             unset($entry['uid']);
 
             // Daten aktualisieren
-            $this
-                    ->getDatabase()
-                    ->exec_UPDATEquery($table, 'uuid=' . $entry['uuid'], $entry);
+            $this->getDatabase()->exec_UPDATEquery($table, 'uuid=' . $entry['uuid'], $entry);
 
             return TRUE;
         } // wenn letzte Aktualisierung jünger ist als einzutragender Stand
         elseif ($lastModified['tstamp'] > $entry['tstamp']) {
             return $entry;
         }
-
-
-        // HDNET
-        // DatabaseService::reset();
-        // return FALSE;
     }
 
     
@@ -256,7 +241,8 @@ class InsertDataService extends AbstractDataService {
                             // falls Ergebnis nicht passt, dann in Fehlerarray schreiben
                             if ($res !== TRUE) {
                                 $entryCollection[] = $res;
-                            } // ansonsten den Eintrag entfernen
+                            } 
+                            // ansonsten den Eintrag entfernen
                             else {
                                 unset($entry);
                             }
@@ -277,7 +263,8 @@ class InsertDataService extends AbstractDataService {
                 if ($res !== TRUE) {
                     $entryCollection[] = $res;
                 }
-            } // alle anderen Einträge werden gesammelt und im zweiten Schritt verarbeitet, 2. Priorität
+            } 
+            // alle anderen Einträge werden gesammelt und im zweiten Schritt verarbeitet, 2. Priorität
             else {
                 $secondPriority[] = $firstPriority;
             }
@@ -308,6 +295,10 @@ class InsertDataService extends AbstractDataService {
                 }
             }
         }
+        
+        // Testdatenbankverbindung zurücksetzen
+        // @todo: später löschen
+        DatabaseService::reset();
 
         return (empty($entryCollection)) ? TRUE : $entryCollection;
     }
@@ -325,14 +316,16 @@ class InsertDataService extends AbstractDataService {
     public function insertResourceDataIntoTable($dataArr) {
         $entryCollection = array();
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
+        //$con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
         // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
-        $con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
+        //$con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
+        
+        DatabaseService::connectTestDatabaseIfExist();
 
-        if ($con->isConnected()) {
+        if ($this->getDatabase()->isConnected()) {
             foreach ($dataArr as $entry) {
                 // letzte Aktualisierung abfragen
-                $lastModified = $con->exec_SELECTgetSingleRow('tstamp', 'sys_file', "uuid = '" . $entry['uuid'] . "'");
+                $lastModified = $this->getDatabase()->exec_SELECTgetSingleRow('tstamp', 'sys_file', "uuid = '" . $entry['uuid'] . "'");
 
                 // falls Datensatz noch nicht exisitert, dann einfügen
                 if ($lastModified === FALSE) {
@@ -340,14 +333,14 @@ class InsertDataService extends AbstractDataService {
                     $entry['tstamp'] = time();
 
                     // Daten einfügen
-                    $con->exec_INSERTquery('sys_file', $entry);
+                    $this->getDatabase()->exec_INSERTquery('sys_file', $entry);
                 } // wenn Eintrag älter ist als der zu aktualisierende
                 elseif ($lastModified['tstamp'] < $entry['tstamp']) {
                     unset($entry['tablename']);
                     $entry['tstamp'] = time();
 
                     // Daten aktualisieren
-                    $con->exec_UPDATEquery('sys_file', 'uuid=' . $entry['uuid'], $entry);
+                    $this->getDatabase()->exec_UPDATEquery('sys_file', 'uuid=' . $entry['uuid'], $entry);
                 } // wenn letzte Aktualisierung jünger ist als einzutragender Stand
                 elseif ($lastModified['tstamp'] > $entry['tstamp']) {
                     $entryCollection[] = $entry;
@@ -369,16 +362,14 @@ class InsertDataService extends AbstractDataService {
         $inputArr = array();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
         $configuration = new ConfigurationService();
 
         $tables = $configuration->getDeploymentTables();
 
-        if ($con->isConnected()) {
+        if ($this->getDatabase()->isConnected()) {
             foreach ($tables as $table) {
-                $tablefields[$table] = $con->admin_get_fields($table);
+                $tablefields[$table] = $this->getDatabase()->admin_get_fields($table);
             }
         } else {
             $tablefields = NULL;
@@ -388,14 +379,14 @@ class InsertDataService extends AbstractDataService {
             foreach ($tablefields as $tablekey => $fields) {
                 if (array_key_exists('uuid', $fields)) {
                     /** @var \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $result */
-                    $results[$tablekey] = $con->exec_SELECTgetRows('uid, uuid', $tablekey, "uuid='' OR uuid IS NULL");
+                    $results[$tablekey] = $this->getDatabase()->exec_SELECTgetRows('uid, uuid', $tablekey, "uuid='' OR uuid IS NULL");
                 }
             }
 
             foreach ($results as $tabkey => $tabval) {
                 foreach ($tabval as $value) {
                     $inputArr = array('uuid' => $fileService->generateUuid());
-                    $con->exec_UPDATEquery($tabkey, 'uid=' . $value['uid'], $inputArr);
+                    $this->getDatabase()->exec_UPDATEquery($tabkey, 'uid=' . $value['uid'], $inputArr);
                 }
             }
         }

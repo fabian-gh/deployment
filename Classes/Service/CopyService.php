@@ -78,10 +78,8 @@ class CopyService extends AbstractDataService {
      * @return boolean
      */
     public function checkIfCommandControllerIsRegistered() {
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
         $pageSelection = new PageRepository();
-        $result = $con->exec_SELECTgetRows('serialized_task_object, disable', 'tx_scheduler_task', '1=1');
+        $result = $this->getDatabase()->exec_SELECTgetRows('serialized_task_object, disable', 'tx_scheduler_task', '1=1');
 
         // HDNET
         # return FALSE;
@@ -110,9 +108,7 @@ class CopyService extends AbstractDataService {
      * @return boolean
      */
     public function checkIfCliUserIsRegistered() {
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        $con = $this->getDatabase();
-        $result = $con->exec_SELECTgetRows('username', 'be_users', "username='_cli_scheduler'");
+        $result = $this->getDatabase()->exec_SELECTgetRows('username', 'be_users', "username='_cli_scheduler'");
 
         if (!empty($result)) {
             foreach ($result as $res) {
