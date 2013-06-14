@@ -13,7 +13,7 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\Deployment\Domain\Model\Log;
+use \TYPO3\Deployment\Domain\Model\Log;
 use \TYPO3\Deployment\Domain\Model\LogData;
 use \TYPO3\Deployment\Domain\Model\HistoryData;
 use \TYPO3\Deployment\Domain\Model\History;

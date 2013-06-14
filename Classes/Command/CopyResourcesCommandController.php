@@ -11,8 +11,8 @@
 
 namespace TYPO3\Deployment\Command;
 
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
-use TYPO3\Deployment\Service\CopyService;
+use \TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+use \TYPO3\Deployment\Service\CopyService;
 
 /**
  * CopyResourcesCommandController

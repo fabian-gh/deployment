@@ -71,7 +71,7 @@ class DatabaseService extends AbstractDataService {
      * Prüfen ob Verbindungsdaten existieren
      */
     public function connectTestDatabaseIfExistInternal() {
-        if($this->host === '' && $this->user === '' && $this->pass === '' && $this->db === ''){
+        if($this->host !== '' && $this->user !== '' && $this->pass !== '' && $this->db !== ''){
             $this->connect($this->host, $this->user, $this->pass, $this->db);
         }
     }

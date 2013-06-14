@@ -11,10 +11,10 @@
 
 namespace TYPO3\Deployment\Service;
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use TYPO3\Deployment\Utility\Arrays;
+use \TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\Deployment\Utility\Arrays;
 
 /**
  * AutoLoader Service

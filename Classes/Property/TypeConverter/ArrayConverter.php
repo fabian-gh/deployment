@@ -11,7 +11,7 @@
 
 namespace TYPO3\Deployment\Property\TypeConverter;
 
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * ArrayConverter

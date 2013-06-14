@@ -11,7 +11,7 @@
 
 namespace TYPO3\Deployment\Domain\Model;
 
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use \TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**
  * Abstract Model

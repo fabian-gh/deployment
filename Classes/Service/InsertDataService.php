@@ -315,7 +315,7 @@ class InsertDataService extends AbstractDataService {
         //$con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
         
         DatabaseService::connectTestDatabaseIfExist();
-
+        DebuggerUtility::var_dump($this->getDatabase()->isConnected());die();
         if ($this->getDatabase()->isConnected()) {
             foreach ($dataArr as $entry) {
                 // letzte Aktualisierung abfragen

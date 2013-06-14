@@ -11,11 +11,11 @@
 
 namespace TYPO3\Deployment\Hooks;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use TYPO3\CMS\Install\tx_em_Install;
-use TYPO3\CMS\Install\CheckTheDatabaseHookInterface;
-use TYPO3\Deployment\Service\ConfigurationService;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Install\tx_em_Install;
+use \TYPO3\CMS\Install\CheckTheDatabaseHookInterface;
+use \TYPO3\Deployment\Service\ConfigurationService;
 
 /**
  * DatabaseFields

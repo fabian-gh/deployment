@@ -11,16 +11,16 @@
 
 namespace TYPO3\Deployment\Service;
 
-use TYPO3\CMS\Core\Utility\CommandUtility;
-use TYPO3\CMS\Core\Utility\HttpUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Page\PageRepository;
-use TYPO3\CMS\Scheduler\Task\AbstractTask;
-use TYPO3\Deployment\Service\FileService;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\Deployment\Service\ConfigurationService;
-use TYPO3\Deployment\Service\XmlResourceService;
+use \TYPO3\CMS\Core\Utility\CommandUtility;
+use \TYPO3\CMS\Core\Utility\HttpUtility;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Frontend\Page\PageRepository;
+use \TYPO3\CMS\Scheduler\Task\AbstractTask;
+use \TYPO3\Deployment\Service\FileService;
+use \TYPO3\CMS\Core\Resource\ResourceFactory;
+use \TYPO3\Deployment\Service\ConfigurationService;
+use \TYPO3\Deployment\Service\XmlResourceService;
 
 /**
  * CopyService

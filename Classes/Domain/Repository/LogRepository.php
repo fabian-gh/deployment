@@ -13,7 +13,7 @@ namespace TYPO3\Deployment\Domain\Repository;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\Deployment\Domain\Model\Log;
+use \TYPO3\Deployment\Domain\Model\Log;
 use \TYPO3\Deployment\Service\ConfigurationService;
 
 /**
@@ -63,7 +63,7 @@ class LogRepository extends AbstractRepository {
 		$tables = $config->getDeploymentTables();
 
 		foreach ($result as $count => $res) {
-			/** @var $res Log */
+			/** @var Log $res */
 			if (!in_array($res->getTablename(), $tables)) {
 				unset($result[$count]);
 			}

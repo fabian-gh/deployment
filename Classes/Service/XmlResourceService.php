@@ -13,7 +13,7 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\Deployment\Domain\Model\File;
+use \TYPO3\Deployment\Domain\Model\File;
 use \TYPO3\Deployment\Domain\Repository\AbstractRepository;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
 use \TYPO3\Deployment\Service\FileService;
