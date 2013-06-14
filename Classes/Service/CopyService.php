@@ -13,8 +13,8 @@ namespace TYPO3\Deployment\Service;
 
 use \TYPO3\CMS\Core\Utility\CommandUtility;
 use \TYPO3\CMS\Core\Utility\HttpUtility;
-use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Frontend\Page\PageRepository;
 use \TYPO3\CMS\Scheduler\Task\AbstractTask;
 use \TYPO3\Deployment\Service\FileService;
@@ -49,14 +49,12 @@ class CopyService extends AbstractDataService {
         if ($this->allPrecautionsSet()) {
             $path = $this->getCliPath();
             $taskUid = $this->getTaskUid();
-            // TODO: Ausführung funktioniert nicht, evtl. shebang-line beachten
             // /var/www/public/typo3/cli_dispatch.phpsh scheduler -i 13 -f
             // HDNET
             #\TYPO3\CMS\Core\Utility\CommandUtility::exec('....');
-            #CommandUtility::getCommand('..', '..') // php -> /usr/var/php
-            #-f
+            #CommandUtility::getCommand('..', '..') // php -> /usr/var/php -f
             // '/usr/local/bin/php5-53STABLE-CLI -f '
-
+            
             exec(escapeshellcmd("$path scheduler -f -i $taskUid"));
         }
     }

@@ -34,11 +34,7 @@ class InsertDataService extends AbstractDataService {
      * @return mixed <b>array</b> or <b>true</b>
      */
     protected function checkDataValues($entry, $flag = FALSE) {
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        #$con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
-        // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
-        #$con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
-
+        // Verbindung zu Testdatenbank aufbauen
         DatabaseService::connectTestDatabaseIfExist();
 
         // letzte Aktualisierung abfragen
@@ -291,7 +287,6 @@ class InsertDataService extends AbstractDataService {
         }
         
         // Testdatenbankverbindung zurücksetzen
-        // @todo: später löschen
         DatabaseService::reset();
 
         return (empty($entryCollection)) ? TRUE : $entryCollection;
@@ -309,13 +304,9 @@ class InsertDataService extends AbstractDataService {
      */
     public function insertResourceDataIntoTable($dataArr) {
         $entryCollection = array();
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        //$con = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\DatabaseConnection');
-        // Fremddatenbank initialiseren ------>>>>> SPÄTER LÖSCHEN
-        //$con->connectDB('localhost', 'root', 'root', 't3masterdeploy2');
-        
+        // Verbindung zu Testdatenbank herstellen
         DatabaseService::connectTestDatabaseIfExist();
-        DebuggerUtility::var_dump($this->getDatabase()->isConnected());die();
+        
         if ($this->getDatabase()->isConnected()) {
             foreach ($dataArr as $entry) {
                 // letzte Aktualisierung abfragen

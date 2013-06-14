@@ -90,6 +90,7 @@ class DatabaseService extends AbstractDataService {
         $this->getDatabase()->setDatabaseUsername($user);
         $this->getDatabase()->setDatabasePassword($pass);
         $this->getDatabase()->setDatabaseName($db);
+        $this->getDatabase()->connectDB();
     }
 
 }
