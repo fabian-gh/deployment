@@ -36,17 +36,17 @@ class InsertDataService extends AbstractDataService {
     protected function checkDataValues($entry) {
         // Verbindung zu Testdatenbank aufbauen
         DatabaseService::connectTestDatabaseIfExist();
-
+        
         // letzte Aktualisierung abfragen
         $lastModified = $this->getDatabase()->exec_SELECTgetSingleRow('tstamp', $entry['tablename'], "uuid = '" . $entry['uuid'] . "'");
-
+        
         // falls Datensatz noch nicht exisitert, dann einfügen
-        if ($lastModified === FALSE) {
+        if ($lastModified === FALSE && $entry['fieldlist'] == '*') {
             $tablename = $entry['tablename'];
-
+            
             // die entsprechende PID abfragen und ersetzen
             $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
-
+            
             // Link abfragen und ersetzen
             if ($entry['header_link'] != '') {
                 $split = explode(':', $entry['header_link']);
@@ -89,10 +89,10 @@ class InsertDataService extends AbstractDataService {
             unset($entry['tablename']);
             unset($entry['fieldlist']);
             unset($entry['uid']);
-
+            
             $this->getDatabase()->exec_INSERTquery($tablename, $entry);
-
-            return TRUE;
+            
+            return true;
         } // wenn Eintrag älter ist als der zu aktualisierende
         elseif ($lastModified['tstamp'] <= $entry['tstamp']) {
             // Tabellennamen vor Löschung merken
@@ -145,10 +145,9 @@ class InsertDataService extends AbstractDataService {
             unset($entry['fieldlist']);
             unset($entry['uid']);
 
-            // Daten aktualisieren
-            $this->getDatabase()->exec_UPDATEquery($table, 'uuid=' . $entry['uuid'], $entry);
+            $this->getDatabase()->exec_UPDATEquery($table, "uuid='". $entry['uuid']."'", $entry);
 
-            return TRUE;
+            return true;
         } // wenn letzte Aktualisierung jünger ist als einzutragender Stand
         elseif ($lastModified['tstamp'] > $entry['tstamp']) {
             return $entry;
@@ -210,7 +209,7 @@ class InsertDataService extends AbstractDataService {
         // Seitenbaumtiefenabhängigkeiten prüfen
         $pageTreeCheck = $this->checkPageTree($dataArr);
         if(!empty($pageTreeCheck)){
-            foreach ($dataArr as $entry) {
+            foreach ($dataArr as $key => $entry) {
                 // vor 1. Prioritätstsufe alle Abhängigen Seiten einfügen
                 // hierfür die UUIDs vergleichen
                 foreach ($pageTreeCheck as $uuid) {
@@ -219,12 +218,12 @@ class InsertDataService extends AbstractDataService {
                         // Daten verarbeiten --> einfügen
                         $res = $this->checkDataValues($entry);
                         // falls Ergebnis nicht passt, dann in Fehlerarray schreiben
-                        if($res !== TRUE){
+                        if(!$res){
                             $entryCollection[] = $res;
                         } 
                         // ansonsten den Eintrag entfernen
                         else {
-                            unset($entry);
+                            unset($dataArr[$key]);
                         }
                     }
                 }
@@ -233,9 +232,9 @@ class InsertDataService extends AbstractDataService {
         
         // Daten durchwandern und einfügen/aktualisieren
         foreach ($dataArr as $firstPriority) {
-            // page-Einträge haben Vorrang, 1. Priorität
-            // Sicherstellung dass erst die Seiten vorhanden sind bevor
-            // diese referenziert werden
+            // page-Einträge haben Vorrang
+            // 1. Priorität ->Sicherstellung dass erst die Seiten vorhanden sind 
+            // bevor diese referenziert werden
             if ($firstPriority['tablename'] == 'pages') {
                 $res = $this->checkDataValues($firstPriority);
 
@@ -248,8 +247,8 @@ class InsertDataService extends AbstractDataService {
                 $secondPriority[] = $firstPriority;
             }
         }
-
-        // zweite Prioritätsstufe
+        
+        // 2. Prioritätsstufe
         // wenn Tabelle tt_content entspricht, dann Verarbeitung, ansonsten sammeln
         foreach ($secondPriority as $second) {
             if ($second['tablename'] == 'tt_content') {
@@ -263,7 +262,7 @@ class InsertDataService extends AbstractDataService {
             }
         }
 
-        // dritte Prioritätsstufe
+        // 3. Prioritätsstufe
         // Daten aller restlichen Tabellen einfügen/aktualisieren
         foreach ($thirdPriority as $third) {
             if ($third['fieldlist'] !== 'l10n_diffsource' || $third['fieldlist'] !== 'l18n_diffsource') {

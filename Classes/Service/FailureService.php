@@ -129,18 +129,15 @@ class FailureService extends AbstractDataService {
         foreach ($failures as $fail) {
             $fails[] = explode('.', $fail);
         }
-        
-        // TODO: Verarbeitung doppelter UUIDs in den Einträgen
-        //DebuggerUtility::var_dump($fails);
-        //DebuggerUtility::var_dump($unserializedFailures);die();
+
         // wenn 'list' ausgewählt wurde dann update, bei database nichts tun
         foreach ($fails as $entry) {
             if ($entry[0] == 'list') {
                 foreach ($unserializedFailures as $unFail) {
-                    if ($unFail['tablename'] == $entry[1] && $unFail['uuid'] == $entry[2]) {
+                if ($unFail['tablename'] == $entry[1] && $unFail['uuid'] == $entry[2] && $unFail['fieldlist'] != '*') {
                         // nicht benötigte Einträge entfernen
                         unset($unFail['tablename']);
-                        if (isset($unFail['fieldlist']) || isset($unFail['uid']) || isset($unFail['pid'])) {
+                        if (isset($unFail['fieldlist']) || isset($unFail['uid']) || isset($unFail['pid'])){
                             unset($unFail['fieldlist']);
                             unset($unFail['uid']);
                             unset($unFail['pid']);
@@ -148,9 +145,9 @@ class FailureService extends AbstractDataService {
 
                         // Timestamp ändern
                         $unFail['tstamp'] = time();
-
+                        
                         // In DB updaten
-                        $res[] = $this->getDatabase()->exec_UPDATEquery($entry[1], 'uuid=' . $entry[2], $unFail);
+                        $res[] = $this->getDatabase()->exec_UPDATEquery($entry[1], "uuid='". $entry[2]."'", $unFail);
                     }
                 }
             }

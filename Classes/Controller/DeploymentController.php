@@ -256,7 +256,7 @@ class DeploymentController extends ActionController {
             }
 
             $failures = array_merge($result1, $result2);
-
+            
             // leere Einträge entfernen
             $fail = $this->failureService->deleteEmptyEntries($failures);
             // Einträge an Action weiterleiten
