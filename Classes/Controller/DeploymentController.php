@@ -5,7 +5,7 @@
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Controller
+ * @subpackage Controller
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -24,7 +24,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
  * Deployment
  *
  * @package    Deployment
- * @subpackage Domain\Controller
+ * @subpackage Controller
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class DeploymentController extends ActionController {

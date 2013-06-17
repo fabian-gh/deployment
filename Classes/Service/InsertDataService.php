@@ -5,7 +5,7 @@
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -19,7 +19,7 @@ use \TYPO3\CMS\Core\Resource\ResourceFactory;
  * InsertDataService
  *
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class InsertDataService extends AbstractDataService {

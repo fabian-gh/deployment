@@ -18,6 +18,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
  * RegistryService
  *
  * @package    Deployment
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class RegistryService extends AbstractDataService {

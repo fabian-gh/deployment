@@ -5,7 +5,7 @@
  * 
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage ViewHelpers\Form
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -15,7 +15,7 @@ namespace TYPO3\Deployment\ViewHelpers\Form;
  * RadioViewHelper
  * 
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage ViewHelpers\Form
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class RadioViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Form\RadioViewHelper {

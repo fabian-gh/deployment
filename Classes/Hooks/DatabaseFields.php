@@ -5,7 +5,7 @@
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Hooks
+ * @subpackage Hooks
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -21,7 +21,7 @@ use \TYPO3\Deployment\Service\ConfigurationService;
  * DatabaseFields
  *
  * @package    Deployment
- * @subpackage Domain\Hooks
+ * @subpackage Hooks
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  * @hook       TYPO3_CONF_VARS|SC_OPTIONS|ext/install/mod/class.tx_install.php|checkTheDatabase
  */

@@ -3,7 +3,7 @@
 /**
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Utility
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -11,7 +11,7 @@ namespace TYPO3\Deployment\Utility;
 
 /**
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Utility
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class Arrays {

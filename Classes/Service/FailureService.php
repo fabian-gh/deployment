@@ -5,7 +5,7 @@
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -18,7 +18,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
  * FailureService
  *
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class FailureService extends AbstractDataService {

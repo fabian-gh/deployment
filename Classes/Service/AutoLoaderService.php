@@ -5,7 +5,7 @@
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -21,7 +21,7 @@ use \TYPO3\Deployment\Utility\Arrays;
  * Controller Abstraction for the ExtBase framework
  *
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class AutoLoaderService {

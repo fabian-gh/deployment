@@ -5,7 +5,7 @@
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Property\TypeConverter
+ * @subpackage Property\TypeConverter
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -18,7 +18,7 @@ use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
  * Converter which transforms arrays to arrays.
  * 
  * @package    Deployment
- * @subpackage Domain\Property\TypeConverter
+ * @subpackage Property\TypeConverter
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\ArrayConverter {

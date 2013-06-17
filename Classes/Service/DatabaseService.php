@@ -5,7 +5,7 @@
  *
  * @category   Extension
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 
@@ -15,7 +15,7 @@ namespace TYPO3\Deployment\Service;
  * DatabaseService
  *
  * @package    Deployment
- * @subpackage Domain\Service
+ * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
 class DatabaseService extends AbstractDataService {
