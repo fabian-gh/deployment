@@ -4,11 +4,11 @@ if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
 
-/*$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['TYPO3\Deployment\Scheduler\CopyTask'] = array(
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['TYPO3\Deployment\Scheduler\UuidTask'] = array(
     'extension'        => $_EXTKEY,
-    'title'            => 'Dateien kopieren',
-    'description'      => 'Dateien größer der festgelegten Grenze kopieren.'
-);*/
+    'title'            => 'UUID Zuweisung',
+    'description'      => 'Automatische Zuweisung von UUIDs zu Datensätzen'
+);
 
 
 /** @var $autoLoader \TYPO3\Deployment\Service\AutoLoaderService */

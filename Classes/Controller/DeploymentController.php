@@ -88,6 +88,12 @@ class DeploymentController extends ActionController {
      * @inject
      */
     protected $copyService;
+    
+    /**
+     * @var \TYPO3\Deployment\Scheduler\UuidTask
+     * @inject
+     */
+    protected $scheduler;
 
     
     /**
@@ -106,6 +112,9 @@ class DeploymentController extends ActionController {
         }
         if($this->copyService->getDisable() == '0') {
             $this->addFlashMessage('', 'Bitte deaktivieren Sie den Command Controller Task', FlashMessage::ERROR);
+        }
+        if($this->scheduler->checkIfTaskIsRegistered()) {
+            $this->addFlashMessage('Task zur autoamtischen Vergabe von UUIDs einrichten', 'UUID Scheduler Task', FlashMessage::INFO);
         }
 
         // Noch nicht indizierte Dateien indizieren
