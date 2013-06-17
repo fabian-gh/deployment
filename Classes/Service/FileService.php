@@ -48,7 +48,6 @@ class FileService extends AbstractDataService {
         return $newArr;
     }
 
-    
     /**
      * Filtert alle nicht indizierten Dateien und fügt diese in die sys-file Tabelle ein
      *
@@ -89,7 +88,6 @@ class FileService extends AbstractDataService {
         return $notIndexedFiles;
     }
 
-    
     /**
      * Prüft ob die Dateien im resource-Ordner innerhalb des fileadmins vorhanden
      * sind. Falls nein werden diese kopiert.
@@ -121,7 +119,6 @@ class FileService extends AbstractDataService {
         }
     }
 
-    
     /**
      * Nicht indizierte Daten in Tabelle eintragen
      *
@@ -159,7 +156,6 @@ class FileService extends AbstractDataService {
         }
     }
 
-    
     /**
      * Generiert eine UUID
      *
@@ -169,7 +165,6 @@ class FileService extends AbstractDataService {
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
     }
 
-    
     /**
      * Löscht alle XML-Dateien und Ordner, die älter als ein halbes Jahr sind
      */
@@ -222,7 +217,6 @@ class FileService extends AbstractDataService {
         }
     }
 
-    
     /**
      * Erstellt die Verzeichnisstruktur falls diese nicht bereits vorhanden sein sollte
      */
@@ -259,7 +253,6 @@ class FileService extends AbstractDataService {
         }
     }
 
-    
     /**
      * Validiert die übergebene Datei
      *
@@ -278,7 +271,6 @@ class FileService extends AbstractDataService {
         }
     }
 
-    
     /**
      * Splittet die Validierung von den Daten
      *
@@ -295,14 +287,13 @@ class FileService extends AbstractDataService {
         }
 
         foreach ($content as $key => $value) {
-            if ($key != 'validation') {
+            if ($key !== 'validation') {
                 $newArr[] = $value;
             }
         }
         return $newArr;
     }
 
-    
     // ======================================= Getter ===============================================
 
     /**
@@ -360,7 +351,7 @@ class FileService extends AbstractDataService {
     public function getDeploymentMediaPathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/media/';
     }
-    
+
     /**
      * @return string
      * 
@@ -378,4 +369,5 @@ class FileService extends AbstractDataService {
     public function getDeploymentResourcePathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/';
     }
+
 }

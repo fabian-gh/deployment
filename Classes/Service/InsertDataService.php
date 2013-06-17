@@ -33,7 +33,7 @@ class InsertDataService extends AbstractDataService {
      *
      * @return mixed <b>array</b> or <b>true</b>
      */
-    protected function checkDataValues($entry, $flag = FALSE) {
+    protected function checkDataValues($entry) {
         // Verbindung zu Testdatenbank aufbauen
         DatabaseService::connectTestDatabaseIfExist();
 
@@ -42,52 +42,45 @@ class InsertDataService extends AbstractDataService {
 
         // falls Datensatz noch nicht exisitert, dann einfügen
         if ($lastModified === FALSE) {
-            $table = $entry['tablename'];
+            $tablename = $entry['tablename'];
 
-            // falls neuer Eintrag in pages-Tabelle
-            if ($flag === TRUE) {
-                // pid auf 0 setzen
-                $entry['pid'] = 0;
-            } // falls neuer Eintrag in andere Tabelle
-            else {
-                // dann wieder die entsprechende PID abfragen und ersetzen
-                $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
+            // die entsprechende PID abfragen und ersetzen
+            $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
 
-                // Link abfragen und ersetzen
-                if ($entry['header_link'] != '') {
-                    $split = explode(':', $entry['header_link']);
+            // Link abfragen und ersetzen
+            if ($entry['header_link'] != '') {
+                $split = explode(':', $entry['header_link']);
 
-                    if ($split[0] === 'file') {
-                        $split[1] = $this->getUidByUuid($split[1], 'sys_file');
-                        $entry['header_link'] = implode(':', $split);
-                    } elseif ($split[0] === 'page') {
-                        $entry['header_link'] = $this->getUidByUuid($split[1], 'pages');
-                    }
-                } elseif ($entry['link'] != '') {
-                    $split = explode(':', $entry['link']);
-
-                    if ($split[0] === 'file') {
-                        $split[1] = $this->getUidByUuid($split[1], 'sys_file');
-                        $entry['link'] = implode(':', $split);
-                    } elseif ($split[0] === 'page') {
-                        $entry['link'] = $this->getUidByUuid($split[1], 'pages');
-                    }
+                if ($split[0] === 'file') {
+                    $split[1] = $this->getUidByUuid($split[1], 'sys_file');
+                    $entry['header_link'] = implode(':', $split);
+                } elseif ($split[0] === 'page') {
+                    $entry['header_link'] = $this->getUidByUuid($split[1], 'pages');
                 }
-                // uid_foreign & uid_local durch UID ersetzen
-                if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
-                    if ($entry['tablename'] == 'sys_file_reference') {
-                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
-                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
-                    } // Fall für tt_news
-                    elseif ($entry['tablename'] == 'tt_news_cat_mm') {
-                        $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
-                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
-                    } elseif ($entry['tablename'] == 'tt_news_related_mm') {
-                        $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
-                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
-                    }
+            } elseif ($entry['link'] != '') {
+                $split = explode(':', $entry['link']);
+
+                if ($split[0] === 'file') {
+                    $split[1] = $this->getUidByUuid($split[1], 'sys_file');
+                    $entry['link'] = implode(':', $split);
+                } elseif ($split[0] === 'page') {
+                    $entry['link'] = $this->getUidByUuid($split[1], 'pages');
+                }
+            }
+            // uid_foreign & uid_local durch UID ersetzen
+            if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
+                if ($entry['tablename'] == 'sys_file_reference') {
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
+                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
+                } // Fall für tt_news
+                elseif ($entry['tablename'] == 'tt_news_cat_mm') {
+                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
+                } elseif ($entry['tablename'] == 'tt_news_related_mm') {
+                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                 }
             }
 
@@ -97,57 +90,52 @@ class InsertDataService extends AbstractDataService {
             unset($entry['fieldlist']);
             unset($entry['uid']);
 
-            $this->getDatabase()->exec_INSERTquery($table, $entry);
+            $this->getDatabase()->exec_INSERTquery($tablename, $entry);
 
             return TRUE;
         } // wenn Eintrag älter ist als der zu aktualisierende
         elseif ($lastModified['tstamp'] <= $entry['tstamp']) {
             // Tabellennamen vor Löschung merken
             $table = $entry['tablename'];
+            
+            $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
 
-            if ($flag === TRUE) {
-                // entsprechende pid herausfinden
-                $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
-            } else {
-                $entry['pid'] = $this->getPidByUuid($entry['pid'], 'pages');
+            // Link abfragen und ersetzen
+            if ($entry['header_link'] != '') {
+                $split = explode(':', $entry['header_link']);
 
-                // Link abfragen und ersetzen
-                if ($entry['header_link'] != '') {
-                    $split = explode(':', $entry['header_link']);
-
-                    if ($split[0] === 'file') {
-                        $split[1] = $this->getUidByUuid($split[1], 'sys_file');
-                        $entry['header_link'] = implode(':', $split);
-                    } elseif ($split[0] === 'page') {
-                        $uid = $this->getUidByUuid($split[1], 'pages');
-                        $entry['header_link'] = $uid;
-                    }
-                } elseif ($entry['link'] != '') {
-                    $split = explode(':', $entry['link']);
-
-                    if ($split[0] === 'file') {
-                        $split[1] = $this->getUidByUuid($split[1], 'sys_file');
-                        $entry['link'] = implode(':', $split);
-                    } elseif ($split[0] === 'page') {
-                        $uid = $this->getUidByUuid($split[1], 'pages');
-                        $entry['link'] = $uid;
-                    }
+                if ($split[0] === 'file') {
+                    $split[1] = $this->getUidByUuid($split[1], 'sys_file');
+                    $entry['header_link'] = implode(':', $split);
+                } elseif ($split[0] === 'page') {
+                    $uid = $this->getUidByUuid($split[1], 'pages');
+                    $entry['header_link'] = $uid;
                 }
-                // uid_foreign & uid_local durch UID ersetzen
-                if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
-                    if ($entry['tablename'] == 'sys_file_reference') {
-                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
-                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
-                    } // Fall für tt_news
-                    elseif ($entry['tablename'] == 'tt_news_cat_mm') {
-                        $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
-                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
-                    } elseif ($entry['tablename'] == 'tt_news_related_mm') {
-                        $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                        $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
-                        $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
-                    }
+            } elseif ($entry['link'] != '') {
+                $split = explode(':', $entry['link']);
+
+                if ($split[0] === 'file') {
+                    $split[1] = $this->getUidByUuid($split[1], 'sys_file');
+                    $entry['link'] = implode(':', $split);
+                } elseif ($split[0] === 'page') {
+                    $uid = $this->getUidByUuid($split[1], 'pages');
+                    $entry['link'] = $uid;
+                }
+            }
+            // uid_foreign & uid_local durch UID ersetzen
+            if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
+                if ($entry['tablename'] == 'sys_file_reference') {
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
+                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
+                } // Fall für tt_news
+                elseif ($entry['tablename'] == 'tt_news_cat_mm') {
+                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
+                } elseif ($entry['tablename'] == 'tt_news_related_mm') {
+                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                 }
             }
 
@@ -178,28 +166,31 @@ class InsertDataService extends AbstractDataService {
     public function checkPageTree($dataArr) {
         $pageTreeDepth = array();
         $beforePages = array();
+        $count = 0;
 
         // prüfen ob Seitenbaumabhängigkeiten existieren
         foreach ($dataArr as $data) {
             // wenn Tabelleneinträge für pages-Tabelle vorhanden sind
             if ($data['tablename'] == 'pages') {
-                // dann Seiten-UUID speichern
-                $pageTreeDepth[] = $data['pid'];
+                // dann Seiten-UUID sowie die Sortierung speichern
+                $pageTreeDepth[$count]['pid'] = $data['pid'];
+                $pageTreeDepth[$count]['sorting'] = $data['sorting'];
             }
+            $count++;
         }
-
+        
         foreach ($dataArr as $data) {
             // und für jede UUID prüfen ob diese nochmals vorkommt
-            foreach ($pageTreeDepth as $uuid) {
+            foreach ($pageTreeDepth as $ptd) {
                 // wenn UUID nochmal vorkommt (nur auf neue Datensätze beschränken)
-                if ($uuid == $data['uuid'] && $data['fieldlist'] == '*') {
+                if ($ptd['pid'] == $data['uuid'] && $data['fieldlist'] == '*' && $ptd['sorting'] != null) {
                     // dann die pages-Einträge zurück liefern, damit diese noch
                     // vor den 1. Prioritätsstufe eingetragen werden
                     $beforePages[] = $data['uuid'];
                 }
             }
         }
-
+        
         return (empty($beforePages)) ? TRUE : array_unique($beforePages);
     }
 
@@ -218,37 +209,35 @@ class InsertDataService extends AbstractDataService {
 
         // Seitenbaumtiefenabhängigkeiten prüfen
         $pageTreeCheck = $this->checkPageTree($dataArr);
-        if (!empty($pageTreeCheck)) {
+        if(!empty($pageTreeCheck)){
             foreach ($dataArr as $entry) {
                 // vor 1. Prioritätstsufe alle Abhängigen Seiten einfügen
-                if ($pageTreeCheck !== TRUE) {
-                    // hierfür die UUIDs vergleichen
-                    foreach ($pageTreeCheck as $uuid) {
-                        // falls diese gleich sind
-                        if ($uuid == $entry['uuid']) {
-                            // Daten verarbeiten --> einfügen
-                            $res = $this->checkDataValues($entry, TRUE);
-                            // falls Ergebnis nicht passt, dann in Fehlerarray schreiben
-                            if ($res !== TRUE) {
-                                $entryCollection[] = $res;
-                            } 
-                            // ansonsten den Eintrag entfernen
-                            else {
-                                unset($entry);
-                            }
+                // hierfür die UUIDs vergleichen
+                foreach ($pageTreeCheck as $uuid) {
+                    // falls diese gleich sind
+                    if ($uuid == $entry['uuid']) {
+                        // Daten verarbeiten --> einfügen
+                        $res = $this->checkDataValues($entry);
+                        // falls Ergebnis nicht passt, dann in Fehlerarray schreiben
+                        if($res !== TRUE){
+                            $entryCollection[] = $res;
+                        } 
+                        // ansonsten den Eintrag entfernen
+                        else {
+                            unset($entry);
                         }
                     }
                 }
             }
         }
-
+        
         // Daten durchwandern und einfügen/aktualisieren
         foreach ($dataArr as $firstPriority) {
             // page-Einträge haben Vorrang, 1. Priorität
             // Sicherstellung dass erst die Seiten vorhanden sind bevor
             // diese referenziert werden
             if ($firstPriority['tablename'] == 'pages') {
-                $res = $this->checkDataValues($firstPriority, TRUE);
+                $res = $this->checkDataValues($firstPriority);
 
                 if ($res !== TRUE) {
                     $entryCollection[] = $res;
