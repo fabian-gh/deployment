@@ -70,3 +70,8 @@ table.typo3-dblist tr td{
     margin-left: 6px;
     margin-top: 6px;
 }
+
+.radios{
+    vertical-align: inherit;
+    margin-bottom: 3px;
+}

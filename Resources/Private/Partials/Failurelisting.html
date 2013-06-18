@@ -16,13 +16,8 @@
 
             <tr class="outertr-spacer">
             <td>
-                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
-                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
-
-                <f:comment>
-                    <f:form.checkbox property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" id="fCheckbox_{fEntry.uuid}{itemIteration.index}" class="failure-checkbox" />&nbsp;Use Listentry(<span class="diff-g">green</span>)<br />
-                    <f:form.checkbox property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" id="dCheckbox_{fEntry.uuid}{itemIteration.index}" class="database-checkbox" />&nbsp;Use Databaseentry(<span class="diff-r">red</span>/black)
-                </f:comment>
+                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" class="radios" checked="checked" />&nbsp;Use Listentry (<span class="diff-g">green</span>)<br />
+                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" class="radios" />&nbsp;Use Databaseentry (<span class="diff-r">red</span>/black)
             </td>
             <td>
                 <table class="table3">
