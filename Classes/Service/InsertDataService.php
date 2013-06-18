@@ -202,6 +202,8 @@ class InsertDataService extends AbstractDataService {
      * @return mixed If no failure <b>true</b>, else <b>array</b>
      */
     public function insertDataIntoTable($dataArr) {
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
+        $configurationService = new ConfigurationService();
         $entryCollection = array();
         $secondPriority = array();
         $thirdPriority = array();
@@ -265,7 +267,7 @@ class InsertDataService extends AbstractDataService {
         // 3. Prioritätsstufe
         // Daten aller restlichen Tabellen einfügen/aktualisieren
         foreach ($thirdPriority as $third) {
-            if ($third['fieldlist'] !== 'l10n_diffsource' || $third['fieldlist'] !== 'l18n_diffsource') {
+            if (!in_array($third['fieldlist'], $configurationService->getNotDeployableColumns())) {
                 $res = $this->checkDataValues($third);
 
                 if ($res !== TRUE) {

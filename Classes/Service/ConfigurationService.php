@@ -38,6 +38,19 @@ class ConfigurationService extends AbstractDataService {
         
         return $tables;
     }
+    
+    
+    /**
+     * Gibt Spalten zurück, die nicht deployed werden sollen
+     * 
+     * @return mixed array or NULL
+     */
+    public function getNotDeployableColumns(){
+        $columns = $this->getAllEntries();
+        $conArr = explode(',', $columns['notDeployableColumns']);
+        
+        return (!empty($conArr)) ? $conArr : NULL;
+    }
 
     
     /**

@@ -63,6 +63,8 @@ class XmlDatabaseService extends AbstractDataService {
         $newInsert = array();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
+        $configurationService = new ConfigurationService();
 
         // Neues XMLWriter-Objekt
         $this->xmlwriter = new \XMLWriter();
@@ -92,7 +94,7 @@ class XmlDatabaseService extends AbstractDataService {
                 $this->xmlwriter->writeElement('fieldlist', '*');
 
                 foreach ($newInsert as $newkey => $newval) {
-                    if ($newkey != 'l18n_diffsource') {
+                    if (!in_array($newkey, $configurationService->getNotDeployableColumns())) {
                         // PID durch UUID ersetzen
                         if ($newkey == 'pid') {
                             $pageUuid = $this->getUuidByUid($newval, 'pages');
@@ -277,6 +279,8 @@ class XmlDatabaseService extends AbstractDataService {
     public function getHistoryDataDiff($historyData) {
         $data = array();
         $differences = array();
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
+        $configurationService = new ConfigurationService();
         /** @var $diff \TYPO3\CMS\Core\Utility\DiffUtility */
         $diff = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
 
@@ -294,7 +298,7 @@ class XmlDatabaseService extends AbstractDataService {
         foreach ($data as $dat) {
             foreach ($dat as $columnkey => $cloumnval) {
                 foreach ($cloumnval as $recuid => $dataArr) {
-                    if ($columnkey != 'l18n_diffsource') {
+                    if (!in_array($columnkey, $configurationService->getNotDeployableColumns())) {
                         $differences[$recuid][$columnkey][] = $diff->makeDiffDisplay($dataArr[0], $dataArr[1]);
                     }
                 }

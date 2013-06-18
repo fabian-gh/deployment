@@ -7,6 +7,9 @@ username =
 # cat=Access; type=password; label=Password: Password for login on pull server
 password = 
 
+# cat=Datahandling; type=text; label=Not deployable columns (Only for development system)
+notDeployableColumns = tx_phpunit_is_dummy_record, l18n_diffsource, l10n_diffsource
+
 # cat=Datahandling; type=text; label=Additional Deployment Tables: The list of deplyoment tables (tt_content and pages are default tables)
 deploymentTables = sys_file, sys_file_reference
 
