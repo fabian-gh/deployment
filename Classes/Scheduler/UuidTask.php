@@ -51,7 +51,7 @@ class UuidTask extends AbstractTask{
             }
         }
         
-        return ($obj === true) ? true : false;
+        return ($obj) ? true : false;
     }
     
     

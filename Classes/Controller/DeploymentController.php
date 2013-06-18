@@ -113,8 +113,8 @@ class DeploymentController extends ActionController {
         if($this->copyService->getDisable() == '0') {
             $this->addFlashMessage('', 'Bitte deaktivieren Sie den Command Controller Task', FlashMessage::ERROR);
         }
-        if($this->scheduler->checkIfTaskIsRegistered()) {
-            $this->addFlashMessage('Task zur autoamtischen Vergabe von UUIDs einrichten', 'UUID Scheduler Task', FlashMessage::INFO);
+        if(!$this->scheduler->checkIfTaskIsRegistered()) {
+            $this->addFlashMessage('Task zur autoamtischen Vergabe von UUIDs erstellen.', 'UUID Scheduler Task', FlashMessage::INFO);
         }
 
         // Noch nicht indizierte Dateien indizieren
@@ -347,7 +347,7 @@ class DeploymentController extends ActionController {
      * @param string $mode
      */
     protected function addFlashMessage($message, $title, $mode) {
-        $this->controllerContext->getFlashMessageQueue()->addMessage(new FlashMessage($message, $title, $mode));
+        $this->controllerContext->getFlashMessageQueue()->addMessage(new FlashMessage($message, $title, $mode, true));
     }
 
 }
