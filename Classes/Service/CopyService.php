@@ -49,10 +49,9 @@ class CopyService extends AbstractDataService {
         if ($this->allPrecautionsSet()) {
             $path = $this->getCliPath();
             $taskUid = $this->getTaskUid();
-            #CommandUtility::getCommand('..', '..') // php -> /usr/var/php -f
-            // '/usr/local/bin/php5-53STABLE-CLI -f '
             
-            CommandUtility::exec(escapeshellcmd("$path scheduler -f -i $taskUid"));
+            // TODO: über CommandUtility::getCommand() irgendwie den php-Pfad herausbekommen
+            CommandUtility::exec(escapeshellcmd("/opt/lampp/bin/php $path scheduler -f -i $taskUid"));
         }
     }
 
@@ -129,7 +128,7 @@ class CopyService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\XmlResourceService $xmlResourceService */
         $xmlResourceService = new XmlResourceService();
 
-        // @todo: Pfad zu fileadmin ändern
+        // TODO: Pfad zu fileadmin ändern
         $path = $fileService->getDeploymentResourcePathWithoutTrailingSlash();
         // Daten aus Konfiguration holen
         $server = $configuration->getPullserver();
@@ -147,13 +146,16 @@ class CopyService extends AbstractDataService {
         }
         // Pfad mit User und PW wieder zusammensetzen
         $pullServer = trim(HttpUtility::buildUrl($parts), '/');
+        
+        // Betriebssystem auslesen
+        $os = get_browser()->platform;
 
         // XML einlesen
         $data = $fileService->splitContent($xmlResourceService->readXmlResourceList());
 
         foreach ($data as $resource) {
             /** @var \TYPO3\CMS\Core\Resource\File $file */
-            $file = $resFact->getFileObject($xmlResourceService->getUid($resource['uuid'], $resource['tablename']));
+            $file = $resFact->getFileObject($xmlResourceService->getUidByUuid($resource['uuid'], $resource['tablename']));
             $split = explode('/', $file->getIdentifier());
             $filename = array_pop($split);
 
@@ -172,8 +174,7 @@ class CopyService extends AbstractDataService {
             }
 
             // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
-            //if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
-            if (TYPO3_OS == 'Linux'|| TYPO3_OS == 'Mac') {
+            if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
                 $sourceDest = CommandUtility::checkCommand("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                 // Parameter: Dateien bei Übertragung komprimieren, neuere Dateien nicht ersetzen,
                 // SymLinks als Syminks kopieren, Dateirechte beibehalten, Quellverzeichnis
