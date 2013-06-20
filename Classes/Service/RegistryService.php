@@ -79,7 +79,7 @@ class RegistryService extends AbstractDataService {
      * @return array
      */
     public function getStoredFailures() {
-        return $this->registry->get('deployment', 'storedFailures');
+        return unserialize($this->registry->get('deployment', 'storedFailures'));
     }
 
     
@@ -89,7 +89,7 @@ class RegistryService extends AbstractDataService {
      * @return array
      */
     public function getStoredHistoryEntries() {
-        return $this->registry->get('deployment', 'storedHistoryData');
+        return unserialize($this->registry->get('deployment', 'storedHistoryData'));
     }
 
 }

@@ -4,33 +4,39 @@ namespace TYPO3\Deployment\Tests\Unit\Service;
 
 class RegistryServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
-	/**
-	 * @test
-	 */
-	function testGetLastDeployIsInt() {
-		/** @var \TYPO3\Deployment\Service\RegistryService $con */
-		$reg = new \TYPO3\Deployment\Service\RegistryService ();
-
-		$this->assertInternalType('int', $reg->getLastDeploy());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetStoredFailuresIsArray() {
-		/** @var \TYPO3\Deployment\Service\RegistryService $con */
-		$reg = new \TYPO3\Deployment\Service\RegistryService ();
-
-		$this->assertInternalType('array', unserialize($reg->getStoredFailures()));
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetStoredHistoryEntriesIsArray() {
-		/** @var \TYPO3\Deployment\Service\RegistryService $con */
-		$reg = new \TYPO3\Deployment\Service\RegistryService ();
-
-		$this->assertInternalType('array', unserialize($reg->getStoredHistoryEntries()));
-	}
+    /**
+     * RegistryServiceTest
+     * 
+     * @var \TYPO3\Deployment\Service\RegistryService
+     */
+    protected $registryService = NULL;
+    
+    
+    /**
+     * Build up the test
+     */
+    public function __construct(){
+        $this->registryService = new \TYPO3\Deployment\Service\RegistryService();
+    }
+    
+    /**
+     * @test
+     */
+    public function testGetLastDeployIsString(){
+        $this->assertInternalType('string', $this->registryService->getLastDeploy());
+    }
+    
+    /**
+     * @test
+     */
+    public function testGetStoredFailuresIsArray(){
+        $this->assertInternalType('array', $this->registryService->getStoredFailures());
+    }
+    
+    /**
+     * @test
+     */
+    public function testGetStoredHistoryEntriesIsArray(){
+        $this->assertInternalType('array', $this->registryService->getStoredHistoryEntries());
+    }
 }
