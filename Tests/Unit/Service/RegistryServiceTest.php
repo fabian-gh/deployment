@@ -5,7 +5,7 @@ namespace TYPO3\Deployment\Tests\Unit\Service;
 class RegistryServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
     /**
-     * RegistryServiceTest
+     * RegistryService
      * 
      * @var \TYPO3\Deployment\Service\RegistryService
      */
