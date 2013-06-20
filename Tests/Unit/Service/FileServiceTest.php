@@ -6,7 +6,7 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
     /**
      *
-     * @var \TYPO3\Deployment\Service\FileService();
+     * @var \TYPO3\Deployment\Service\FileService
      */
     protected $fileService = NULL;
     

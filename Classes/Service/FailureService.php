@@ -122,9 +122,6 @@ class FailureService extends AbstractDataService {
         // Verbindung mit Testdatenbank aufbauen
         DatabaseService::connectTestDatabaseIfExist();
 
-        // Fehler aus Registry deserialisieren
-        $unserializedFailures = unserialize($storedFailures);
-
         // Einträge splitten
         foreach ($failures as $fail) {
             $fails[] = explode('.', $fail);
@@ -133,21 +130,21 @@ class FailureService extends AbstractDataService {
         // wenn 'list' ausgewählt wurde dann update, bei database nichts tun
         foreach ($fails as $entry) {
             if ($entry[0] == 'list') {
-                foreach ($unserializedFailures as $unFail) {
-                if ($unFail['tablename'] == $entry[1] && $unFail['uuid'] == $entry[2] && $unFail['fieldlist'] != '*') {
+                foreach ($storedFailures as $sfail) {
+                if ($sfail['tablename'] == $entry[1] && $sfail['uuid'] == $entry[2] && $sfail['fieldlist'] != '*') {
                         // nicht benötigte Einträge entfernen
-                        unset($unFail['tablename']);
-                        if (isset($unFail['fieldlist']) || isset($unFail['uid']) || isset($unFail['pid'])){
-                            unset($unFail['fieldlist']);
-                            unset($unFail['uid']);
-                            unset($unFail['pid']);
+                        unset($sfail['tablename']);
+                        if (isset($sfail['fieldlist']) || isset($sfail['uid']) || isset($sfail['pid'])){
+                            unset($sfail['fieldlist']);
+                            unset($sfail['uid']);
+                            unset($sfail['pid']);
                         }
 
                         // Timestamp ändern
-                        $unFail['tstamp'] = time();
+                        $sfail['tstamp'] = time();
                         
                         // In DB updaten
-                        $res[] = $this->getDatabase()->exec_UPDATEquery($entry[1], "uuid='". $entry[2]."'", $unFail);
+                        $res[] = $this->getDatabase()->exec_UPDATEquery($entry[1], "uuid='". $entry[2]."'", $sfail);
                     }
                 }
             }

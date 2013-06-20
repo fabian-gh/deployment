@@ -436,7 +436,7 @@ class XmlDatabaseService extends AbstractDataService {
     public function compareDataWithRegistry($uid) {
         /** @var \TYPO3\Deployment\Service\RegistryService $registry */
         $registry = new RegistryService();
-        $data = unserialize($registry->getStoredHistoryEntries());
+        $data = $registry->getStoredHistoryEntries();
 
         foreach ($data as $hisdata) {
             /** @var HistoryData $hisdata */
