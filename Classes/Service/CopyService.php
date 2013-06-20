@@ -36,7 +36,7 @@ class CopyService extends AbstractDataService {
     protected $taskUid;
 
     /**
-     * @var string
+     * @var int
      */
     protected $disable;
 
@@ -114,7 +114,6 @@ class CopyService extends AbstractDataService {
                 return TRUE;
             }
         }
-        
         return FALSE;
     }
 
@@ -206,16 +205,6 @@ class CopyService extends AbstractDataService {
 
     
     /**
-     * Get the TYPO3 database
-     *
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabase() {
-        return $GLOBALS['TYPO3_DB'];
-    }
-
-    
-    /**
      * @return string
      */
     public function getCliPath() {
@@ -240,6 +229,6 @@ class CopyService extends AbstractDataService {
      * @param string $disable
      */
     public function setDisable($disable) {
-        $this->disable = $disable;
+        $this->disable = (int) $disable;
     }
 }

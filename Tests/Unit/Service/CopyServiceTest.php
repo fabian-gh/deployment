@@ -36,22 +36,25 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     /**
      * @test
      */
-    public function testGetTaskUidNotEmpty() {
-        $this->assertNotEmpty($this->copyService->getTaskUid());
+    public function testGetTaskUidIsNotNull() {
+        $this->copyService->checkIfCommandControllerIsRegistered();
+        $this->assertNotNull($this->copyService->getTaskUid());
     }
 
     /**
      * @test
      */
-    public function testGetDisable() {
-        $this->assertEquals(1, $this->copyService->getDisable());
+    public function testGetDisableIsInt() {
+        $this->copyService->checkIfCommandControllerIsRegistered();
+        $this->assertInternalType('int', $this->copyService->getDisable());
     }
 
     /**
      * @test
      */
-    public function testGetDisableNotEmpty() {
-        $this->assertNotEmpty($this->copyService->getDisable());
+    public function testGetDisableNotNull() {
+        $this->copyService->checkIfCommandControllerIsRegistered();
+        $this->assertNotNull($this->copyService->getDisable());
     }
 
     /**
