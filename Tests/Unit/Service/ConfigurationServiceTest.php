@@ -21,112 +21,112 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     /**
      * @test
      */
-    function testGetDeploymentTablesNotNull() {
+    public function testGetDeploymentTablesNotNull() {
         $this->assertNotNull($this->configurationService->getDeploymentTables());
     }
     
     /**
      * @test
      */
-    function testGetDeploymentTablesIsArray() {
+    public function testGetDeploymentTablesIsArray() {
         $this->assertInternalType('array', $this->configurationService->getDeploymentTables());
     }
 
     /**
      * @test
      */
-    function testGetDeploymentTablesContainsTtContent() {
+    public function testGetDeploymentTablesContainsTtContent() {
         $this->assertContains('tt_content', $this->configurationService->getDeploymentTables());
     }
 
     /**
      * @test
      */
-    function testGetDeploymentTablesCotainsPages() {
+    public function testGetDeploymentTablesCotainsPages() {
         $this->assertContains('pages', $this->configurationService->getDeploymentTables());
     }
     
     /**
      * @test
      */
-    function testGetNotDeployableColumnsIsArray(){
+    public function testGetNotDeployableColumnsIsArray(){
         $this->assertInternalType('array', $this->configurationService->getNotDeployableColumns());
     }
 
     /**
      * @test
      */
-    function testGetNotDeployableColumnsIsNotNull() {
+    public function testGetNotDeployableColumnsIsNotNull() {
         $this->assertNotNull($this->configurationService->getNotDeployableColumns());
     }
     
     /**
      * @test
      */
-    function testGetDeleteStateIsNotNull() {
+    public function testGetDeleteStateIsNotNull() {
         $this->assertNotNull($this->configurationService->getDeleteState());
     }
 
     /**
      * @test
      */
-    function testGetDeleteStateIsInt() {
+    public function testGetDeleteStateIsInt() {
         $this->assertInternalType('int', $this->configurationService->getDeleteState());
     }
     
     /**
      * @test
      */
-    function testGetPhpPathIsString(){
+    public function testGetPhpPathIsString(){
         $this->assertInternalType('string', $this->configurationService->getPhpPath());
     }
     
     /**
      * @test
      */
-    function testGetPhpPathIsNotNull(){
+    public function testGetPhpPathIsNotNull(){
         $this->assertNotNull($this->configurationService->getPhpPath());
     }
 
     /**
      * @test
      */
-    function testGetPullServerIsNotNull() {
+    public function testGetPullServerIsNotNull() {
         $this->assertNotNull($this->configurationService->getPullserver());
     }
 
     /**
      * @test
      */
-    function testGetPullServerIsString() {
+    public function testGetPullServerIsString() {
         $this->assertInternalType('string', $this->configurationService->getPullserver());
     }
 
     /**
      * @test
      */
-    function testGetUsernameIsNotNull() {
+    public function testGetUsernameIsNotNull() {
         $this->assertNotNull($this->configurationService->getUsername());
     }
 
     /**
      * @test
      */
-    function testGetUsernameIsString() {
+    public function testGetUsernameIsString() {
         $this->assertInternalType('string', $this->configurationService->getUsername());
     }
 
     /**
      * @test
      */
-    function testGetPasswordIsNotNull() {
+    public function testGetPasswordIsNotNull() {
         $this->assertNotNull($this->configurationService->getPassword());
     }
 
     /**
      * @test
      */
-    function testGetPasswordIsString() {
+    public function testGetPasswordIsString() {
         $this->assertInternalType('string', $this->configurationService->getPassword());
     }
 
