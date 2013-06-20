@@ -239,12 +239,4 @@ class XmlResourceService extends AbstractDataService {
     public function setXmlreader(\SimpleXml $xmlreader) {
         $this->xmlreader = $xmlreader;
     }
-
-    /**
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabase() {
-        return $GLOBALS['TYPO3_DB'];
-    }
-
 }
