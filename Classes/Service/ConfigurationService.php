@@ -70,8 +70,8 @@ class ConfigurationService extends AbstractDataService {
      * @return mixed string or NULL
      */
     public function getPhpPath(){
-        $path = $this->getAllEntries();
-        return isset($path['phpPath']) ? (int) $path['phpPath'] : NULL;
+        $configuration = $this->getAllEntries();
+        return isset($configuration['phpPath']) ? $configuration['phpPath'] : NULL;
     }
 
     
