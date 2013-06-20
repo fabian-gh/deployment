@@ -75,7 +75,7 @@ class XmlDatabaseService extends AbstractDataService {
         $this->xmlwriter->startDocument('1.0'); // Document-Tag erzeugen
         // Document Type Definition (DTD)
         $this->xmlwriter->startDtd('changeSet');
-        $this->xmlwriter->writeDtdElement('changeSet', '(data)+');
+        $this->xmlwriter->writeDtdElement('changeSet', '(data+)');
         $this->xmlwriter->writeDtdElement('data', 'ANY');
         $this->xmlwriter->endDtd();
 

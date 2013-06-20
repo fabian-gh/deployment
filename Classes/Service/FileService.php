@@ -48,6 +48,7 @@ class FileService extends AbstractDataService {
         return $newArr;
     }
 
+    
     /**
      * Filtert alle nicht indizierten Dateien und fügt diese in die sys-file Tabelle ein
      *
@@ -88,6 +89,7 @@ class FileService extends AbstractDataService {
         return $notIndexedFiles;
     }
 
+    
     /**
      * Prüft ob die Dateien im resource-Ordner innerhalb des fileadmins vorhanden
      * sind. Falls nein werden diese kopiert.
@@ -119,6 +121,7 @@ class FileService extends AbstractDataService {
         }
     }
 
+    
     /**
      * Nicht indizierte Daten in Tabelle eintragen
      *
@@ -156,6 +159,7 @@ class FileService extends AbstractDataService {
         }
     }
 
+    
     /**
      * Generiert eine UUID
      *
@@ -165,6 +169,7 @@ class FileService extends AbstractDataService {
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
     }
 
+    
     /**
      * Löscht alle XML-Dateien und Ordner, die älter als ein halbes Jahr sind
      */
@@ -217,6 +222,7 @@ class FileService extends AbstractDataService {
         }
     }
 
+    
     /**
      * Erstellt die Verzeichnisstruktur falls diese nicht bereits vorhanden sein sollte
      */
@@ -228,6 +234,7 @@ class FileService extends AbstractDataService {
         $exFold[] = $folder->folderExists($this->getDeploymentPathWithTrailingSlash());
         $exFold[] = $folder->folderExists($this->getDeploymentDatabasePathWithTrailingSlash());
         $exFold[] = $folder->folderExists($this->getDeploymentMediaPathWithTrailingSlash());
+        // TODO: Löschen des Pfades
         $exFold[] = $folder->folderExists($this->getDeploymentResourcePathWithTrailingSlash());
 
         foreach ($exFold as $ergkey => $ergvalue) {
@@ -244,7 +251,8 @@ class FileService extends AbstractDataService {
                     case 2:
                         GeneralUtility::mkdir($ergvalue);
                         break;
-
+					
+                    // TODO: Pfad löschen
                     case 3:
                         GeneralUtility::mkdir($ergvalue);
                         break;
@@ -253,6 +261,7 @@ class FileService extends AbstractDataService {
         }
     }
 
+    
     /**
      * Validiert die übergebene Datei
      *
@@ -263,7 +272,7 @@ class FileService extends AbstractDataService {
     public function xmlValidation($file) {
         $dom = new \DOMDocument;
         $dom->load($file);
-
+        
         if ($dom->validate()) {
             return TRUE;
         } else {
@@ -271,6 +280,7 @@ class FileService extends AbstractDataService {
         }
     }
 
+    
     /**
      * Splittet die Validierung von den Daten
      *
