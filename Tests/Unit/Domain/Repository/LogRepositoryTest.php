@@ -1,5 +1,6 @@
 <?php
-namespace TYPO3\Deployment\Domain\Repository;
+
+namespace TYPO3\Deployment\Tests\Unit\Domain\Repository;
 
 class LogRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     
