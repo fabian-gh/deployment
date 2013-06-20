@@ -65,17 +65,6 @@ class ConfigurationService extends AbstractDataService {
     
     
     /**
-     * Gibt den PHP-Pfad zurück
-     * 
-     * @return mixed string or NULL
-     */
-    public function getPhpPath(){
-        $configuration = $this->getAllEntries();
-        return isset($configuration['phpPath']) ? $configuration['phpPath'] : NULL;
-    }
-
-    
-    /**
      * Gibt die Adresse des PullServers zurück
      *
      * @return mixed string or NULL

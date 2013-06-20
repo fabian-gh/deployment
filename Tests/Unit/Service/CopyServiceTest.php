@@ -2,88 +2,77 @@
 
 namespace TYPO3\Deployment\Tests\Unit\Service;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
-	/**
-	 * @test
-	 */
-	function testCheckIfCommandControllerIsRegistered() {
-		/** @var \TYPO3\Deployment\Service\CopyService $con */
-		$copy = new \TYPO3\Deployment\Service\CopyService();
+    /**
+     * CopyService
+     * 
+     * @var \TYPO3\Deployment\Service\CopyService|NULL
+     */
+    protected $copyService = NULL;
+    
+    
+    /**
+     * build up the test
+     */
+    public function __construct(){
+        $this->copyService = new \TYPO3\Deployment\Service\CopyService();
+    }
+    
+    /**
+     * @test
+     */
+    public function testCheckIfCommandControllerIsRegistered() {
+        $this->assertTrue($this->copyService->checkIfCommandControllerIsRegistered());
+    }
 
-		$this->assertTrue($copy->checkIfCommandControllerIsRegistered());
-	}
+    /**
+     * @test
+     */
+    public function testCheckIfCliUserIsRegistered() {
+        $this->assertTrue($this->copyService->checkIfCliUserIsRegistered());
+    }
 
-	/**
-	 * @test
-	 */
-	function testCheckIfCliUserIsRegistered() {
-		/** @var \TYPO3\Deployment\Service\CopyService $con */
-		$copy = new \TYPO3\Deployment\Service\CopyService();
+    /**
+     * @test
+     */
+    public function testGetTaskUidNotEmpty() {
+        $this->assertNotEmpty($this->copyService->getTaskUid());
+    }
 
-		$this->assertTrue($copy->checkIfCliUserIsRegistered());
-	}
+    /**
+     * @test
+     */
+    public function testGetDisable() {
+        $this->assertEquals(1, $this->copyService->getDisable());
+    }
 
-	/**
-	 * @test
-	 */
-	function testGetTaskUidNotEmpty() {
-		/** @var \TYPO3\Deployment\Service\CopyService $con */
-		$copy = new \TYPO3\Deployment\Service\CopyService();
+    /**
+     * @test
+     */
+    public function testGetDisableNotEmpty() {
+        $this->assertNotEmpty($this->copyService->getDisable());
+    }
 
-		$this->assertNotEmpty($copy->getTaskUid());
-	}
+    /**
+     * @test
+     */
+    public function testAllPrecausionsSet() {
+        $this->assertTrue($this->copyService->allPrecautionsSet());
+    }
 
-	/**
-	 * @test
-	 */
-	function testGetDisable() {
-		/** @var \TYPO3\Deployment\Service\CopyService $con */
-		$copy = new \TYPO3\Deployment\Service\CopyService();
+    /**
+     * @test
+     */
+    public function testGetCliPathIsString() {
+        $this->assertInternalType('string', $this->copyService->getCliPath());
+    }
 
-		$this->assertEquals(1, $copy->getDisable());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetDisableNotEmpty() {
-		/** @var \TYPO3\Deployment\Service\CopyService $con */
-		$copy = new \TYPO3\Deployment\Service\CopyService();
-
-		$this->assertNotEmpty($copy->getDisable());
-	}
-
-	/**
-	 * @test
-	 */
-	function testAllPrecausionsSet() {
-		/** @var \TYPO3\Deployment\Service\CopyService $con */
-		$copy = new \TYPO3\Deployment\Service\CopyService();
-
-		$this->assertTrue($copy->allPrecautionsSet());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetCliPathIsString() {
-		/** @var \TYPO3\Deployment\Service\CopyService $con */
-		$copy = new \TYPO3\Deployment\Service\CopyService();
-
-		$this->assertInternalType('string', $copy->getCliPath());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetCliPath() {
-		/** @var \TYPO3\Deployment\Service\CopyService $con */
-		$copy = new \TYPO3\Deployment\Service\CopyService();
-
-		$this->assertEquals(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'typo3/cli_dispatch.phpsh', $copy->getCliPath());
-	}
+    /**
+     * @test
+     */
+    public function testGetCliPath() {
+        $this->assertEquals(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'typo3/cli_dispatch.phpsh', $this->copyService->getCliPath());
+    }
 
 }

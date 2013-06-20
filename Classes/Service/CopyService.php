@@ -15,7 +15,6 @@ use \TYPO3\CMS\Core\Utility\CommandUtility;
 use \TYPO3\CMS\Core\Utility\HttpUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use \TYPO3\CMS\Frontend\Page\PageRepository;
 use \TYPO3\CMS\Scheduler\Task\AbstractTask;
 use \TYPO3\Deployment\Service\FileService;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -47,16 +46,17 @@ class CopyService extends AbstractDataService {
      */
     public function trigger() {
         if ($this->allPrecautionsSet()) {
-            /** @var \TYPO3\Deployment\Service\ConfigurationService $conf */
-            $conf = new ConfigurationService();
-            
-            $phpPath = $conf->getPhpPath();
+            $arr = array();
             $path = $this->getCliPath();
             $taskUid = $this->getTaskUid();
             
-            // TODO: über CommandUtility::getCommand() irgendwie den php-Pfad herausbekommen
-            // Linux: /opt/lampp/bin/php
-            CommandUtility::exec(escapeshellcmd("$conf $path scheduler -f -i $taskUid"));
+            $userAgent = $_SERVER['HTTP_USER_AGENT'];
+            if (preg_match('/linux/i', $userAgent) == 1 || preg_match('/mac/i', $userAgent) == 1) {
+                CommandUtility::exec('whereis -b php', $arr);
+                $phpPath = GeneralUtility::trimExplode(':', $arr[0]);
+                
+                CommandUtility::exec(escapeshellcmd("$phpPath[1] $path scheduler -f -i $taskUid"));
+            }
         }
     }
 
@@ -152,8 +152,8 @@ class CopyService extends AbstractDataService {
         // Pfad mit User und PW wieder zusammensetzen
         $pullServer = trim(HttpUtility::buildUrl($parts), '/');
         
-        // Betriebssystem auslesen
-        $os = get_browser()->platform;
+        // User-Agent auslesen
+        $userAgent = $_SERVER['HTTP_USER_AGENT'];
 
         // XML einlesen
         $data = $fileService->splitContent($xmlResourceService->readXmlResourceList());
@@ -179,7 +179,7 @@ class CopyService extends AbstractDataService {
             }
 
             // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
-            if (strpos($os, 'Linux') !== FALSE || strpos($os, 'Mac') !== FALSE) {
+            if (preg_match('/linux/i', $userAgent) == 1 || preg_match('/mac/i', $userAgent) == 1) {
                 $sourceDest = CommandUtility::checkCommand("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
                 // Parameter: Dateien bei Übertragung komprimieren, neuere Dateien nicht ersetzen,
                 // SymLinks als Syminks kopieren, Dateirechte beibehalten, Quellverzeichnis

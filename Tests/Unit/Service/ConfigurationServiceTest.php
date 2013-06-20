@@ -73,20 +73,6 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     public function testGetDeleteStateIsInt() {
         $this->assertInternalType('int', $this->configurationService->getDeleteState());
     }
-    
-    /**
-     * @test
-     */
-    public function testGetPhpPathIsString(){
-        $this->assertInternalType('string', $this->configurationService->getPhpPath());
-    }
-    
-    /**
-     * @test
-     */
-    public function testGetPhpPathIsNotNull(){
-        $this->assertNotNull($this->configurationService->getPhpPath());
-    }
 
     /**
      * @test
