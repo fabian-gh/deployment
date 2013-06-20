@@ -212,10 +212,8 @@ class FileService extends AbstractDataService {
                             $splitFile = explode('_', $filevalue);
                             $folder = ($splitFile[1] == 'changes.xml') ? 'database' : 'media';
 
-                            unlink($this->getDeploymentPathWithTrailingSlash() . $folder . '/' . $datekey . '/' . $filevalue);
+                            GeneralUtility::rmdir($this->getDeploymentPathWithTrailingSlash().$folder.'/'.$datekey, true);
                         }
-                        // Ordner selbst löschen
-                        rmdir($this->getDeploymentPathWithTrailingSlash() . $folder . '/' . $datekey);
                     }
                 }
             }

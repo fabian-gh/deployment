@@ -4,174 +4,143 @@ namespace TYPO3\Deployment\Tests\Unit\Service;
 
 class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
-	/**
-	 * @test
-	 */
-	function testReadFilesInFileadmin() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
+    /**
+     *
+     * @var \TYPO3\Deployment\Service\FileService();
+     */
+    protected $fileService = NULL;
+    
+    
+    /**
+     * Build up the test
+     */
+    public function __construct(){
+        $this->fileService = new \TYPO3\Deployment\Service\FileService();
+    }
+    
+    /**
+     * @test
+     */
+    public function testReadFilesInFileadminIsArray() {
+        $this->assertInternalType('array', $this->fileService->readFilesInFileadmin());
+    }
+    
+    /**
+     * @test
+     */
+    public function testReadFilesInFileadminIsNotEmpty(){
+        $this->assertNotEmpty($this->fileService->readFilesInFileadmin());
+    }
 
-		$this->assertInternalType('array', $file->readFilesInFileadmin());
-	}
+    /**
+     * @test
+     */
+    function testReadFilesInFileadminWithoutDeploymentFiles() {
+        $this->assertNotContains('/deployment', $this->fileService->readFilesInFileadmin());
+    }
+    
+    /**
+     * @test
+     */
+    function testReadFilesInFileadminWithoutProcessedFiles() {
+        $this->assertNotContains('/_processed', $this->fileService->getNotIndexedFiles());
+    }
+    
+    /**
+     * @test
+     */
+    function testReadFilesInFileadminWithoutTempFiles() {
+        $this->assertNotContains('/_temp', $this->fileService->getNotIndexedFiles());
+    }
+    
+    /**
+     * @test
+     */
+    public function testGetNotIndexedFilesIsArray() {
+        $this->assertInternalType('array', $this->fileService->getNotIndexedFiles());
+    }
+    
+    /**
+     * @test
+     */
+    public function testGetNotIndexedFilesIsNotEmpty() {
+        $this->assertNotEmpty($this->fileService->getNotIndexedFiles());
+    }
+    
+    /**
+     * @test
+     */
+    function testGenerateUuid() {
+        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $this->fileService->generateUuid());
+    }
 
-	/**
-	 * @test
-	 */
-	function testReadFilesInFileadminWithoutDeploymentFiles() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
+    /**
+     * @test
+     */
+    function testGetFileadminPathWithoutTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getFileadminPathWithoutTrailingSlash());
+    }
 
-		$this->assertNotContains('/deployment', $file->readFilesInFileadmin());
-	}
+    /**
+     * @test
+     */
+    function testGetFileadminPathWithTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getFileadminPathWithTrailingSlash());
+    }
 
-	/**
-	 * @test
-	 */
-	function testGetNotIndexedFiles() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
+    /**
+     * @test
+     */
+    function testGetDeploymentPathWithoutTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentPathWithoutTrailingSlash());
+    }
 
-		$this->assertInternalType('array', $file->getNotIndexedFiles());
-	}
+    /**
+     * @test
+     */
+    function testGetDeploymentPathWithTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentPathWithTrailingSlash());
+    }
 
-	/**
-	 * @test
-	 */
-	function testReadFilesInFileadminWithoutProcessedFiles() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
+    /**
+     * @test
+     */
+    function testGetDeploymentDatabasePathWithoutTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentDatabasePathWithoutTrailingSlash());
+    }
 
-		$this->assertNotContains('/_processed', $file->getNotIndexedFiles());
-	}
+    /**
+     * @test
+     */
+    function testGetDeploymentDatabasePathWithTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentDatabasePathWithTrailingSlash());
+    }
 
-	/**
-	 * @test
-	 */
-	function testReadFilesInFileadminWithoutTempFiles() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
+    /**
+     * @test
+     */
+    function testGetDeploymentMediaPathWithoutTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentMediaPathWithoutTrailingSlash());
+    }
 
-		$this->assertNotContains('/_temp', $file->getNotIndexedFiles());
-	}
+    /**
+     * @test
+     */
+    function testGetDeploymentMediaPathWithTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentMediaPathWithTrailingSlash());
+    }
 
-	/**
-	 * @test
-	 */
-	function testGenerateUuid() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
+    /**
+     * @test
+     */
+    function testGetDeploymentResourcePathWithoutTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentResourcePathWithoutTrailingSlash());
+    }
 
-		$this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $file->generateUuid());
-	}
-
-	/**
-	 * @test
-	 */
-	function testxmlValidation() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertTrue($file->xmlValidation());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetFileadminPathWithoutTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getFileadminPathWithoutTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetFileadminPathWithTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getFileadminPathWithTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetDeploymentPathWithoutTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getDeploymentPathWithoutTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetDeploymentPathWithTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getDeploymentPathWithTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetDeploymentDatabasePathWithoutTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getDeploymentDatabasePathWithoutTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetDeploymentDatabasePathWithTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getDeploymentDatabasePathWithTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetDeploymentMediaPathWithoutTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getDeploymentMediaPathWithoutTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetDeploymentMediaPathWithTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getDeploymentMediaPathWithTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testGetDeploymentResourcePathWithoutTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getDeploymentResourcePathWithoutTrailingSlash());
-	}
-
-	/**
-	 * @test
-	 */
-	function testetDeploymentResourcePathWithTrailingSlashIsString() {
-		/** @var \TYPO3\Deployment\Service\FileService $con */
-		$file = new \TYPO3\Deployment\Service\FileService();
-
-		$this->assertInternalType('string', $file->getDeploymentResourcePathWithTrailingSlash());
-	}
-
+    /**
+     * @test
+     */
+    function testGetDeploymentResourcePathWithTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentResourcePathWithTrailingSlash());
+    }
 }

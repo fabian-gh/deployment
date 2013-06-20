@@ -231,8 +231,8 @@ class XmlDatabaseService extends AbstractDataService {
                 // wenn Datei-Timestamp später als letztes Deployment,
                 // dann die Datei lesen und umwandeln
                 if ($dateAsTstamp >= $timestamp) {
-                    $validationResult['validation']['database/' . $folder . '/' . $file] = $fileService->xmlValidation($fileService->getDeploymentDatabasePathWithTrailingSlash() . $folder . '/' . $file);
-                    $xmlString = file_get_contents($fileService->getDeploymentDatabasePathWithTrailingSlash() . $folder . '/' . $file);
+                    $validationResult['validation']['database/'.$folder.'/'.$file] = $fileService->xmlValidation($fileService->getDeploymentDatabasePathWithTrailingSlash().$folder.'/'.$file);
+                    $xmlString = file_get_contents($fileService->getDeploymentDatabasePathWithTrailingSlash().$folder.'/'.$file);
 
                     $this->xmlreader = new \SimpleXMLElement($xmlString);
                     foreach ($this->xmlreader->data as $dataset) {
