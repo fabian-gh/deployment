@@ -62,6 +62,17 @@ class ConfigurationService extends AbstractDataService {
         $configuration = $this->getAllEntries();
         return isset($configuration['deleteOlderFiles']) ? (int) $configuration['deleteOlderFiles'] : NULL;
     }
+    
+    
+    /**
+     * Gibt den PHP-Pfad zurück
+     * 
+     * @return mixed string or NULL
+     */
+    public function getPhpPath(){
+        $path = $this->getAllEntries();
+        return isset($path['phpPath']) ? (int) $path['phpPath'] : NULL;
+    }
 
     
     /**

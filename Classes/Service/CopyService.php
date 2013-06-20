@@ -47,11 +47,16 @@ class CopyService extends AbstractDataService {
      */
     public function trigger() {
         if ($this->allPrecautionsSet()) {
+            /** @var \TYPO3\Deployment\Service\ConfigurationService $conf */
+            $conf = new ConfigurationService();
+            
+            $phpPath = $conf->getPhpPath();
             $path = $this->getCliPath();
             $taskUid = $this->getTaskUid();
             
             // TODO: über CommandUtility::getCommand() irgendwie den php-Pfad herausbekommen
-            CommandUtility::exec(escapeshellcmd("/opt/lampp/bin/php $path scheduler -f -i $taskUid"));
+            // Linux: /opt/lampp/bin/php
+            CommandUtility::exec(escapeshellcmd("$conf $path scheduler -f -i $taskUid"));
         }
     }
 

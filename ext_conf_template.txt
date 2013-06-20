@@ -1,3 +1,6 @@
+# cat=Access; type=text; label=PHP-Path: Path to the executable php file
+phpPath = 
+
 # cat=Access; type=text; label=Pull-Server: Address of pull server
 pullServer = 
 
