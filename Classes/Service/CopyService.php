@@ -175,7 +175,7 @@ class CopyService extends AbstractDataService {
             $source = "$server/fileadmin/$fold/$filename";
             
             // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
-            if (preg_match('/linux/i', $userAgent) == 1 || preg_match('/mac/i', $userAgent) == 1) {
+            if (preg_match('/linux/i', $userAgent) == 1) {
                 // In Zielverzeichnis wechseln und über wget nur Dateien holen, die neuer als Zieldatei sind
                 CommandUtility::exec("cd $dest; wget --user=$username --password=$password --timestamping $source");
             } else {
