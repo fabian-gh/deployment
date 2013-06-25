@@ -122,7 +122,7 @@ class CopyService extends AbstractDataService {
      * Dateien aus der sys_file-Tabelle über die XML-Datei einlesen und diese
      * mittels des Command Controller Tasks vom Quellsystem kopieren
      */
-    protected function deployResources() {
+    public function deployResources() {
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
@@ -131,6 +131,9 @@ class CopyService extends AbstractDataService {
         $configuration = new ConfigurationService();
         /** @var \TYPO3\Deployment\Service\XmlResourceService $xmlResourceService */
         $xmlResourceService = new XmlResourceService();
+        
+        // User-Agent auslesen
+        $userAgent = $_SERVER['HTTP_USER_AGENT'];
 
         // TODO: Pfad zu fileadmin ändern
         $path = $fileService->getDeploymentResourcePathWithoutTrailingSlash();
@@ -139,20 +142,10 @@ class CopyService extends AbstractDataService {
         $username = $configuration->getUsername();
         $password = $configuration->getPassword();
 
-        // URL in Teile zerlegen
-        $parts = parse_url($server);
-        // Username & Password trimmen falls nicht leer
-        if (trim($username) != '') {
-            $parts['user'] = $username;
+        // letztes Slash entfernen falls vorhanden
+        if(substr($server, strlen($server)-1) == "/"){
+            $server = substr($server, 0, -1);
         }
-        if (trim($password) != '') {
-            $parts['pass'] = $password;
-        }
-        // Pfad mit User und PW wieder zusammensetzen
-        $pullServer = trim(HttpUtility::buildUrl($parts), '/');
-        
-        // User-Agent auslesen
-        $userAgent = $_SERVER['HTTP_USER_AGENT'];
 
         // XML einlesen
         $data = $fileService->splitContent($xmlResourceService->readXmlResourceList());
@@ -176,16 +169,16 @@ class CopyService extends AbstractDataService {
             if (!is_dir($path . '/' . $fold)) {
                 GeneralUtility::mkdir_deep($path . '/' . $fold);
             }
-
+            
             // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
             if (preg_match('/linux/i', $userAgent) == 1 || preg_match('/mac/i', $userAgent) == 1) {
-                $sourceDest = CommandUtility::checkCommand("$pullServer/fileadmin/$fold/$filename $path/$fold/$filename");
-                // Parameter: Dateien bei Übertragung komprimieren, neuere Dateien nicht ersetzen,
-                // SymLinks als Syminks kopieren, Dateirechte beibehalten, Quellverzeichnis
-                CommandUtility::exec("rsync --compress --update --links --perms $sourceDest");
+                $dest = "$path/$fold/";
+                $source = "$server/fileadmin/$fold/$filename";
+                // In Zielverzeichnis wechseln und über wget nur Dateien holen, die neuer als Zieldatei sind
+                CommandUtility::exec("cd $dest; wget --user=$username --password=$password --timestamping $source");
             } else {
                 //TODO: Pfad ändern
-                GeneralUtility::upload_copy_move($pullServer.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
+                GeneralUtility::upload_copy_move($server.'/fileadmin/'.$fold.'/'.$filename, $path.'/'.$fold.'/'.$filename);
             }
         }
     }
