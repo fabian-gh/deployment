@@ -63,6 +63,21 @@ class AbstractDataService {
 
         return (!empty($pid['pid'])) ? $pid['pid'] : 0;
     }
+    
+    
+    /**
+     * Kontrollergebnis abfragen
+     * 
+     * @param string $field
+     * @param string $table
+     * @param string $uuid
+     * @return mixed <b>string</b> or <b>null</b>
+     */
+    public function getControlResult($field, $table, $uuid){
+        $uuid = $this->getDatabase()->exec_SELECTgetSingleRow($field, $table, "uuid='".$uuid."'");
+        
+        return (!empty($uuid[$field])) ? $uuid[$field] : null;
+    }
 
     
     /**

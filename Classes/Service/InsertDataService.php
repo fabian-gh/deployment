@@ -38,10 +38,10 @@ class InsertDataService extends AbstractDataService {
         DatabaseService::connectTestDatabaseIfExist();
         
         // letzte Aktualisierung abfragen
-        $lastModified = $this->getDatabase()->exec_SELECTgetSingleRow('tstamp', $entry['tablename'], "uuid = '" . $entry['uuid'] . "'");
+        $lastModified = $this->getControlResult('tstamp', $entry['tablename'], $entry['uuid']);
         
         // falls Datensatz noch nicht exisitert, dann einfügen
-        if ($lastModified === FALSE && $entry['fieldlist'] == '*') {
+        if ($lastModified === NULL && $entry['fieldlist'] == '*') {
             $tablename = $entry['tablename'];
             
             // die entsprechende PID abfragen und ersetzen
@@ -74,12 +74,12 @@ class InsertDataService extends AbstractDataService {
                     $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
                 } // Fall für tt_news
                 elseif ($entry['tablename'] == 'tt_news_cat_mm') {
-                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                    $table = $this->getControlResult('tablenames', 'tt_news_cat_mm', $entry['uid_foreign']);
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table);
                     $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                 } elseif ($entry['tablename'] == 'tt_news_related_mm') {
-                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                    $table = $this->getControlResult('tablenames', 'tt_news_related_mm', $entry['uid_foreign']);
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table);
                     $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                 }
             }
@@ -94,7 +94,7 @@ class InsertDataService extends AbstractDataService {
             
             return true;
         } // wenn Eintrag älter ist als der zu aktualisierende
-        elseif ($lastModified['tstamp'] <= $entry['tstamp']) {
+        elseif ($lastModified <= $entry['tstamp']) {
             // Tabellennamen vor Löschung merken
             $table = $entry['tablename'];
             
@@ -129,12 +129,12 @@ class InsertDataService extends AbstractDataService {
                     $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
                 } // Fall für tt_news
                 elseif ($entry['tablename'] == 'tt_news_cat_mm') {
-                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_cat_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                    $table = $this->getControlResult('tablenames', 'tt_news_cat_mm', $entry['uid_foreign']);
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table);
                     $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                 } elseif ($entry['tablename'] == 'tt_news_related_mm') {
-                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', 'tt_news_related_mm', "uuid='" . $entry['uid_foreign'] . "'");
-                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table['tablenames']);
+                    $table = $this->getControlResult('tablenames', 'tt_news_related_mm', $entry['uid_foreign']);
+                    $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table);
                     $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_news');
                 }
             }
@@ -149,7 +149,7 @@ class InsertDataService extends AbstractDataService {
 
             return true;
         } // wenn letzte Aktualisierung jünger ist als einzutragender Stand
-        elseif ($lastModified['tstamp'] > $entry['tstamp']) {
+        elseif ($lastModified > $entry['tstamp']) {
             return $entry;
         }
     }
@@ -300,24 +300,24 @@ class InsertDataService extends AbstractDataService {
         if ($this->getDatabase()->isConnected()) {
             foreach ($dataArr as $entry) {
                 // letzte Aktualisierung abfragen
-                $lastModified = $this->getDatabase()->exec_SELECTgetSingleRow('tstamp', 'sys_file', "uuid = '" . $entry['uuid'] . "'");
+                $lastModified = $this->getControlResult('tstamp', 'sys_file', $entry['uuid']);
 
                 // falls Datensatz noch nicht exisitert, dann einfügen
-                if ($lastModified === FALSE) {
+                if ($lastModified === NULL) {
                     unset($entry['tablename']);
                     $entry['tstamp'] = time();
 
                     // Daten einfügen
                     $this->getDatabase()->exec_INSERTquery('sys_file', $entry);
                 } // wenn Eintrag älter ist als der zu aktualisierende
-                elseif ($lastModified['tstamp'] < $entry['tstamp']) {
+                elseif ($lastModified < $entry['tstamp']) {
                     unset($entry['tablename']);
                     $entry['tstamp'] = time();
 
                     // Daten aktualisieren
                     $this->getDatabase()->exec_UPDATEquery('sys_file', 'uuid=' . $entry['uuid'], $entry);
                 } // wenn letzte Aktualisierung jünger ist als einzutragender Stand
-                elseif ($lastModified['tstamp'] > $entry['tstamp']) {
+                elseif ($lastModified > $entry['tstamp']) {
                     $entryCollection[] = $entry;
                 }
             }
