@@ -34,6 +34,8 @@ class ConfigurationService extends AbstractDataService {
 
         array_push($tables, 'tt_content');
         array_push($tables, 'pages');
+        array_push($tables, 'sys_file');
+        array_push($tables, 'sys_file_reference');
         array_unique($tables);
         
         return $tables;
