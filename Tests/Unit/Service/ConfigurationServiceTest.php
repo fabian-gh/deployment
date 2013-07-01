@@ -45,6 +45,20 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     public function testGetDeploymentTablesCotainsPages() {
         $this->assertContains('pages', $this->configurationService->getDeploymentTables());
     }
+
+    /**
+     * @test
+     */
+    public function testGetDeploymentTablesCotainsSysFile() {
+        $this->assertContains('sys_file', $this->configurationService->getDeploymentTables());
+    }
+
+    /**
+     * @test
+     */
+    public function testGetDeploymentTablesCotainsSysFileReference() {
+        $this->assertContains('sys_file_reference', $this->configurationService->getDeploymentTables());
+    }
     
     /**
      * @test
