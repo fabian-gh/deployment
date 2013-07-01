@@ -105,16 +105,16 @@ class DeploymentController extends ActionController {
 
         // prüfen ob Command Controller & Benutzer registiert ist
         if(!$this->copyService->checkIfCommandControllerIsRegistered()) {
-            $this->addFlashMessage('Bitte erstellen Sie im Scheduler-Modul einen Extbase Command Controller Task und deaktivieren sie diesen.', 'Kein Command Controller vorhanden', FlashMessage::ERROR);
+            $this->addFlashMessage('Please create a CommandController Task in the scheduler module and disable it.', 'No Extbase CommandController Task found', FlashMessage::ERROR);
         }
         if(!$this->copyService->checkIfCliUserIsRegistered()) {
-            $this->addFlashMessage("Bitte erstellen Sie im Scheduler-Modul unter dem Menüpunkt 'Setup Check' einen CLI-User.", 'CLI Benutzer nicht vorhanden', FlashMessage::ERROR);
+            $this->addFlashMessage("Please create a CLI-User under 'Setup Check' in the scheduler module.", 'No CLI-User found', FlashMessage::ERROR);
         }
         if($this->copyService->getDisable() == '0') {
-            $this->addFlashMessage('', 'Bitte deaktivieren Sie den Command Controller Task', FlashMessage::ERROR);
+            $this->addFlashMessage('', 'Please disable the CommandController Task', FlashMessage::ERROR);
         }
         if(!$this->scheduler->checkIfTaskIsRegistered()) {
-            $this->addFlashMessage('Task zur automatischen Vergabe von UUIDs erstellen.', 'UUID Scheduler Task', FlashMessage::INFO);
+            $this->addFlashMessage('Create a task for automatic UUID assignment.', 'UUID Scheduler Task', FlashMessage::INFO);
         }
 
         // Noch nicht indizierte Dateien indizieren
@@ -180,7 +180,7 @@ class DeploymentController extends ActionController {
                 'diffData' => $diffData
             ));
         } else {
-            $this->addFlashMessage('Keine Einträge gefunden', '', FlashMessage::ERROR);
+            $this->addFlashMessage('', 'No entries found', FlashMessage::ERROR);
         }
     }
 
@@ -209,7 +209,7 @@ class DeploymentController extends ActionController {
         $this->xmlDatabaseService->setDeployData(array_unique($deployData));
         $this->xmlDatabaseService->writeXML();
 
-        $this->addFlashMessage('Daten wurden erstellt.', '', FlashMessage::OK);
+        $this->addFlashMessage('', 'Lists were created', FlashMessage::OK);
         $this->redirect('index');
     }
 
@@ -247,11 +247,11 @@ class DeploymentController extends ActionController {
             // TODO: Entkommentieren
             //$this->registry->set('deployment', 'last_deploy', time());
             // Bestätigung ausgeben
-            $this->addFlashMessage('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
+            $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
 
             // Warnung falls XML nicht valide
             if (in_array(FALSE, $validationContent)) {
-                $this->addFlashMessage('Das Deployment wurde dennoch fortgesetzt', 'XML-Datei nicht valide', FlashMessage::WARNING);
+                $this->addFlashMessage('However, the deployment was continued', 'XML-File not valid', FlashMessage::WARNING);
             }
 
             // Redirect auf Hauptseite
@@ -308,7 +308,7 @@ class DeploymentController extends ActionController {
         $diff = $this->failureService->getFailureDataDiff($databaseEntries, $failureEntries);
         $diffData = $this->failureService->convertTimestamps($diff);
 
-        $this->addFlashMessage('Ein Teil der Daten konnte nicht eingefügt werden. Bitte kontrollieren Sie die unteren Einträge.', 'Es sind Fehler aufgetreten!', FlashMessage::ERROR);
+        $this->addFlashMessage('A part of the data could not be inserted. Please check the given entries.', 'An error has occured!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failure' => $failure,
             'failureEntries' => $failureEntries,
@@ -331,7 +331,7 @@ class DeploymentController extends ActionController {
         if ($res) {
             // TODO: Entkomentieren
             //$this->registry->set('deployment', 'last_deploy', time());
-            $this->addFlashMessage('Bitte leeren Sie nun noch den Cache', 'Deployment wurde erfolgreich ausgeführt', FlashMessage::OK);
+            $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
             $this->redirect('index');
         } else {
             $this->forward('listFailure', NULL, NULL, array('failures' => $storedFailures));
