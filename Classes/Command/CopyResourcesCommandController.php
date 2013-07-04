@@ -1,7 +1,8 @@
 <?php
 
 /**
- * CopyResourcesCommandController
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -16,6 +17,7 @@ use \TYPO3\Deployment\Service\CopyService;
 
 /**
  * CopyResourcesCommandController
+ * Class for the Command Controller Task
  *
  * @package    Deployment
  * @subpackage Domain\Command
