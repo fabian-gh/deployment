@@ -1,7 +1,8 @@
 <?php
 
 /**
- * ArrayConverter
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -11,11 +12,9 @@
 
 namespace TYPO3\Deployment\Property\TypeConverter;
 
-use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-
 /**
  * ArrayConverter
- * Converter which transforms arrays to arrays.
+ * Converter which transforms strings to arrays.
  * 
  * @package    Deployment
  * @subpackage Property\TypeConverter
@@ -50,5 +49,4 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\ArrayConv
         }
         throw new \Exception('No valid convert from string to array', 23467324523);
     }
-
 }
