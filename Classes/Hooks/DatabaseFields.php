@@ -1,7 +1,8 @@
 <?php
 
 /**
- * DatabaseFields
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -12,13 +13,13 @@
 namespace TYPO3\Deployment\Hooks;
 
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
-use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Install\tx_em_Install;
 use \TYPO3\CMS\Install\CheckTheDatabaseHookInterface;
 use \TYPO3\Deployment\Service\ConfigurationService;
 
 /**
  * DatabaseFields
+ * Hook class for creating uuid coloumn in tables
  *
  * @package    Deployment
  * @subpackage Hooks
