@@ -1,6 +1,7 @@
 <?php
 /**
- * AutoLoader Service
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -16,6 +17,7 @@ use \TYPO3\Deployment\Utility\Arrays;
 
 /**
  * AutoLoader Service
+ * Class for autoloading the hooks and command controller
  *
  * @package    Deployment
  * @subpackage Service
@@ -46,8 +48,7 @@ class AutoLoaderService {
     
 
     /**
-     * Lädt alle Hooks aus dem Hook Verzeichnis und prüft die Klassen auf ein Tag ähnlich:
-     * [at]hook TYPO3_CONF_VARS|SC_OPTIONS|tslib/class.tslib_content.php|stdWrap
+     * Loads the hooks from the hook directory
      * 
      * @return AutoLoaderService
      */
@@ -62,7 +63,7 @@ class AutoLoaderService {
             /** @var \TYPO3\CMS\Extbase\Reflection\ClassReflection $classReflection */
             $classReflection = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Reflection\\ClassReflection', $hookClass);
 
-            // Füge Klassen-Hooks hinzu
+            // add class hooks
             $classTags = $classReflection->getTagsValues();
             if (isset($classTags['hook'])) {
                 if (is_array($classTags['hook'])) {
@@ -72,7 +73,7 @@ class AutoLoaderService {
                 $this->addHook($classTags['hook'], $hookBase);
             }
 
-            // Füge methoden Hooks hinzu
+            // add method hooks
             foreach ($classReflection->getMethods() as $methodReflection) {
                 /** @var \TYPO3\CMS\Extbase\Reflection\MethodReflection $methodReflection */
                 $methodTags = $methodReflection->getTagsValues();
@@ -90,7 +91,7 @@ class AutoLoaderService {
 
     
     /**
-     * Lädt den Command Controller
+     * Load the command controller
      *
      * @return AutoLoaderService
      */
@@ -110,9 +111,9 @@ class AutoLoaderService {
 
     
     /**
-     * Einen Hook hinzufügen
+     * Add a Hook
      *
-     * @param string $location Der ort des Hooks separiert durch Pipes
+     * @param string $location Path of Hook seperated by pipes
      * @param string $configuration
      */
     public function addHook($location, $configuration) {
@@ -123,8 +124,7 @@ class AutoLoaderService {
     
 
     /**
-     * Alle Dateinamen aus dem Verzeichnis lesen
-     * Ebenso prüfen ob das Verzeichnis existiert
+     * Read all filenames from the directory and check if directory exists
      *
      * @param $dirPath
      * @param $fileExtension

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * FileService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -17,6 +18,7 @@ use \TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /**
  * FileService
+ * Class for file creating service
  *
  * @package    Deployment
  * @subpackage Service
@@ -25,7 +27,7 @@ use \TYPO3\CMS\Core\Resource\ResourceFactory;
 class FileService extends AbstractDataService {
 
     /**
-     * Schreibt eine Dateiliste des Fileadmins, ohne Deploymentdateien
+     * Write a file list of the fileadmin without deployment data
      *
      * @return array
      */
@@ -33,12 +35,12 @@ class FileService extends AbstractDataService {
         $fileArr = array();
         $newArr = array();
 
-        // direktes auslesen des Ordners, da evtl. nicht alle Dateien in Tabellen indexiert sind
+        // read the directory directly, because maybe not all files are indexed
         $path = $this->getFileadminPathWithTrailingSlash();
         $fileList = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $path);
 
         $pathCount = strlen($path);
-        // deployment-Ordner exkludieren
+        // exclude deplyoment directory
         foreach ($fileList as $filekey => $filevalue) {
             if (strstr($filevalue, '/fileadmin/deployment') == FALSE) {
                 $newArr[$filekey] = substr($filevalue, $pathCount);
@@ -50,7 +52,7 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Filtert alle nicht indizierten Dateien und fügt diese in die sys-file Tabelle ein
+     * Filter all not indexed files and add them to the sys_file table
      *
      * @return array
      */
@@ -61,14 +63,14 @@ class FileService extends AbstractDataService {
 
         $filesInFileadmin = $this->readFilesInFileadmin();
 
-        // processed Data raus
+        // exclude processed data
         foreach ($filesInFileadmin as $filevalue) {
             if (strstr($filevalue, '_processed_/') == FALSE) {
                 $fileArr[] = $filevalue;
             }
         }
 
-        // temp Data raus
+        // exclude temp data
         foreach ($fileArr as $filevalue) {
             if (strstr($filevalue, '_temp_/') == FALSE) {
                 $newFileArr[] = $filevalue;
@@ -91,8 +93,7 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Prüft ob die Dateien im resource-Ordner innerhalb des fileadmins vorhanden
-     * sind. Falls nein werden diese kopiert.
+     * Check if the files in the resource directory are available. If not copy them.
      * 
      * @deprecated since version 2
      */
@@ -101,19 +102,19 @@ class FileService extends AbstractDataService {
         $path = $this->getFileadminPathWithTrailingSlash();
         $resPath = $this->getDeploymentResourcePathWithTrailingSlash();
 
-        // Dateilisten
+        // data lists
         $fileadminFiles = $this->readFilesInFileadmin();
         $fileList = GeneralUtility::getAllFilesAndFoldersInPath($resourceFiles, $resPath);
 
-        // Pfade kürzen und in Array abspeichern
+        // chop the path and save in array
         foreach ($fileList as $paths) {
             $newFileList[] = str_replace('resource/', '', strstr($paths, 'resource'));
         }
 
-        // Unterschiede ermitteln
+        // determine differences
         $diffFiles = array_diff($newFileList, $fileadminFiles);
 
-        // Dateien aus resource in fileadmin kopieren
+        // copy resources from fileadmin
         foreach ($diffFiles as $file) {
             if (!file_exists($path . '/' . $file)) {
                 copy($resPath . $file, $path . '/' . $file);
@@ -123,19 +124,17 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Nicht indizierte Daten in Tabelle eintragen
+     * Index not indexed files
      *
      * @param array $fileArr
      */
     public function processNotIndexedFiles($fileArr) {
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $con */
-        //$con = $this->getDatabase();
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
 
         foreach ($fileArr as $file) {
             $res = $resFact->getFileObjectFromCombinedIdentifier('/fileadmin/' . $file);
-            // automatische Indizierung sobald mit $res gearbeitet wird
+            // automatic indexing as soon as $res is used
             $res->isIndexed();
         }
 
@@ -144,9 +143,9 @@ class FileService extends AbstractDataService {
             $res = $fileRep->findByIdentifierWithoutHeadingSlash('/fileadmin/');
 
             foreach ($res as $file) {
-                // File-Objekt über UID des Ergebnisses erzeugen
+                // create file-object over uid of the result
                 $File = $resFact->getFileObject($file->getUid());
-                // Identifier des Objekts abfragen
+                // qzery identifier of the object
                 $identifier = $File->getIdentifier();
 
                 if (strstr($identifier, '/fileadmin') != FALSE) {
@@ -161,7 +160,7 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Generiert eine UUID
+     * Generate a uuid
      *
      * @return string
      */
@@ -171,7 +170,7 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Löscht alle XML-Dateien und Ordner, die älter als ein halbes Jahr sind
+     * Delete all xml files which are older than a half year
      */
     public function deleteOlderFiles() {
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configuration */
@@ -179,7 +178,7 @@ class FileService extends AbstractDataService {
 
         $deleteState = $configuration->getDeleteState();
 
-        // falls Daten gelöscht werden sollen
+        // if data should be deleted
         if ($deleteState == 1) {
             $fileArr = array();
             $split = array();
@@ -188,24 +187,24 @@ class FileService extends AbstractDataService {
             $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $this->getDeploymentPathWithTrailingSlash(), '', TRUE);
 
             if ($filesAndFolders) {
-                // Dateipfad ausplitten
+                // split file path
                 foreach ($filesAndFolders as $faf) {
                     $exFaf[] = explode('/', $faf);
                 }
 
-                // pro Ordner/Datum ein Array mit allen Dateinamen darin
+                //  for each date an own directory with all filename inside
                 foreach ($exFaf as $item) {
                     if ($item[7] != '' && $item[8] != '') {
                         $dateFolder[$item[7]][] = $item[8];
                     }
                 }
 
-                // Datum splitten und löschen
+                // split date and delete
                 foreach ($dateFolder as $datekey => $files) {
                     $split = explode('_', $datekey);
                     $splitdate = mktime(0, 0, 0, $split[1], $split[2], $split[0]);
 
-                    // falls Ordner älter als halbes Jahr
+                    // if directory older than a half year
                     if ($splitdate + (6 * 30 * 24 * 60 * 60) < time()) {
                         // dann Dateien in Ordner löschen
                         foreach ($files as $filevalue) {
@@ -222,7 +221,7 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Erstellt die Verzeichnisstruktur falls diese nicht bereits vorhanden sein sollte
+     * Creates the directory structure if it not already exists
      */
     public function createDirectories() {
         $exFold = array();
@@ -261,7 +260,7 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Validiert die übergebene Datei
+     * Validate the assigned xml file
      *
      * @param XML-File $file
      *
@@ -280,7 +279,7 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Splittet die Validierung von den Daten
+     * Split the validation from the data
      *
      * @param array $content
      * @param bool  $validation
@@ -377,5 +376,4 @@ class FileService extends AbstractDataService {
     public function getDeploymentResourcePathWithTrailingSlash() {
         return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/';
     }
-
 }

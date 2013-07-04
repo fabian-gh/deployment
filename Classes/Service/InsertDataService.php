@@ -1,7 +1,8 @@
 <?php
 
 /**
- * InsertDataService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -17,6 +18,7 @@ use \TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /**
  * InsertDataService
+ * Class for updating and inserting the data into the database
  *
  * @package    Deployment
  * @subpackage Service
@@ -25,8 +27,8 @@ use \TYPO3\CMS\Core\Resource\ResourceFactory;
 class InsertDataService extends AbstractDataService {
 
     /**
-     * Prüft ob der übergebene Eintrag eingefügt oder aktualisert werden muss.
-     * Falls der Eintrag älter ist als der vorhandene, dann für manuelle Fehlerbehung sammeln
+     * Check if the assigned entry has to be updated or inserted
+     * If a newer entry exists, than collect entries for bug fixing
      *
      * @param array   $entry
      * @param boolean $flag
@@ -34,20 +36,20 @@ class InsertDataService extends AbstractDataService {
      * @return mixed <b>array</b> or <b>true</b>
      */
     protected function checkDataValues($entry) {
-        // Verbindung zu Testdatenbank aufbauen
+        // Connect to test database
         DatabaseService::connectTestDatabaseIfExist();
         
-        // letzte Aktualisierung abfragen
+        // query the last update
         $lastModified = $this->getControlResult('tstamp', $entry['tablename'], $entry['uuid']);
         
-        // falls Datensatz noch nicht exisitert, dann einfügen
+        // if data not exists, insert it
         if ($lastModified === NULL && $entry['fieldlist'] == '*') {
             $tablename = $entry['tablename'];
             
-            // die entsprechende PID abfragen und ersetzen
+            // query the pid and replace it
             $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
             
-            // Link abfragen und ersetzen
+            // query the link and replace it
             if ($entry['header_link'] != '') {
                 $split = explode(':', $entry['header_link']);
 
@@ -67,12 +69,13 @@ class InsertDataService extends AbstractDataService {
                     $entry['link'] = $this->getUidByUuid($split[1], 'pages');
                 }
             }
-            // uid_foreign & uid_local durch UID ersetzen
+            // replace uid_foreign & uid_local with uid
             if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
                 if ($entry['tablename'] == 'sys_file_reference') {
                     $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
                     $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
-                } // Fall für tt_news
+                } 
+                // case for tt_news
                 elseif ($entry['tablename'] == 'tt_news_cat_mm') {
                     $table = $this->getControlResult('tablenames', 'tt_news_cat_mm', $entry['uid_foreign']);
                     $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table);
@@ -84,7 +87,7 @@ class InsertDataService extends AbstractDataService {
                 }
             }
 
-            // neuen Timestamp setzen
+            // set new timestamp
             $entry['tstamp'] = time();
             unset($entry['tablename']);
             unset($entry['fieldlist']);
@@ -93,14 +96,15 @@ class InsertDataService extends AbstractDataService {
             $this->getDatabase()->exec_INSERTquery($tablename, $entry);
             
             return true;
-        } // wenn Eintrag älter ist als der zu aktualisierende
+        } 
+        // if database entry is older than the one to be updated (from xml)
         elseif ($lastModified <= $entry['tstamp']) {
-            // Tabellennamen vor Löschung merken
+            // notice the tablename before it's getting deleted
             $table = $entry['tablename'];
             
             $entry['pid'] = $this->getUidByUuid($entry['pid'], 'pages');
 
-            // Link abfragen und ersetzen
+            // query link and replace
             if ($entry['header_link'] != '') {
                 $split = explode(':', $entry['header_link']);
 
@@ -122,12 +126,13 @@ class InsertDataService extends AbstractDataService {
                     $entry['link'] = $uid;
                 }
             }
-            // uid_foreign & uid_local durch UID ersetzen
+            // replace uid_foreign & uid_local with uid
             if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
                 if ($entry['tablename'] == 'sys_file_reference') {
                     $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
                     $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
-                } // Fall für tt_news
+                } 
+                // case for tt_news
                 elseif ($entry['tablename'] == 'tt_news_cat_mm') {
                     $table = $this->getControlResult('tablenames', 'tt_news_cat_mm', $entry['uid_foreign']);
                     $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], $table);
@@ -140,7 +145,7 @@ class InsertDataService extends AbstractDataService {
             }
 
             $entry['tstamp'] = time();
-            // Tabellennamen, Fieldlist und UID löschen
+            // delete tablename, fieldlist and uid
             unset($entry['tablename']);
             unset($entry['fieldlist']);
             unset($entry['uid']);
@@ -148,7 +153,9 @@ class InsertDataService extends AbstractDataService {
             $this->getDatabase()->exec_UPDATEquery($table, "uuid='". $entry['uuid']."'", $entry);
 
             return true;
-        } // wenn letzte Aktualisierung jünger ist als einzutragender Stand
+        } 
+        // if last update is younger than the to be updated entry (xml) than 
+        // collect them for the failure handling
         elseif ($lastModified > $entry['tstamp']) {
             return $entry;
         }
@@ -156,7 +163,7 @@ class InsertDataService extends AbstractDataService {
 
     
     /**
-     * Prüft ob Abhängigkeiten in der Seitenbaumtiefe vorhanden sind
+     * Check if there are page dependencies
      *
      * @param array $dataArr
      *
@@ -167,11 +174,10 @@ class InsertDataService extends AbstractDataService {
         $beforePages = array();
         $count = 0;
 
-        // prüfen ob Seitenbaumabhängigkeiten existieren
         foreach ($dataArr as $data) {
-            // wenn Tabelleneinträge für pages-Tabelle vorhanden sind
+            // if table entries for pages exists
             if ($data['tablename'] == 'pages') {
-                // dann Seiten-UUID sowie die Sortierung speichern
+                // than save the page-uuid and the sorting
                 $pageTreeDepth[$count]['pid'] = $data['pid'];
                 $pageTreeDepth[$count]['sorting'] = $data['sorting'];
             }
@@ -179,12 +185,11 @@ class InsertDataService extends AbstractDataService {
         }
         
         foreach ($dataArr as $data) {
-            // und für jede UUID prüfen ob diese nochmals vorkommt
+            // check for each uuid if it is repeatedly listed
             foreach ($pageTreeDepth as $ptd) {
-                // wenn UUID nochmal vorkommt (nur auf neue Datensätze beschränken)
+                // if yes, than (only constricted on data entries)
                 if ($ptd['pid'] == $data['uuid'] && $data['fieldlist'] == '*' && $ptd['sorting'] != null) {
-                    // dann die pages-Einträge zurück liefern, damit diese noch
-                    // vor den 1. Prioritätsstufe eingetragen werden
+                    // return the page-entry, so it can be inserted before the first priority level
                     $beforePages[] = $data['uuid'];
                 }
             }
@@ -195,7 +200,7 @@ class InsertDataService extends AbstractDataService {
 
     
     /**
-     * Einfügen/ Aktualisieren der Daten über 3 Prioritätsstufen hinweg
+     * Insert or update the data over three priority level away
      *
      * @param array $dataArr
      *
@@ -208,22 +213,22 @@ class InsertDataService extends AbstractDataService {
         $secondPriority = array();
         $thirdPriority = array();
 
-        // Seitenbaumtiefenabhängigkeiten prüfen
+        // check page tree dependencies
         $pageTreeCheck = $this->checkPageTree($dataArr);
         if(!empty($pageTreeCheck)){
             foreach ($dataArr as $key => $entry) {
-                // vor 1. Prioritätstsufe alle Abhängigen Seiten einfügen
-                // hierfür die UUIDs vergleichen
+                // insert all dependencies before the first priority level
+                // use the uuid for it
                 foreach ($pageTreeCheck as $uuid) {
-                    // falls diese gleich sind
+                    // if uuids equals each other
                     if ($uuid == $entry['uuid']) {
-                        // Daten verarbeiten --> einfügen
+                        // insert data
                         $res = $this->checkDataValues($entry);
-                        // falls Ergebnis nicht passt, dann in Fehlerarray schreiben
+                        // if result don't match, collect for failure array
                         if(!$res){
                             $entryCollection[] = $res;
                         } 
-                        // ansonsten den Eintrag entfernen
+                        // else delete the entry
                         else {
                             unset($dataArr[$key]);
                         }
@@ -232,11 +237,10 @@ class InsertDataService extends AbstractDataService {
             }
         }
         
-        // Daten durchwandern und einfügen/aktualisieren
+        // traverse data and update/insert
         foreach ($dataArr as $firstPriority) {
-            // page-Einträge haben Vorrang
-            // 1. Priorität ->Sicherstellung dass erst die Seiten vorhanden sind 
-            // bevor diese referenziert werden
+            // page entries have precedence
+            // 1. prioriry level: Ensure that all pages exists before they get referenced
             if ($firstPriority['tablename'] == 'pages') {
                 $res = $this->checkDataValues($firstPriority);
 
@@ -244,14 +248,13 @@ class InsertDataService extends AbstractDataService {
                     $entryCollection[] = $res;
                 }
             } 
-            // alle anderen Einträge werden gesammelt und im zweiten Schritt verarbeitet, 2. Priorität
+            // collect other entries for 2. priority level
             else {
                 $secondPriority[] = $firstPriority;
             }
         }
         
-        // 2. Prioritätsstufe
-        // wenn Tabelle tt_content entspricht, dann Verarbeitung, ansonsten sammeln
+        // 2. priority level: if table equals tt_content, than proceed, else collect
         foreach ($secondPriority as $second) {
             if ($second['tablename'] == 'tt_content') {
                 $res = $this->checkDataValues($second);
@@ -264,8 +267,7 @@ class InsertDataService extends AbstractDataService {
             }
         }
 
-        // 3. Prioritätsstufe
-        // Daten aller restlichen Tabellen einfügen/aktualisieren
+        // 3. priority level: insert/update data for all other tables
         foreach ($thirdPriority as $third) {
             if (!in_array($third['fieldlist'], $configurationService->getNotDeployableColumns())) {
                 $res = $this->checkDataValues($third);
@@ -276,7 +278,7 @@ class InsertDataService extends AbstractDataService {
             }
         }
         
-        // Testdatenbankverbindung zurücksetzen
+        // reset test database
         DatabaseService::reset();
         
         return (empty($entryCollection)) ? TRUE : $entryCollection;
@@ -284,9 +286,8 @@ class InsertDataService extends AbstractDataService {
 
     
     /**
-     * Vergleich der Resourcendatensätze über die UUID. Modifizieren bzw.
-     * einfügen des Datensatzes falls aktualisiert werden muss oder nicht
-     * existiert
+     * Comparison for resources over uuid. Modify respectively insert data
+     * if they have to be updated or don't exists
      *
      * @param array $dataArr
      *
@@ -294,35 +295,37 @@ class InsertDataService extends AbstractDataService {
      */
     public function insertResourceDataIntoTable($dataArr) {
         $entryCollection = array();
-        // Verbindung zu Testdatenbank herstellen
+        // connect to test database
         DatabaseService::connectTestDatabaseIfExist();
         
         if ($this->getDatabase()->isConnected()) {
             foreach ($dataArr as $entry) {
-                // letzte Aktualisierung abfragen
+                // query last deployment date
                 $lastModified = $this->getControlResult('tstamp', 'sys_file', $entry['uuid']);
 
-                // falls Datensatz noch nicht exisitert, dann einfügen
+                // if data doesn't exist, insert
                 if ($lastModified === NULL) {
                     unset($entry['tablename']);
                     $entry['tstamp'] = time();
 
-                    // Daten einfügen
+                    // insert data
                     $this->getDatabase()->exec_INSERTquery('sys_file', $entry);
-                } // wenn Eintrag älter ist als der zu aktualisierende
+                } 
+                // if entry older than the one to be updated (xml)
                 elseif ($lastModified < $entry['tstamp']) {
                     unset($entry['tablename']);
                     $entry['tstamp'] = time();
 
-                    // Daten aktualisieren
+                    // update data
                     $this->getDatabase()->exec_UPDATEquery('sys_file', 'uuid=' . $entry['uuid'], $entry);
-                } // wenn letzte Aktualisierung jünger ist als einzutragender Stand
+                } 
+                // if last update younger than the one to be updated (xml)
                 elseif ($lastModified > $entry['tstamp']) {
                     $entryCollection[] = $entry;
                 }
             }
             
-            // Testdatenbankverbindung zurücksetzen
+            // reset test database
             DatabaseService::reset();
             
             return (empty($entryCollection)) ? TRUE : $entryCollection;
@@ -331,8 +334,8 @@ class InsertDataService extends AbstractDataService {
 
     
     /**
-     * Prüft ob die Spalte UUID existiert. Wenn dies der Fall ist, dann überprüfen
-     * ob hier Werte gesetzt sind. Falls nein, dann Werte generieren.
+     * Check if the coloumn uuid exists. If this is the case, also check the value
+     * If there is no value, generate it
      */
     public function checkIfUuidExists() {
         $tablefields = array();

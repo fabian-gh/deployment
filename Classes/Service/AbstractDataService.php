@@ -1,7 +1,8 @@
 <?php
 
 /**
- * AbstractDataService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -13,6 +14,7 @@ namespace TYPO3\Deployment\Service;
 
 /**
  * AbstractDataService
+ * Class for general data service methods
  *
  * @package    Deployment
  * @subpackage Service
@@ -21,7 +23,7 @@ namespace TYPO3\Deployment\Service;
 class AbstractDataService {
 
     /**
-     * Gibt die entsprechende UUID passend zum Datensatz zurück
+     * Returns the uuid by uid
      *
      * @param string $uid
      * @param string $table
@@ -36,7 +38,7 @@ class AbstractDataService {
     
     
     /**
-     * Gibt anhand der Parameter die UID zurück
+     * Return the uid by uuid
      *
      * @param string $uuid
      * @param string $table
@@ -51,7 +53,7 @@ class AbstractDataService {
     
     
     /**
-     * Gibt anhand der Parameter die PID zurück
+     * Returns the uid by uuid
      *
      * @param string $uuid
      * @param string $table
@@ -66,7 +68,7 @@ class AbstractDataService {
     
     
     /**
-     * Kontrollergebnis abfragen
+     * Query control result
      * 
      * @param string $field
      * @param string $table

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * ConfigurationService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -16,6 +17,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * ConfigurationService
+ * Class for reading the deployment configuration
  *
  * @package    Deployment
  * @subpackage Service
@@ -24,7 +26,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 class ConfigurationService extends AbstractDataService {
 
     /**
-     * Gibt die Depolymenttabellen zurück
+     * Returns the deplyoment tables
      *
      * @return array
      */
@@ -43,7 +45,7 @@ class ConfigurationService extends AbstractDataService {
     
     
     /**
-     * Gibt Spalten zurück, die nicht deployed werden sollen
+     * returns coloumns which shouldn't be deplyoed
      * 
      * @return mixed array or NULL
      */
@@ -56,7 +58,7 @@ class ConfigurationService extends AbstractDataService {
 
     
     /**
-     * Gibt den aktuellen Löschungsstatus zurück
+     * Returns the delete state
      *
      * @return mixed int or NULL
      */
@@ -67,7 +69,7 @@ class ConfigurationService extends AbstractDataService {
     
     
     /**
-     * Gibt die Adresse des PullServers zurück
+     * Returns the address of the pull server
      *
      * @return mixed string or NULL
      */
@@ -78,7 +80,7 @@ class ConfigurationService extends AbstractDataService {
 
     
     /**
-     * Gibt den Benutzernamen zurück
+     * Returns the username
      *
      * @return mixed string or NULL
      */
@@ -89,7 +91,7 @@ class ConfigurationService extends AbstractDataService {
 
     
     /**
-     * Gibt das Passwort zurück
+     * Returns the password
      *
      * @return mixed string or NULL
      */
@@ -100,7 +102,7 @@ class ConfigurationService extends AbstractDataService {
 
     
     /**
-     * Gibt alle Deploymenteinträge zurück
+     * Returns all deplyoment entries
      *
      * @return array
      */
@@ -108,5 +110,4 @@ class ConfigurationService extends AbstractDataService {
         $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
         return is_array($configuration) ? $configuration : array();
     }
-
 }

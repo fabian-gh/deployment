@@ -1,7 +1,8 @@
 <?php
 
 /**
- * FailureService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -16,6 +17,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * FailureService
+ * Class for failure treatment
  *
  * @package    Deployment
  * @subpackage Service
@@ -24,7 +26,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 class FailureService extends AbstractDataService {
 
     /**
-     * Gibt die Einträge potenzieller Fehler der Datenbank zurück
+     * Returns potential failure entries from the database
      * 
      * @param array $failures
      * @return array
@@ -39,13 +41,13 @@ class FailureService extends AbstractDataService {
         if ($this->getDatabase()->isConnected()) {
             foreach ($failures as $failure) {
                 $keyListArr = array();
-                // Array mit Schlüsseln erstellen
+                // create an array with keys
                 foreach ($failure as $key => $value) {
                     if ($key != 'tablename' && $key != 'fieldlist') {
                         $keyListArr[] = $key;
                     }
                 }
-                // Liste erstellen
+                // create list for query
                 $keyList = implode(',', $keyListArr);
 
                 $res = $this->getDatabase()->exec_SELECTgetSingleRow($keyList, $failure['tablename'], "uuid='" . $failure['uuid'] . "'");
@@ -66,6 +68,7 @@ class FailureService extends AbstractDataService {
     
     /**
      * Splittet das übergebene Array zur Weiterverarbeitung
+     * Split the assigned array for further treatment
      * 
      * @param array $entries
      * @param boolean $failurePart
@@ -81,7 +84,7 @@ class FailureService extends AbstractDataService {
 
     
     /**
-     * Gibt Differenzen zwischen den Datensätzen zurück
+     * Return the differences between the entries
      * 
      * @param array $failures
      * @param array $database
@@ -109,7 +112,7 @@ class FailureService extends AbstractDataService {
 
     
     /**
-     * Verarbeitung der angekreuzten Fehler
+     * Treatment of ticked failures
      * 
      * @param array $failures
      * @param string $storedFailures serialized array from registry
@@ -119,20 +122,20 @@ class FailureService extends AbstractDataService {
         $fails = array();
         $res = array();
         
-        // Verbindung mit Testdatenbank aufbauen
+        // connect to test database
         DatabaseService::connectTestDatabaseIfExist();
 
-        // Einträge splitten
+        // split entries
         foreach ($failures as $fail) {
             $fails[] = explode('.', $fail);
         }
 
-        // wenn 'list' ausgewählt wurde dann update, bei database nichts tun
+        // if 'list' is ticked than update, if 'database' is ticked do nothing
         foreach ($fails as $entry) {
             if ($entry[0] == 'list') {
                 foreach ($storedFailures as $sfail) {
                 if ($sfail['tablename'] == $entry[1] && $sfail['uuid'] == $entry[2] && $sfail['fieldlist'] != '*') {
-                        // nicht benötigte Einträge entfernen
+                        // remove not needed entries
                         unset($sfail['tablename']);
                         if (isset($sfail['fieldlist']) || isset($sfail['uid']) || isset($sfail['pid'])){
                             unset($sfail['fieldlist']);
@@ -140,10 +143,10 @@ class FailureService extends AbstractDataService {
                             unset($sfail['pid']);
                         }
 
-                        // Timestamp ändern
+                        // change timestamp
                         $sfail['tstamp'] = time();
                         
-                        // In DB updaten
+                        // update
                         $res[] = $this->getDatabase()->exec_UPDATEquery($entry[1], "uuid='". $entry[2]."'", $sfail);
                     }
                 }
@@ -160,7 +163,7 @@ class FailureService extends AbstractDataService {
 
     
     /**
-     * Löscht leere Einträge aus dem Fehlerarray
+     * Delete empty entries from the failure array
      * 
      * @param array $failures
      * @return array
@@ -181,7 +184,7 @@ class FailureService extends AbstractDataService {
 
     
     /**
-     * Konvertiert Timestamps zur korrekten Darstellung
+     * Convert the timestamp for correct presentation
      * 
      * @param array $diff
      * @return array
@@ -193,12 +196,11 @@ class FailureService extends AbstractDataService {
         foreach ($diff as $entry) {
             foreach ($entry as $key => $value) {
                 if ($key === 'tstamp' || $key === 'crdate' || $key === 'modification_date' || $key === 'creation_date') {
-                    // Zeichen bis zum ersten '>' entfernen. Dann von 1.-10. Zeichen zurückgeben -> date1
+                    // remove chars until '>'. Return the 1.-10. chars -> date 1
                     $date1 = substr(strstr($value, '>'), 1, 10);
-                    // Alle Zeichen in Charlist entfernen -> date2
+                    // remove all chars in charlist -> date2
                     $date2 = trim(str_replace('</span>', '', str_replace('<span class="diff-r"></span> <span class="diff-g">', '', str_replace($date1, '', $value))));
-
-                    // Daten umwandeln und in Zeichenkette ersetzen, so dass die span-Tags erhalten bleiben
+                    // convert data and replace them in charlist, so that the span-tags get preserved
                     $conDate1 = date('d.m.Y H:i:s', $date1);
                     $conDate2 = date('d.m.Y H:i:s', $date2);
 

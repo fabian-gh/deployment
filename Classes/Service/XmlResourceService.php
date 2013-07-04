@@ -1,7 +1,8 @@
 <?php
 
 /**
- * XmlResourceService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -20,6 +21,7 @@ use \TYPO3\Deployment\Service\FileService;
 
 /**
  * XmlResourceService
+ * Class for creating and reading resource xml files
  *
  * @package    Deployment
  * @subpackage Service
@@ -44,8 +46,7 @@ class XmlResourceService extends AbstractDataService {
 
     
     /**
-     * Schreibt eine XML-Datei mit allen im Fileadmin befindlichen Dateien, 
-     * ohne Pfadangabe zum Fileadmin
+     * Writes a xml-file with all files inside the fileadmin
      */
     public function writeXmlResourceList() {
 
@@ -54,10 +55,10 @@ class XmlResourceService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
         $fileService = new FileService();
 
-        // Neues XMLWriter-Objekt
+        // new XMLWriter-Object
         $this->xmlwriter = new \XMLWriter();
 
-        // Dokumenteneigenschaften
+        // document properties
         $this->xmlwriter->openMemory();
         $this->xmlwriter->setIndent(TRUE);
         $this->xmlwriter->startDocument('1.0');
@@ -84,7 +85,7 @@ class XmlResourceService extends AbstractDataService {
         $this->xmlwriter->writeDtdElement('uuid', '(#PCDATA)');
         $this->xmlwriter->endDtd();
 
-        // Daten schreiben
+        // write data
         $this->xmlwriter->startElement('resourcelist');
 
         foreach ($this->fileList as $file) {
@@ -111,7 +112,6 @@ class XmlResourceService extends AbstractDataService {
             $this->xmlwriter->endElement();
         }
 
-        //$this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
         $this->xmlwriter->endDocument();
         $writeString = $this->xmlwriter->outputMemory();
@@ -127,8 +127,8 @@ class XmlResourceService extends AbstractDataService {
 
     
     /**
-     * Liest alle noch nicht deployten Datensätze aus der Resource-XML Datei 
-     * und gibt diese als Array zurück.
+     * Read all not deployed data from the resource xml file 
+     * and converts it to an array
      * 
      * @return array
      */
@@ -149,36 +149,36 @@ class XmlResourceService extends AbstractDataService {
         $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentMediaPathWithTrailingSlash());
 
         if ($filesAndFolders) {
-            // Dateipfad ausplitten
+            // split data path
             foreach ($filesAndFolders as $faf) {
                 $exFaf[] = str_replace('media/', '', strstr($faf, 'media'));
             }
 
-            // Datum und Uhrzeit splitten
+            // split date and time
             foreach ($exFaf as $dateTime) {
                 $splittedDateTime[] = explode('/', $dateTime);
             }
 
-            // pro Ordner/Datum ein Array mit allen Dateinamen darin
+            // for each date an own directory with all filename inside
             foreach ($splittedDateTime as $dateTime) {
                 $dateFolder[$dateTime[0]][] = $dateTime[1];
             }
         }
 
-        //Dateien einlesen
+        // read files
         foreach ($dateFolder as $folder => $filename) {
-            // Datum aus Ordner extrahieren
+            // extract the date from the directory
             $expDate = explode('_', $folder);
 
             foreach ($filename as $file) {
-                // für jede Datei die Uhrzeit extrahieren
+                // extract the time for each file
                 $temp = explode('_', $file);
                 $expTime = explode('-', $temp[0]);
-                // Timestamp erstellen
+                // create timestamp
                 $dateAsTstamp = mktime($expTime[0], $expTime[1], $expTime[2], $expDate[1], $expDate[2], $expDate[0]);
 
-                // wenn Datei-Timestamp später als letztes Deployment,
-                // dann die Datei lesen und umwandeln
+                // if file-timestamp newer than last deplyoment.
+                // than read the file and convert it
                 if ($dateAsTstamp >= $timestamp) {
                     $validationResult['validation']['database/' . $folder . '/' . $file] = $fileService->xmlValidation($fileService->getDeploymentMediaPathWithTrailingSlash() . $folder . '/' . $file);
                     $xmlString = file_get_contents($fileService->getDeploymentMediaPathWithTrailingSlash() . $folder . '/' . $file);

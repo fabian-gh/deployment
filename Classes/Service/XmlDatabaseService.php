@@ -1,7 +1,8 @@
 <?php
 
 /**
- * XmlDatabaseService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -22,6 +23,7 @@ use \TYPO3\Deployment\Service\RegistryService;
 
 /**
  * XmlDatabaseService
+ * Class for creating and reading the database xml file
  *
  * @package    Deployment
  * @subpackage Service
@@ -56,8 +58,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Geänderte Datensätze in ein XML-Dokument schreiben.
-     * XML-Dateien sind unter fileadmin/deployment/database/YYYY-MM-DD/ zu finden
+     * Write new and changed entries into a xml file
      */
     public function writeXML() {
         $newInsert = array();
@@ -66,61 +67,65 @@ class XmlDatabaseService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
         $configurationService = new ConfigurationService();
 
-        // Neues XMLWriter-Objekt
+        // new XMLWriter-Object
         $this->xmlwriter = new \XMLWriter();
 
-        // Dokumenteneigenschaften
-        $this->xmlwriter->openMemory(); // Daten in Speicher schreiben
-        $this->xmlwriter->setIndent(TRUE); // Einzug aktivieren
-        $this->xmlwriter->startDocument('1.0'); // Document-Tag erzeugen
+        // document properties
+        $this->xmlwriter->openMemory(); // write data in memory
+        $this->xmlwriter->setIndent(TRUE); // activate indent
+        $this->xmlwriter->startDocument('1.0'); // create document tag
         // Document Type Definition (DTD)
         $this->xmlwriter->startDtd('changeSet');
         $this->xmlwriter->writeDtdElement('changeSet', '(data+)');
         $this->xmlwriter->writeDtdElement('data', 'ANY');
         $this->xmlwriter->endDtd();
 
-        // Daten schreiben
+        // write data
         $this->xmlwriter->startElement('changeSet');
 
         foreach ($this->deployData as $cData) {
             /** @var HistoryData $cData */
-            // Alle neuen Datensätze abfragen
+            // query all new entries
             if ($cData->getSysLogUid() == 'NEW' && $cData->getFieldlist() == '*') {
                 $newInsert = $this->getDatabase()->exec_SELECTgetSingleRow('*', $cData->getTablename(), 'uid=' . $cData->getUid());
 
-                // für jeden Datensatz ein neues data-Element mit UID als Attribut
+                // for each entry a new data-element
                 $this->xmlwriter->startElement('data');
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', '*');
 
                 foreach ($newInsert as $newkey => $newval) {
                     if (!in_array($newkey, $configurationService->getNotDeployableColumns())) {
-                        // PID durch UUID ersetzen
+                        // replace pid with uuid
                         if ($newkey == 'pid') {
                             $pageUuid = $this->getUuidByUid($newval, 'pages');
                             $this->xmlwriter->writeElement('pid', $pageUuid);
-                        } // uid_foreign durch UUID ersetzen
+                        } 
+                        // replace uid_foreign with uuid
                         elseif ($newkey == 'uid_foreign') {
-                            // Dieses Prinzip klappt immer, da 'tablenames' in jeder Relationstabelle vorhanden ist
-                            // Referenztabelle zur uid_local abfragen
+                            // this approach works always, because 'tablenames' in is available in each relation
+                            // query reference table for uid_local
                             $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign=' . $newval);
-                            // UUID des Datensatzes abfragen
+                            // query uuid of the entry
                             $uuid_foreign = $this->getUuidByUid($newval, $table['tablenames']);
-                            // Datensatz verarbeiten
+                            // process data
                             $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
-                        } // uid_local durch UUID ersetzen
+                        } 
+                        // replace uid_local with uuid
                         elseif ($newkey == 'uid_local') {
-                            // hier muss unterschieden werden, da table_local nicht immer vorhanden ist
+                            // at this place we have to differ, because table_local is not available in each relational
                             if ($cData->getTablename() == 'sys_file_reference') {
                                 $table = $this->getDatabase()->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local=' . $newval);
                                 $uuid_local = $this->getUuidByUid($newval, $table['table_local']);
                                 $this->xmlwriter->writeElement('uid_local', $uuid_local);
-                            } // Unterscheidung für tt_news
+                            } 
+                            // determination for tt_news
                             elseif ($cData->getTablename() == 'tt_news_cat_mm' || $cData->getTablename() == 'tt_news_related_mm') {
                                 $uuid_local = $this->getUuidByUid($newval, 'tt_news');
                                 $this->xmlwriter->writeElement('uid_local', $uuid_local);
                             }
-                        } // header_link (tt_content) durch entsprechende UUID ersetzen
+                        } 
+                        // replace header_link (tt_content) with uuid
                         elseif ($newkey == 'header_link' || $newkey == 'link') {
                             $substring = $this->checkLinks($newval);
                             $this->xmlwriter->writeElement($newkey, $substring);
@@ -131,22 +136,23 @@ class XmlDatabaseService extends AbstractDataService {
                 }
 
                 $this->xmlwriter->endElement();
-            } // Veränderte Datensätze erstellen
+            } 
+            // create changed data
             else {
-                // pid abfragen
+                // query pid
                 $pid = $this->getPid($cData->getRecuid(), $cData->getTablename());
 
-                // für jeden Datensatz ein neues data-Element mit UID als Attribut
+                // create for each entry a new data-element
                 $this->xmlwriter->startElement('data');
 
-                // Einzelne Feldelemente schreiben
+                // write individual field elements
                 $this->xmlwriter->writeElement('tablename', $cData->getTablename());
                 $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
                 $this->xmlwriter->writeElement('pid', $this->getUuidByUid($pid, 'pages'));
                 $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
                 $this->xmlwriter->writeElement('uuid', $this->getUuidByUid($cData->getRecuid(), $cData->getTablename()));
 
-                // geänderte Historydaten durchlaufen
+                // travers changed history entries
                 foreach ($cData->getHistoryData() as $datakey => $data) {
                     if ($datakey == 'newRecord') {
                         foreach ($data as $key => $value) {
@@ -164,9 +170,8 @@ class XmlDatabaseService extends AbstractDataService {
             }
         }
 
-        //$this->xmlwriter->endElement();
         $this->xmlwriter->endElement();
-        $this->xmlwriter->endDocument(); // Dokument schließen
+        $this->xmlwriter->endDocument();
         $writeString = $this->xmlwriter->outputMemory();
 
         $file = GeneralUtility::tempnam('deploy_');
@@ -180,7 +185,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Liest alle noch nicht deployeten XML-Datensätze
+     * Reads all not deployed data from the xml
      *
      * @param string $timestamp
      *
@@ -199,37 +204,37 @@ class XmlDatabaseService extends AbstractDataService {
         $filesAndFolders = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $fileService->getDeploymentDatabasePathWithTrailingSlash());
 
         if ($filesAndFolders) {
-            // Dateipfad ausplitten
+            // split file path
             foreach ($filesAndFolders as $faf) {
                 $exFaf[] = str_replace('database/', '', strstr($faf, 'database'));
             }
 
-            // Datum und Uhrzeit splitten
+            // split date and time
             $splittedDateTime = array();
             foreach ($exFaf as $dateTime) {
                 $splittedDateTime[] = explode('/', $dateTime);
             }
 
-            // pro Ordner/Datum ein Array mit allen Dateinamen darin
+            // for each date an own directory with all filename inside
             foreach ($splittedDateTime as $dateTime) {
                 $dateFolder[$dateTime[0]][] = $dateTime[1];
             }
         }
 
-        //Dateien einlesen
+        // read file
         foreach ($dateFolder as $folder => $filename) {
-            // Datum aus Ordner extrahieren
+            // extract date from directory
             $expDate = explode('_', $folder);
 
             foreach ($filename as $file) {
-                // für jede Datei die Uhrzeit extrahieren
+                // extract the time for each file
                 $temp = explode('_', $file);
                 $expTime = explode('-', $temp[0]);
-                // Timestamp erstellen
+                // create timestamp
                 $dateAsTstamp = mktime($expTime[0], $expTime[1], $expTime[2], $expDate[1], $expDate[2], $expDate[0]);
 
-                // wenn Datei-Timestamp später als letztes Deployment,
-                // dann die Datei lesen und umwandeln
+                // if file-timestamp newer than last deplyoment.
+                // than read the file and convert it
                 if ($dateAsTstamp >= $timestamp) {
                     $validationResult['validation']['database/'.$folder.'/'.$file] = $fileService->xmlValidation($fileService->getDeploymentDatabasePathWithTrailingSlash().$folder.'/'.$file);
                     $xmlString = file_get_contents($fileService->getDeploymentDatabasePathWithTrailingSlash().$folder.'/'.$file);
@@ -249,7 +254,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Ersetzt die uid im übergebenen Link durch die UUID
+     * Replace uid with uuid in the assigned link
      *
      * @param string $link
      *
@@ -270,7 +275,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Gibt die Differenzen der Daten zurück
+     * Get the Difference between the history data
      *
      * @param \TYPO3\Deployment\Domain\Model\HistoryData $historyData
      *
@@ -284,7 +289,7 @@ class XmlDatabaseService extends AbstractDataService {
         /** @var $diff \TYPO3\CMS\Core\Utility\DiffUtility */
         $diff = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
 
-        // Daten pro Datensatz in einem Array organisieren
+        // organize date for each entry in an array
         foreach ($historyData as $hisData) {
             /** @var HistoryData $hisData */
             foreach ($hisData->getHistoryData() as $records) {
@@ -294,7 +299,7 @@ class XmlDatabaseService extends AbstractDataService {
             }
         }
 
-        // Array durchwandern und Differenz aus old/newRecord erstellen
+        // traverse array and create the difference between old/new record
         foreach ($data as $dat) {
             foreach ($dat as $columnkey => $cloumnval) {
                 foreach ($cloumnval as $recuid => $dataArr) {
@@ -310,7 +315,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Deserialisiert die übergebenen Log-Daten
+     * Unserialize the assigned log-data
      *
      * @param \TYPO3\Deployment\Domain\Model\Log $logData
      *
@@ -349,7 +354,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Deserialisiert die übergebenen History-Daten
+     * Unserialize the assigned history-data
      *
      * @param array<\TYPO3\Deployment\Domain\Model\History> $historyData
      *
@@ -369,7 +374,7 @@ class XmlDatabaseService extends AbstractDataService {
 
                     $unlogdata = unserialize($his->getHistoryData());
 
-                    // wird benötigt um das l18n_diffsource-Feld zu deserialisieren
+                    // this for each is needed to unserialize the l18n_diffsource-field
                     foreach ($unlogdata as $key => $value) {
                         $data = array();
                         foreach ($value as $k => $val) {
@@ -400,8 +405,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Konvertiert neue Logeinträge, die noch nicht in der History Tabelle erfasst sind,
-     * zu HistoryData-Objekten
+     * Converts new log entries, which aren't captured in history table, to history entries
      *
      * @param \TYPO3\Deployment\Domain\Model\LogData $entry
      *
@@ -427,7 +431,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Sucht die übergebene UID innerhalb der in der Registry gespeicherten History Daten
+     * Search for the uid inside the history data in the registry
      *
      * @param string $uid
      *
@@ -448,7 +452,7 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
-     * Gibt die pid der übergebenen uid zurück
+     * Returns the pid of the assigned uid
      *
      * @param string $uid
      * @param string $table
@@ -531,5 +535,4 @@ class XmlDatabaseService extends AbstractDataService {
     public function setXmlreader(\SimpleXml $xmlreader) {
         $this->xmlreader = $xmlreader;
     }
-
 }

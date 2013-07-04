@@ -1,7 +1,8 @@
 <?php
 
 /**
- * DatabaseService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -13,6 +14,7 @@ namespace TYPO3\Deployment\Service;
 
 /**
  * DatabaseService
+ * Class for temporarily database connection
  *
  * @package    Deployment
  * @subpackage Service
@@ -42,7 +44,7 @@ class DatabaseService extends AbstractDataService {
 
     
     /**
-     * Schnellzugriff auf die Testdatenbank
+     * Quick access to the test databse
      */
     public static function connectTestDatabaseIfExist() {
         $dbService = new DatabaseService();
@@ -51,7 +53,7 @@ class DatabaseService extends AbstractDataService {
 
     
     /**
-     * Verbindung zur Datenbank zurück setzen
+     * Reset the connection to the database
      */
     public static function reset() {
         $dbService = new DatabaseService();
@@ -60,7 +62,7 @@ class DatabaseService extends AbstractDataService {
 
     
     /**
-     * Verbindung zur Datenbank zurück setzen
+     * Reset the connection to the database
      */
     public function resetInternal() {
         $this->getDatabase()->setDatabaseHost(TYPO3_db_host);
@@ -72,7 +74,7 @@ class DatabaseService extends AbstractDataService {
 
     
     /**
-     * Prüfen ob Verbindungsdaten existieren
+     * Check if connection data exist
      */
     public function connectTestDatabaseIfExistInternal() {
         if($this->host !== '' && $this->user !== '' && $this->pass !== '' && $this->db !== ''){
@@ -82,7 +84,7 @@ class DatabaseService extends AbstractDataService {
 
     
     /**
-     * Mit Testdatenbank verbinden
+     * Connect to test database
      * 
      * @param string $host
      * @param string $user
@@ -96,5 +98,4 @@ class DatabaseService extends AbstractDataService {
         $this->getDatabase()->setDatabaseName($db);
         $this->getDatabase()->connectDB();
     }
-
 }

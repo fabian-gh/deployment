@@ -1,7 +1,8 @@
 <?php
 
 /**
- * RegistryService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -16,6 +17,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * RegistryService
+ * Class for registry services
  *
  * @package    Deployment
  * @subpackage Service
@@ -31,7 +33,7 @@ class RegistryService extends AbstractDataService {
     protected $registry = NULL;
 
     /**
-     * Konstruktor
+     * Constructor
      */
     public function __construct() {
         $this->registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
@@ -39,8 +41,7 @@ class RegistryService extends AbstractDataService {
 
     
     /**
-     * Prüft die Registry nach dem Eintrag. Falls nicht vorhanden wird dieser
-     * erstellt
+     * Check the regsitry for the last deployment date. If it not exists, create it
      */
     public function checkForRegistryEntry() {
         $deploy = $this->registry->get('deployment', 'last_deploy');
@@ -52,7 +53,7 @@ class RegistryService extends AbstractDataService {
 
     
     /**
-     * Persistiert Einträge in der Registry
+     * Persist the entries in the registry
      *
      * @param mixed  $data
      * @param string $key
@@ -64,7 +65,7 @@ class RegistryService extends AbstractDataService {
 
     
     /**
-     * Gibt den letzten Deploymentstand zurück
+     * Returns the last deployment date
      *
      * @return string
      */
@@ -74,7 +75,7 @@ class RegistryService extends AbstractDataService {
 
     
     /**
-     * Gibt die gespeicherten Fehler zurück
+     * Returns the persisted failures
      *
      * @return array
      */
@@ -84,12 +85,11 @@ class RegistryService extends AbstractDataService {
 
     
     /**
-     * Gibt die gespeicherten Historyeinträge zurück
+     * Returns the persisted history entries
      *
      * @return array
      */
     public function getStoredHistoryEntries() {
         return unserialize($this->registry->get('deployment', 'storedHistoryData'));
     }
-
 }

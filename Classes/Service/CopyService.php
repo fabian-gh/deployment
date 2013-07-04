@@ -1,7 +1,8 @@
 <?php
 
 /**
- * CopyService
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -23,6 +24,7 @@ use \TYPO3\Deployment\Service\XmlResourceService;
 
 /**
  * CopyService
+ * Class for copying the resources from one to another system
  *
  * @package    Deployment
  * @subpackage Service
@@ -42,7 +44,7 @@ class CopyService extends AbstractDataService {
 
     
     /**
-     * Triggerfunktion zum Aufruf des Command Controllers über das CLI
+     * Trigger function for invoking the command controller over the cli
      */
     public function trigger() {
         if ($this->allPrecautionsSet()) {
@@ -52,6 +54,7 @@ class CopyService extends AbstractDataService {
             
             $userAgent = $_SERVER['HTTP_USER_AGENT'];
             if (preg_match('/linux/i', $userAgent) == 1 || preg_match('/mac/i', $userAgent) == 1) {
+                // search php path
                 CommandUtility::exec('whereis -b php', $arr);
                 $phpPath = GeneralUtility::trimExplode(':', $arr[0]);
                 
@@ -62,7 +65,7 @@ class CopyService extends AbstractDataService {
 
     
     /**
-     * Führt das Kopieren aus
+     * Execute the copying
      */
     public function execute() {
         if($this->allPrecautionsSet()) {
@@ -72,7 +75,7 @@ class CopyService extends AbstractDataService {
 
     
     /**
-     * Prüft ob der Command Controller registiert ist
+     * Check if the command controller is registered
      *
      * @return boolean
      */
@@ -102,7 +105,7 @@ class CopyService extends AbstractDataService {
 
     
     /**
-     * Prüft ob der benötigter _cli_scheduler-User vorhanden ist
+     * Check if required _cli_scheduler-user is available
      *
      * @return boolean
      */
@@ -119,8 +122,8 @@ class CopyService extends AbstractDataService {
 
     
     /**
-     * Dateien aus der sys_file-Tabelle über die XML-Datei einlesen und diese
-     * mittels des Command Controller Tasks vom Quellsystem kopieren
+     * Read files from the xml file list and copy them over the command
+     * controller task to the destination
      */
     protected function deployResources() {
         /** @var \TYPO3\Deployment\Service\FileService $fileService */
@@ -132,22 +135,22 @@ class CopyService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\XmlResourceService $xmlResourceService */
         $xmlResourceService = new XmlResourceService();
         
-        // User-Agent auslesen
+        // read user agent
         $userAgent = $_SERVER['HTTP_USER_AGENT'];
 
         // TODO: Pfad zu fileadmin ändern
         $path = $fileService->getDeploymentResourcePathWithoutTrailingSlash();
-        // Daten aus Konfiguration holen
+        // get data from configuration
         $server = $configuration->getPullserver();
         $username = $configuration->getUsername();
         $password = $configuration->getPassword();
 
-        // letztes Slash entfernen falls vorhanden
+        // remove last slash if it exists
         if(substr($server, strlen($server)-1) == "/"){
             $server = substr($server, 0, -1);
         }
 
-        // XML einlesen
+        // read xml
         $data = $fileService->splitContent($xmlResourceService->readXmlResourceList());
 
         foreach ($data as $resource) {
@@ -156,7 +159,7 @@ class CopyService extends AbstractDataService {
             $split = explode('/', $file->getIdentifier());
             $filename = array_pop($split);
 
-            // Pfad wieder zusammensetzen
+            // compose the path
             $folder = '';
             foreach ($split as $sp) {
                 if ($sp != '' && $sp != 'fileadmin') {
@@ -164,19 +167,20 @@ class CopyService extends AbstractDataService {
                 }
             }
 
-            // erste Slash entfernen und Ordnerstruktur erstellen
+            // remove first slash and create directory structure
             $fold = substr($folder, 1);
             if (!is_dir($path . '/' . $fold)) {
                 GeneralUtility::mkdir_deep($path . '/' . $fold);
             }
             
-            // Pfade festlegen
+            // define paths
             $dest = "$path/$fold/";
             $source = "$server/fileadmin/$fold/$filename";
             
-            // Dateien mittels OS-Unterscheidung vom Quellsystem kopieren oder syncen
+            // copy files over OS-Determination from the source
             if (preg_match('/linux/i', $userAgent) == 1) {
-                // In Zielverzeichnis wechseln und über wget nur Dateien holen, die neuer als Zieldatei sind
+                // change to the destination directory and get the file over wget 
+                // (only if the file is newer than destination)
                 CommandUtility::exec("cd $dest; wget --user=$username --password=$password --timestamping $source");
             } else {
                 //TODO: Pfad ändern
@@ -187,7 +191,7 @@ class CopyService extends AbstractDataService {
 
     
     /**
-     * Prüft ob alle Vorkehrungen getroffen sind
+     * Check if all precautions are set
      *
      * @return boolean
      */
