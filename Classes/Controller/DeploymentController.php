@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Deployment
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -21,7 +22,8 @@ use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Deployment
+ * DeploymentController
+ * Controller class for the deployment extension
  *
  * @package    Deployment
  * @subpackage Controller
@@ -97,13 +99,14 @@ class DeploymentController extends ActionController {
 
     
     /**
-     * IndexAction
+     * IndexAction to start the extension
      */
     public function indexAction() {
-        // Registry prüfen
+        // check registry for last deploy date, if it not exists than write it
         $this->registry->checkForRegistryEntry();
 
-        // prüfen ob Command Controller & Benutzer registiert ist
+        // check if command controller task, cli_user, and a scheduler task are registered
+        // also check if the command controller task is disabled
         if(!$this->copyService->checkIfCommandControllerIsRegistered()) {
             $this->addFlashMessage('Please create a CommandController Task in the scheduler module and disable it.', 'No Extbase CommandController Task found', FlashMessage::ERROR);
         }
@@ -117,19 +120,21 @@ class DeploymentController extends ActionController {
             $this->addFlashMessage('Create a task for automatic UUID assignment.', 'UUID Scheduler Task', FlashMessage::INFO);
         }
 
-        // Noch nicht indizierte Dateien indizieren
+        // index not indexed files
         $notIndexed = $this->fileService->getNotIndexedFiles();
         $this->fileService->processNotIndexedFiles($notIndexed);
 
-        // prüft ob die Spalte UUID & der Wert existieren
+        // check if the coloumn uuid and a value exists
         $this->insertDataService->checkIfUuidExists();
 
-        // XML-Dateien die älter als 0.5 Jahre sind löschen
+        // delete xml-files older than a half year
         $this->fileService->deleteOlderFiles();
     }
 
     
     /**
+     * Lists all changed and new entries to create a xml-file
+     * 
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate                                        $deploy
      */
@@ -138,7 +143,7 @@ class DeploymentController extends ActionController {
         $allHistoryEintries = array();
         $historyEntries = array();
 
-        // Registry Eintrag holen
+        // get registry entry
         $date = $this->registry->getLastDeploy();
 
         /** @var QueryResultInterface $logEntries */
@@ -151,9 +156,8 @@ class DeploymentController extends ActionController {
 
             $unserializedLogData = $this->xmlDatabaseService->unserializeLogData($logEntries);
 
-            // Einträge durchlaufen, falls Action == 1 dann handelt es sich um einen komplett
-            // neuen Datensatz, der zu einem Historyeintrag umgewandelt wird, damit dieser
-            // widerum dargestellt werden kann
+            // traverse entries, if action == 1 than we have a complete new entry which 
+            // have to be converted to a history entry to get displayed properly
             foreach ($unserializedLogData as $entry) {
                 /** @var Log $entry */
                 if ($entry->getAction() == '1') {
@@ -168,24 +172,29 @@ class DeploymentController extends ActionController {
                     }
                 }
             }
-
+            
+            // further data treatment
             $allHistoryEintries = array_merge($newHistoryEntries, $historyEntries);
             $unserializedHistoryData = $this->xmlDatabaseService->unserializeHistoryData($allHistoryEintries);
             $this->registry->storeDataInRegistry($unserializedHistoryData, 'storedHistoryData');
             $diffData = $this->xmlDatabaseService->getHistoryDataDiff($unserializedHistoryData);
 
+            // view assigning
             $this->view->assignMultiple(array(
                 'deploy' => $deploy,
                 'historyEntries' => $unserializedHistoryData,
                 'diffData' => $diffData
             ));
         } else {
+            // if no entries were found, display an error message
             $this->addFlashMessage('', 'No entries found', FlashMessage::ERROR);
         }
     }
 
     
     /**
+     * Creates a deployment by creating new xml lists
+     * 
      * @param \TYPO3\Deployment\Domain\Model\Request\Deploy $deploy
      * @dontvalidate                                        $deploy
      */
@@ -196,16 +205,16 @@ class DeploymentController extends ActionController {
             $deployData[] = $this->xmlDatabaseService->compareDataWithRegistry($uid);
         }
 
-        // falls deployment-Ordner noch nicht existieren, dann erstellen
+        // if there is noch deployment directory create one
         $this->fileService->createDirectories();
 
-        // Mediendaten erstellen
+        // create resource data
         $date = $this->registry->getLastDeploy();
         $resourceData = $this->fileRepository->findYoungerThen($date);
         $this->xmlResourceService->setFileList($resourceData);
         $this->xmlResourceService->writeXmlResourceList();
 
-        // Deploydaten setzen und XML erstellen
+        // create database data
         $this->xmlDatabaseService->setDeployData(array_unique($deployData));
         $this->xmlDatabaseService->writeXML();
 
@@ -215,26 +224,26 @@ class DeploymentController extends ActionController {
 
     
     /**
-     * DeployAction
+     * DeployAction to execute a whole deployment
      */
     public function deployAction() {
         $result1 = array();
         $result2 = array();
-        // letztes Deployment-Datum lesen
+        // read last deployment date
         $tstamp = $this->registry->getLastDeploy();
 
-        //Mediendaten lesen
+        // read resource data
         $resourceData = $this->xmlResourceService->readXmlResourceList();
-        // Gelesene Daten splitten, da sowohl die Resultate als auch die Ergebnisse
-        // der Validierung in einem Array stehen
+        // split all read data, because the read data as well as the validation 
+        // results are in the same array
         $contentSplit1 = $this->fileService->splitContent($resourceData);
         $result1 = $this->insertDataService->insertResourceDataIntoTable($contentSplit1);
         $validationContent1 = $this->fileService->splitContent($resourceData, TRUE);
 
-        // Dateien vom Quellsystem holen
+        // get data from source system
         $this->copyService->trigger();
 
-        // XML lesen
+        // read xml
         $content = $this->xmlDatabaseService->readXML($tstamp);
         $contentSplit2 = $this->fileService->splitContent($content);
         $result2 = $this->insertDataService->insertDataIntoTable($contentSplit2);
@@ -242,19 +251,20 @@ class DeploymentController extends ActionController {
         
         $validationContent = array_merge($validationContent1, $validationContent2);
         
+        // if there are no errors
         if ($result1 === TRUE && $result2 === TRUE) {
-            // letzten Deployment-Stand registrieren
+            // register last deployment status
             // TODO: Entkommentieren
             //$this->registry->set('deployment', 'last_deploy', time());
-            // Bestätigung ausgeben
+            // display ok-message
             $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
 
-            // Warnung falls XML nicht valide
+            // warning if xml not valid
             if (in_array(FALSE, $validationContent)) {
                 $this->addFlashMessage('However, the deployment was continued', 'XML-File not valid', FlashMessage::WARNING);
             }
 
-            // Redirect auf Hauptseite
+            // Redirect to index
             $this->redirect('index');
         } elseif (is_array($result1) || is_array($result2)) {
             if (!is_array($result1)) {
@@ -266,30 +276,30 @@ class DeploymentController extends ActionController {
 
             $failures = array_merge($result1, $result2);
             
-            // leere Einträge entfernen
+            // delete empty entries
             $fail = $this->failureService->deleteEmptyEntries($failures);
-            // Einträge an Action weiterleiten
+            // forward the results to the action
             $this->forward('listFailure', NULL, NULL, array('failures' => $fail));
         }
     }
 
     
     /**
-     * Leert den Cache aller registrierten Seiten
+     * Clear the cache
      */
     public function clearCacheAction() {
         /** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
         $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
-        // Datahandler initialiseren
+        // Initialize datahandler
         $dataHandler->start(NULL, NULL);
-        // ALLE Caches löschen (typo3temp/Cache + Tabellen)
+        // delete ALL caches (typo3temp/cache + tables)
         $dataHandler->clear_cacheCmd('all');
         $this->redirect('index');
     }
 
     
     /**
-     * Fehlerbehandlung
+     * Error listing action for displaying the errors
      *
      * @param array                                          $failures
      * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failure
@@ -300,7 +310,7 @@ class DeploymentController extends ActionController {
             $failure = new Failure();
         }
 
-        // Fehleinträge in Registry speichern
+        // persist the error entries in the registry
         $this->registry->storeDataInRegistry($failures, 'storedFailures');
         $entries = $this->failureService->getFailureEntries($failures);
         $failureEntries = $this->failureService->splitEntries($entries, TRUE);
@@ -319,7 +329,7 @@ class DeploymentController extends ActionController {
 
     
     /**
-     * Fehlerbehebung
+     * Error treatment to clear the failures
      *
      * @param \TYPO3\Deployment\Domain\Model\Request\Failure $failure
      * @dontvalidate                                         $failures
