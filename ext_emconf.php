@@ -10,7 +10,7 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Deployment',
-	'description' => 'Mit dieser Extension wird es möglich sowohl Dateien als auch Daten zu deployen.',
+	'description' => 'With this extension you are able to deploy databse entries from one to another system',
 	'category' => '',
 	'shy' => 0,
 	'version' => '2.0.0',
@@ -19,7 +19,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'loadOrder' => '',
 	'module' => '',
 	'priority' => '',
-	'state' => 'stable',
+	'state' => 'beta',
 	'uploadfolder' => 0,
 	'createDirs' => 'fileadmin/deployment, fileadmin/deployment/database, fileadmin/deployment/media, fileadmin/deployment/resource',
 	'modify_tables' => '',

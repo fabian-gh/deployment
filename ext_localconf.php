@@ -6,8 +6,8 @@ if (!defined('TYPO3_MODE')) {
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['TYPO3\Deployment\Scheduler\UuidTask'] = array(
     'extension'        => $_EXTKEY,
-    'title'            => 'UUID Zuweisung',
-    'description'      => 'Automatische Zuweisung von UUIDs zu Datensätzen'
+    'title'            => 'UUID allocation',
+    'description'      => 'Automatic Allocation from UUIDs to data entries'
 );
 
 
