@@ -1,7 +1,8 @@
 <?php
 
 /**
- * LogData
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -13,6 +14,7 @@ namespace TYPO3\Deployment\Domain\Model;
 
 /**
  * LogData
+ * Class for processed log data
  *
  * @package    Deployment
  * @subpackage Domain\Model
@@ -152,6 +154,5 @@ class LogData extends AbstractModel{
      */
     public function setPid($pid) {
         $this->pid = $pid;
-    }
-    
+    }   
 }

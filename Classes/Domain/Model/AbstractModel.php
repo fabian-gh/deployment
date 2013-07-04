@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Abstract Model
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -23,8 +24,8 @@ use \TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 class AbstractModel extends AbstractEntity {
 
     /**
-     * getCleanProperties-Methode aus der AbstractEntitty überschreiben,
-     * da unter Umständen Warnings auftreten können.
+     * Overwrite getCleanProperties-method from AbstractEntity,
+     * because warnings may could be displayed
      * 
      * @return array
      */
@@ -32,5 +33,4 @@ class AbstractModel extends AbstractEntity {
         $properties = parent::_getCleanProperties();
         return is_array($properties) ? $properties : array();
     }
-
 }

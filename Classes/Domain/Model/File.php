@@ -1,7 +1,8 @@
 <?php
 
 /**
- * File
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -13,6 +14,7 @@ namespace TYPO3\Deployment\Domain\Model;
 
 /**
  * File
+ * Class for file models
  *
  * @package    Deployment
  * @subpackage Domain\Model

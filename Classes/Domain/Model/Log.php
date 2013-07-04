@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Log
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -13,6 +14,7 @@ namespace TYPO3\Deployment\Domain\Model;
 
 /**
  * Log
+ * Class for log entries from table
  *
  * @package    Deployment
  * @subpackage Domain\Model
