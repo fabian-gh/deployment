@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Deploy
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -15,9 +16,7 @@ use \TYPO3\Deployment\Domain\Model\AbstractModel;
 
 /**
  * Deploy
- *
- * Das Objekt dieser Klasse wird dem Formular mitgegeben. 
- * In dieses Objekt werden die angehakten Daten geschrieben.
+ * Class for deployment requests which is appended to the form
  *
  * @package    Deployment
  * @subpackage Domain\Model\Request
@@ -33,6 +32,8 @@ class Deploy extends AbstractModel{
 
     
     /**
+     * Return the deploy entries
+     * 
      * @return array
      */
     public function getDeployEntries() {
@@ -44,6 +45,8 @@ class Deploy extends AbstractModel{
 
     
     /**
+     * Set the deploy entries
+     * 
      * @param array $deployEntries
      */
     public function setDeployEntries($deployEntries) {

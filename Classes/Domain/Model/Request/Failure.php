@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Failure
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -15,6 +16,7 @@ use \TYPO3\Deployment\Domain\Model\AbstractModel;
 
 /**
  * Failure
+ * Class for failure requests
  *
  * @package    Deployment
  * @subpackage Domain\Model\Request
@@ -30,6 +32,8 @@ class Failure extends AbstractModel {
 
     
     /**
+     * Return failure entries
+     * 
      * @return array
      */
     public function getFailureEntries() {
@@ -41,6 +45,8 @@ class Failure extends AbstractModel {
 
     
     /**
+     * Set failure entries
+     * 
      * @param array $failureEntries
      */
     public function setFailureEntries($failureEntries) {
