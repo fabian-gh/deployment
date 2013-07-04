@@ -1,7 +1,8 @@
 <?php
 
 /**
- * UuidTask
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  *
  * @category   Extension
  * @package    Deployment
@@ -16,6 +17,7 @@ use \TYPO3\Deployment\Service\InsertDataService;
 
 /**
  * UuidTask
+ * Class for executing the uuid scheduler task
  *
  * @package    Deployment
  * @subpackage Scheduler
