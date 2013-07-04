@@ -1,7 +1,8 @@
 <?php
 
 /**
- * RadioViewHelper
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
  * 
  * @category   Extension
  * @package    Deployment
@@ -13,6 +14,7 @@ namespace TYPO3\Deployment\ViewHelpers\Form;
 
 /**
  * RadioViewHelper
+ * Class for extending the Radio View Helper
  * 
  * @package    Deployment
  * @subpackage ViewHelpers\Form
@@ -55,14 +57,14 @@ class RadioViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Form\RadioViewHelper 
             $checked = $propertyValue == $valueAttribute;
         }
 
-        // =====  Neu: Erweiterung der Radio Buttons um Arrays anhängen zu können ====
+        // ===========  New: Extension for radio buttons to appenmd arrays =====
         if ($this->isObjectAccessorMode()) {
             $propertyValue = $this->getPropertyValue();
             if (is_array($propertyValue)) {
                 $nameAttribute .= '[' . $this->arguments['radioIndex'] . ']';
             }
         }
-        // ============================================================================
+        // =====================================================================
 
         $this->registerFieldNameForFormTokenGeneration($nameAttribute);
         $this->tag->addAttribute('name', $nameAttribute);
@@ -75,5 +77,4 @@ class RadioViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Form\RadioViewHelper 
 
         return $this->tag->render();
     }
-
 }

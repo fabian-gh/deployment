@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
  * @category   Extension
  * @package    Deployment
  * @subpackage Utility
@@ -10,6 +13,9 @@
 namespace TYPO3\Deployment\Utility;
 
 /**
+ * Arrays
+ * Class for advanced array handling
+ * 
  * @package    Deployment
  * @subpackage Utility
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
@@ -25,29 +31,28 @@ class Arrays {
         $separator = '|'; // Pipe als Separatorzeichen setzen
         foreach ($data as $name => $value) {
             if (strpos($name, $separator) === FALSE) {
-                // Wenn das Array keinen spezielles Separatorzeichen besitzt, setze das Schlüssel-Wert-Paar
-                // Wenn $value ein Array ist, setze nested Schlüssel-Wert-Paare
+                // if the array has no special seperator char, set the kay-value pair
+                // if $value is an array, set nested kay-value pairs
                 $array[$name] = $value;
             } else {
-                // In diesem Fall wird versucht einen speziellen Knoten zu erreichen, 
-                // ohne Folgeknoten zu überschreiben
-                // Der Knoten oder seine Nachfolger existieren noch nicht.
+                // in this case a special node is trying to be reached, without overwriting successors
+                // the node or its successors don't exist yet
                 $keys = explode($separator, $name);
-                // Wurzel des Baums setzen
+                // set root of tree
                 $opt_tree = & $array;
-                // Baum traversieren, spezielle Schlüssel benutzen
+                // traverse tree, use special keys
                 while ($key = array_shift($keys)) {
-                    // Wenn weitere Schlüssel nach dem folgen
+                    // if there are no successors
                     if ($keys) {
                         if (!isset($opt_tree[$key]) || !is_array($opt_tree[$key])) {
-                            // Erstelle den Knoten falls dieser nich nicht existiert
+                            // create the node if not already exist
                             $opt_tree[$key] = array();
                         }
-                        // Wurzel des Baums zu diesem Knoten neu definieren(assign by reference)
-                        // dann den nächsten Schlüssel bearbeiten
+                        // define root of the tree as this node (assign by reference)
+                        // and then edit next kex
                         $opt_tree = & $opt_tree[$key];
                     } else {
-                        // letzter zu prüfneder Schlüssel
+                        // last checkable key
                         $opt_tree[$key] = $value;
                     }
                 }
