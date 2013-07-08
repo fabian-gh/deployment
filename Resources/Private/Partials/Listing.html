@@ -12,7 +12,7 @@
         <f:for each="{historyEntries}" as="entry">
 
             <tr class="db_list_normal">
-                <td><f:form.checkbox property="deployEntries" value="{entry.uid}" class="value-checkbox" /></td>
+                <td><f:form.checkbox property="deployEntries" value="{entry.uid}.{entry.tablename}" class="value-checkbox" /></td>
             <td class="space">
                 UID: {entry.uid}<br/>
                 Log-UID: {entry.sysLogUid}<br />

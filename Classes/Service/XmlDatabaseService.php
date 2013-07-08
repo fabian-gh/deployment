@@ -435,18 +435,22 @@ class XmlDatabaseService extends AbstractDataService {
     /**
      * Search for the uid inside the history data in the registry
      *
-     * @param string $uid
+     * @param string $uidTable
      *
      * @return \TYPO3\Deployment\Domain\Model\HistoryData
      */
-    public function compareDataWithRegistry($uid) {
+    public function compareDataWithRegistry($uidTable) {
         /** @var \TYPO3\Deployment\Service\RegistryService $registry */
         $registry = new RegistryService();
         $data = $registry->getStoredHistoryEntries();
-
+        
+        $temp = explode('.', $uidTable);
+        $uid = $temp[0];
+        $table = $temp[1];
+        
         foreach ($data as $hisdata) {
             /** @var HistoryData $hisdata */
-            if ($hisdata->getUid() == $uid) {
+            if ($hisdata->getUid() == $uid && $hisdata->getTablename() == $table) {
                 return $hisdata;
             }
         }

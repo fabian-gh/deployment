@@ -201,8 +201,8 @@ class DeploymentController extends ActionController {
     public function createDeployAction(Deploy $deploy) {
         $deployData = array();
 
-        foreach ($deploy->getDeployEntries() as $uid) {
-            $deployData[] = $this->xmlDatabaseService->compareDataWithRegistry($uid);
+        foreach ($deploy->getDeployEntries() as $uidTable) {
+            $deployData[] = $this->xmlDatabaseService->compareDataWithRegistry($uidTable);
         }
 
         // if there is noch deployment directory create one
