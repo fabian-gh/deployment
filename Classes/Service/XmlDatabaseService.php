@@ -86,87 +86,89 @@ class XmlDatabaseService extends AbstractDataService {
         foreach ($this->deployData as $cData) {
             /** @var HistoryData $cData */
             // query all new entries
-            if ($cData->getSysLogUid() == 'NEW' && $cData->getFieldlist() == '*') {
-                $newInsert = $this->getDatabase()->exec_SELECTgetSingleRow('*', $cData->getTablename(), 'uid=' . $cData->getUid());
+            if(in_array($cData->getTablename(), $configurationService->getDeploymentTables())){
+                if ($cData->getSysLogUid() == 'NEW' && $cData->getFieldlist() == '*') {
+                    $newInsert = $this->getDatabase()->exec_SELECTgetSingleRow('*', $cData->getTablename(), 'uid=' . $cData->getUid());
 
-                // for each entry a new data-element
-                $this->xmlwriter->startElement('data');
-                $this->xmlwriter->writeElement('tablename', $cData->getTablename());
-                $this->xmlwriter->writeElement('fieldlist', '*');
+                    // for each entry a new data-element
+                    $this->xmlwriter->startElement('data');
+                    $this->xmlwriter->writeElement('tablename', $cData->getTablename());
+                    $this->xmlwriter->writeElement('fieldlist', '*');
 
-                foreach ($newInsert as $newkey => $newval) {
-                    if (!in_array($newkey, $configurationService->getNotDeployableColumns())) {
-                        // replace pid with uuid
-                        if ($newkey == 'pid') {
-                            $pageUuid = $this->getUuidByUid($newval, 'pages');
-                            $this->xmlwriter->writeElement('pid', $pageUuid);
-                        } 
-                        // replace uid_foreign with uuid
-                        elseif ($newkey == 'uid_foreign') {
-                            // this approach works always, because 'tablenames' in is available in each relation
-                            // query reference table for uid_local
-                            $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign=' . $newval);
-                            // query uuid of the entry
-                            $uuid_foreign = $this->getUuidByUid($newval, $table['tablenames']);
-                            // process data
-                            $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
-                        } 
-                        // replace uid_local with uuid
-                        elseif ($newkey == 'uid_local') {
-                            // at this place we have to differ, because table_local is not available in each relational
-                            if ($cData->getTablename() == 'sys_file_reference') {
-                                $table = $this->getDatabase()->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local=' . $newval);
-                                $uuid_local = $this->getUuidByUid($newval, $table['table_local']);
-                                $this->xmlwriter->writeElement('uid_local', $uuid_local);
+                    foreach ($newInsert as $newkey => $newval) {
+                        if (!in_array($newkey, $configurationService->getNotDeployableColumns())) {
+                            // replace pid with uuid
+                            if ($newkey == 'pid') {
+                                $pageUuid = $this->getUuidByUid($newval, 'pages');
+                                $this->xmlwriter->writeElement('pid', $pageUuid);
                             } 
-                            // determination for tt_news
-                            elseif ($cData->getTablename() == 'tt_news_cat_mm' || $cData->getTablename() == 'tt_news_related_mm') {
-                                $uuid_local = $this->getUuidByUid($newval, 'tt_news');
-                                $this->xmlwriter->writeElement('uid_local', $uuid_local);
-                            }
-                        } 
-                        // replace header_link (tt_content) with uuid
-                        elseif ($newkey == 'header_link' || $newkey == 'link') {
-                            $substring = $this->checkLinks($newval);
-                            $this->xmlwriter->writeElement($newkey, $substring);
-                        } else {
-                            $this->xmlwriter->writeElement($newkey, $newval);
-                        }
-                    }
-                }
-
-                $this->xmlwriter->endElement();
-            } 
-            // create changed data
-            else {
-                // query pid
-                $pid = $this->getPid($cData->getRecuid(), $cData->getTablename());
-
-                // create for each entry a new data-element
-                $this->xmlwriter->startElement('data');
-
-                // write individual field elements
-                $this->xmlwriter->writeElement('tablename', $cData->getTablename());
-                $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
-                $this->xmlwriter->writeElement('pid', $this->getUuidByUid($pid, 'pages'));
-                $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
-                $this->xmlwriter->writeElement('uuid', $this->getUuidByUid($cData->getRecuid(), $cData->getTablename()));
-
-                // travers changed history entries
-                foreach ($cData->getHistoryData() as $datakey => $data) {
-                    if ($datakey == 'newRecord') {
-                        foreach ($data as $key => $value) {
-                            if ($key === 'header_link' || $key == 'link') {
-                                $substring = $this->checkLinks($value);
-                                $this->xmlwriter->writeElement($key, $substring);
+                            // replace uid_foreign with uuid
+                            elseif ($newkey == 'uid_foreign') {
+                                // this approach works always, because 'tablenames' in is available in each relation
+                                // query reference table for uid_local
+                                $table = $this->getDatabase()->exec_SELECTgetSingleRow('tablenames', $cData->getTablename(), 'uid_foreign=' . $newval);
+                                // query uuid of the entry
+                                $uuid_foreign = $this->getUuidByUid($newval, $table['tablenames']);
+                                // process data
+                                $this->xmlwriter->writeElement('uid_foreign', $uuid_foreign);
+                            } 
+                            // replace uid_local with uuid
+                            elseif ($newkey == 'uid_local') {
+                                // at this place we have to differ, because table_local is not available in each relational
+                                if ($cData->getTablename() == 'sys_file_reference') {
+                                    $table = $this->getDatabase()->exec_SELECTgetSingleRow('table_local', 'sys_file_reference', 'uid_local=' . $newval);
+                                    $uuid_local = $this->getUuidByUid($newval, $table['table_local']);
+                                    $this->xmlwriter->writeElement('uid_local', $uuid_local);
+                                } 
+                                // determination for tt_news
+                                elseif ($cData->getTablename() == 'tt_news_cat_mm' || $cData->getTablename() == 'tt_news_related_mm') {
+                                    $uuid_local = $this->getUuidByUid($newval, 'tt_news');
+                                    $this->xmlwriter->writeElement('uid_local', $uuid_local);
+                                }
+                            } 
+                            // replace header_link (tt_content) with uuid
+                            elseif ($newkey == 'header_link' || $newkey == 'link') {
+                                $substring = $this->checkLinks($newval);
+                                $this->xmlwriter->writeElement($newkey, $substring);
                             } else {
-                                $this->xmlwriter->writeElement($key, $value);
+                                $this->xmlwriter->writeElement($newkey, $newval);
                             }
                         }
                     }
-                }
 
-                $this->xmlwriter->endElement();
+                    $this->xmlwriter->endElement();
+                } 
+                // create changed data
+                else {
+                    // query pid
+                    $pid = $this->getPid($cData->getRecuid(), $cData->getTablename());
+
+                    // create for each entry a new data-element
+                    $this->xmlwriter->startElement('data');
+
+                    // write individual field elements
+                    $this->xmlwriter->writeElement('tablename', $cData->getTablename());
+                    $this->xmlwriter->writeElement('fieldlist', $cData->getFieldlist());
+                    $this->xmlwriter->writeElement('pid', $this->getUuidByUid($pid, 'pages'));
+                    $this->xmlwriter->writeElement('tstamp', $cData->getTstamp()->getTimestamp());
+                    $this->xmlwriter->writeElement('uuid', $this->getUuidByUid($cData->getRecuid(), $cData->getTablename()));
+
+                    // travers changed history entries
+                    foreach ($cData->getHistoryData() as $datakey => $data) {
+                        if ($datakey == 'newRecord') {
+                            foreach ($data as $key => $value) {
+                                if ($key === 'header_link' || $key == 'link') {
+                                    $substring = $this->checkLinks($value);
+                                    $this->xmlwriter->writeElement($key, $substring);
+                                } else {
+                                    $this->xmlwriter->writeElement($key, $value);
+                                }
+                            }
+                        }
+                    }
+
+                    $this->xmlwriter->endElement();
+                }
             }
         }
 

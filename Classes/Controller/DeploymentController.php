@@ -255,7 +255,7 @@ class DeploymentController extends ActionController {
         if ($result1 === TRUE && $result2 === TRUE) {
             // register last deployment status
             // TODO: Entkommentieren
-            //$this->registry->set('deployment', 'last_deploy', time());
+            //$this->registry->setLastDeploy();
             // display ok-message
             $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
 
@@ -340,7 +340,7 @@ class DeploymentController extends ActionController {
         
         if ($res) {
             // TODO: Entkomentieren
-            //$this->registry->set('deployment', 'last_deploy', time());
+            //$this->registry->setLastDeploy();
             $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
             $this->redirect('index');
         } else {

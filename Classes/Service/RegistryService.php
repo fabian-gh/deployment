@@ -72,6 +72,14 @@ class RegistryService extends AbstractDataService {
     public function getLastDeploy() {
         return $this->registry->get('deployment', 'last_deploy');
     }
+    
+    
+    /**
+     * Sets a new timestamp
+     */
+    public function setLastDeploy(){
+        $this->registry->set('deployment', 'last_deploy', time());
+    }
 
     
     /**

@@ -51,7 +51,7 @@ class ConfigurationService extends AbstractDataService {
      */
     public function getNotDeployableColumns(){
         $columns = $this->getAllEntries();
-        $conArr = explode(',', $columns['notDeployableColumns']);
+        $conArr = GeneralUtility::trimExplode(',', $columns['notDeployableColumns']);
         
         return (!empty($conArr)) ? $conArr : NULL;
     }
