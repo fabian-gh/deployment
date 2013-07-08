@@ -215,7 +215,7 @@ class DeploymentController extends ActionController {
         $this->xmlResourceService->writeXmlResourceList();
 
         // create database data
-        $this->xmlDatabaseService->setDeployData(array_unique($deployData));
+        $this->xmlDatabaseService->setDeployData($deployData);
         $this->xmlDatabaseService->writeXML();
 
         $this->addFlashMessage('', 'Lists were created', FlashMessage::OK);

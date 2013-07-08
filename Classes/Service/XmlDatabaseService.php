@@ -444,6 +444,7 @@ class XmlDatabaseService extends AbstractDataService {
         $registry = new RegistryService();
         $data = $registry->getStoredHistoryEntries();
         
+        // explode the checkbox identifier
         $temp = explode('.', $uidTable);
         $uid = $temp[0];
         $table = $temp[1];
