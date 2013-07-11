@@ -3,6 +3,10 @@
 <f:form action="clearFailures" name="failure" object="{failure}">
     <br />
     <b>Number of entries to be checked: </b><f:count>{failureEntries}</f:count><br /><br />
+    
+    <input type="button" class="allDb" value="Select all database entries" />
+    <input type="button" class="allList" value="Select all list entries" />
+    <br /><br />
 
     <table class="table2 typo3-dblist">
         <tr class="t3-row-header">
@@ -16,8 +20,8 @@
 
             <tr class="outertr-spacer">
             <td>
-                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" class="radios" checked="checked" />&nbsp;Use Databaseentry (<span class="diff-r">red</span>/black)<br />
-                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" class="radios" />&nbsp;Use Listentry (<span class="diff-g">green</span>)
+                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" class="radios db-radio" />&nbsp;Use Databaseentry (<span class="diff-r">red</span>/black)<br />
+                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" class="radios list-radio" />&nbsp;Use Listentry (<span class="diff-g">green</span>)
             </td>
             <td>
                 <table class="table3">
@@ -43,5 +47,29 @@
             </tr>
         </f:for>
     </table>
+    
+    <input type="button" class="allDb" value="Select all database entries" />
+    <input type="button" class="allList" value="Select all list entries" />
+    <br /><br /><br />
+    
     <f:form.submit value="Correct entries" />  
 </f:form>
+
+<script type="text/javascript">
+
+jQuery('document').ready(function() {
+    
+    jQuery('.db-radio').attr('checked', 'checked');
+    
+    jQuery('.allDb').click(function() {
+        jQuery('.list-radio').removeAttr('checked');
+        jQuery('.db-radio').prop('checked', 'checked');
+    });
+    
+    jQuery('.allList').click(function() {
+        jQuery('.db-radio').removeAttr('checked');
+        jQuery('.list-radio').prop('checked', 'checked');       
+    });
+});
+
+</script>
