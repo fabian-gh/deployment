@@ -2,7 +2,7 @@
 
 <f:form action="clearFailures" name="failure" object="{failure}">
     <br />
-    <b>Number of entries to be checked: </b><f:count>{failureEntries}</f:count><br /><br />
+    <b>Number of entries to be checked: </b><f:count>{diff}</f:count><br /><br />
     
     <input type="button" class="allDb" value="Select all database entries" />
     <input type="button" class="allList" value="Select all list entries" />
@@ -14,37 +14,31 @@
             <th class="th-spacer3">Differences</th>
         </tr>
         <f:for each="{failureEntries}" as="fEntry" key="fKey" iteration="itemIteration">
-            <tr rowspan="2">
-                <td class="innertableheader-spacer" colspan="2"><b>Table: {fEntry.tablename}</b></td>
-            </tr>
+            <f:for each="{diff}" as="diffEntry" key="diffkey">
+                <f:if condition="{fKey} == {diffkey}">
+                    <f:debug>{dEntry}</f:debug>
+                    <tr rowspan="2">
+                        <td class="innertableheader-spacer" colspan="2"><b>Table: {fEntry.tablename}</b></td>
+                    </tr>
 
-            <tr class="outertr-spacer">
-            <td>
-                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" class="radios db-radio" />&nbsp;Use Databaseentry (<span class="diff-r">red</span>/black)<br />
-                <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" class="radios list-radio" />&nbsp;Use Listentry (<span class="diff-g">green</span>)
-            </td>
-            <td>
-                <table class="table3">
-                    <tr class="t3-row-header"><th class="th-spacer3">Coloumn</th><th class="th-spacer3">Value</th></tr>
-                    <f:for each="{diff}" as="diffEntry" key="diffkey">
-                        <f:if condition="{diffkey} == {itemIteration.index}">
-                            <f:for each="{diffEntry}" as="entry" key="key">
-                                <tr>
-                                <f:if condition="{0:key} == {0:'tstamp'}">
-                                    <f:then>
-                                        <td><b>{key}: </b></td><td><b><f:format.raw>{entry}</f:format.raw></b></td> 
-                                    </f:then>
-                                    <f:else>
+                    <tr class="outertr-spacer">
+                    <td>
+                        <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="database.{fEntry.tablename}.{fEntry.uuid}" class="radios db-radio" />&nbsp;Use Databaseentry (<span class="diff-r">red</span>)<br />
+                        <d:form.radio radioIndex="{itemIteration.index}" property="failureEntries" value="list.{fEntry.tablename}.{fEntry.uuid}" class="radios list-radio" />&nbsp;Use Listentry (<span class="diff-g">green</span>)
+                    </td>
+                    <td>
+                        <table class="table3">
+                            <tr class="t3-row-header"><th class="th-spacer3">Coloumn</th><th class="th-spacer3">Value</th></tr>
+                                <f:for each="{diffEntry}" as="entry" key="key">
+                                    <tr>
                                         <td><b>{key}: </td><td></b><f:format.raw>{entry}</f:format.raw></td> 
-                                    </f:else>
-                                </f:if>
-                                </tr>
-                            </f:for>
-                        </f:if>
-                    </f:for>
-                </table>
-            </td>
-            </tr>
+                                    </tr>
+                                </f:for>
+                        </table>
+                    </td>
+                    </tr>
+                </f:if>
+            </f:for>
         </f:for>
     </table>
     

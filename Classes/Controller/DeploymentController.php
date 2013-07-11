@@ -316,14 +316,14 @@ class DeploymentController extends ActionController {
         $failureEntries = $this->failureService->splitEntries($entries, TRUE);
         $databaseEntries = $this->failureService->splitEntries($entries);
         $diff = $this->failureService->getFailureDataDiff($databaseEntries, $failureEntries);
-        $diffData = $this->failureService->convertTimestamps($diff);
-
+        //$diffData = $this->failureService->convertTimestamps($diff);
+        
         $this->addFlashMessage('A part of the data could not be inserted. Please check the given entries.', 'An error has occured!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failure' => $failure,
             'failureEntries' => $failureEntries,
             'databaseEntries' => $databaseEntries,
-            'diff' => $diffData
+            'diff' => $diff
         ));
     }
 
