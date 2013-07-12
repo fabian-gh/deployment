@@ -106,7 +106,7 @@ class FailureService extends AbstractDataService {
                         // exclude the timestamp from diff making, because 
                         // the clocks of each system aren't equal
                         // you can add here some more keys which shouldn't been checked
-                        if($key != 'tstamp'){
+                        if($key != 'tstamp' && $key != 'uid'){
                             $differences[$count][$key] = $diff->makeDiffDisplay($value, $database[$count][$key]);
                         }
                     }
@@ -196,6 +196,8 @@ class FailureService extends AbstractDataService {
      * 
      * @param array $diff
      * @return array
+     * 
+     * @deprecated
      */
     public function convertTimestamps($diff) {
         $arr = array();

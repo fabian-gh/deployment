@@ -318,6 +318,13 @@ class DeploymentController extends ActionController {
         $diff = $this->failureService->getFailureDataDiff($databaseEntries, $failureEntries);
         //$diffData = $this->failureService->convertTimestamps($diff);
         
+        if(empty($diff)){
+            // TODO: Entkomentieren
+            //$this->registry->setLastDeploy();
+            $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
+            $this->redirect('index');
+        }
+        
         $this->addFlashMessage('A part of the data could not be inserted. Please check the given entries.', 'An error has occured!', FlashMessage::ERROR);
         $this->view->assignMultiple(array(
             'failure' => $failure,
