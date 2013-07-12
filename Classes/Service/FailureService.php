@@ -95,9 +95,6 @@ class FailureService extends AbstractDataService {
         $count = 0;
         /** @var \TYPO3\CMS\Core\Utility\DiffUtility $diff */
         $diff = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\DiffUtility');
-        
-        //DebuggerUtility::var_dump($failures, 'Fehler');
-        //DebuggerUtility::var_dump($database, 'Datenbank');
 
         foreach ($failures as $failure) {
             foreach ($failure as $key => $value) {
@@ -106,7 +103,7 @@ class FailureService extends AbstractDataService {
                 } else {
                     // if the values differ from each other
                     if($value != $database[$count][$key]){
-                        // exclude the timestamp from making the diff, because 
+                        // exclude the timestamp from diff making, because 
                         // the clocks of each system aren't equal
                         // you can add here some more keys which shouldn't been checked
                         if($key != 'tstamp'){
@@ -117,7 +114,7 @@ class FailureService extends AbstractDataService {
             }
             $count++;
         }
-        //DebuggerUtility::var_dump($differences, 'Differenzen');
+        
         return $differences;
     }
 
