@@ -1,3 +1,6 @@
+# cat=Access; type=text; label=PHP-Path: Path to the PHP binaries
+phpPath =
+
 # cat=Access; type=text; label=Pull-Server: Address of pull server
 pullServer =
 
@@ -8,7 +11,7 @@ username =
 password =
 
 # cat=Datahandling; type=text; label=Not deployable columns (Only for development system)
-notDeployableColumns = tx_phpunit_is_dummy_record, l18n_diffsource, l10n_diffsource
+notDeployableColumns = l18n_diffsource, l10n_diffsource, tx_phpunit_is_dummy_record
 
 # cat=Datahandling; type=text; label=Additional Deployment Tables: The list of deplyoment tables (tt_content and pages are default tables)
 deploymentTables =

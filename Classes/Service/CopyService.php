@@ -47,18 +47,21 @@ class CopyService extends AbstractDataService {
      * Trigger function for invoking the command controller over the cli
      */
     public function trigger() {
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
+        $configurationService = new ConfigurationService();
+        
         if ($this->allPrecautionsSet()) {
-            $arr = array();
             $path = $this->getCliPath();
             $taskUid = $this->getTaskUid();
             
             $userAgent = $_SERVER['HTTP_USER_AGENT'];
             if (preg_match('/linux/i', $userAgent) == 1 || preg_match('/mac/i', $userAgent) == 1) {
-                // search php path
+                /*// search php path
                 CommandUtility::exec('whereis -b php', $arr);
-                $phpPath = GeneralUtility::trimExplode(':', $arr[0]);
+                $phpPath = GeneralUtility::trimExplode(':', $arr[0]);*/
+                $phpPath = $configurationService->getPhpPath();
                 
-                CommandUtility::exec(escapeshellcmd("$phpPath[1] $path scheduler -f -i $taskUid"));
+                CommandUtility::exec(escapeshellcmd("$phpPath $path scheduler -f -i $taskUid"));
             }
         }
     }

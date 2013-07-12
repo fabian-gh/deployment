@@ -129,5 +129,18 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     public function testGetPasswordIsString() {
         $this->assertInternalType('string', $this->configurationService->getPassword());
     }
+    
+    /**
+     * @test
+     */
+    public function testGetPhpPathIsNotNull() {
+        $this->assertNotNull($this->configurationService->getPhpPath());
+    }
 
+    /**
+     * @test
+     */
+    public function testGetPhpPathIsString() {
+        $this->assertInternalType('string', $this->configurationService->getPhpPath());
+    }
 }

@@ -55,6 +55,17 @@ class ConfigurationService extends AbstractDataService {
         
         return (!empty($conArr)) ? $conArr : NULL;
     }
+    
+    
+    /**
+     * Returns the PHP path
+     *
+     * @return mixed string or NULL
+     */
+    public function getPhpPath() {
+        $configuration = $this->getAllEntries();
+        return isset($configuration['phpPath']) ? $configuration['phpPath'] : NULL;
+    }
 
     
     /**
