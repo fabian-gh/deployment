@@ -91,7 +91,7 @@ class DatabaseService extends AbstractDataService {
      * @param string $pass
      * @param string $db
      */
-    protected function connect($host, $user, $pass, $db) {
+    public function connect($host, $user, $pass, $db) {
         $this->getDatabase()->setDatabaseHost($host);
         $this->getDatabase()->setDatabaseUsername($user);
         $this->getDatabase()->setDatabasePassword($pass);

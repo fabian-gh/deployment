@@ -12,113 +12,176 @@
 
 namespace TYPO3\Deployment\Service;
 
+use \TYPO3\Deployment\Service\FileService;
+use \TYPO3\Deployment\Service\DatabaseService;
+use \TYPO3\CMS\Core\Utility\CommandUtility;
+use \TYPO3\CMS\Core\Database\DatabaseConnection;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * ConfigurationService
- * Class for reading the deployment configuration
+ * BoundlessBackdeploymentService
+ * Class for creating databse dump and resource copying
  *
  * @package    Deployment
  * @subpackage Service
  * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
  */
-class ConfigurationService extends AbstractDataService {
+class BoundlessBackdeploymentService extends AbstractDataService {
 
     /**
-     * Returns the deplyoment tables
-     *
-     * @return array
+     * @var string
      */
-    public function getDeploymentTables() {
-        $configuration = $this->getAllEntries();
-        $tables = GeneralUtility::trimExplode(',', $configuration['deploymentTables'], TRUE);
-
-        array_push($tables, 'tt_content');
-        array_push($tables, 'pages');
-        array_push($tables, 'sys_file');
-        array_push($tables, 'sys_file_reference');
-        array_unique($tables);
-        
-        return $tables;
-    }
+    protected $mysqlServer;
+    
+    /**
+     * @var string
+     */
+    protected $database;
+    
+    /**
+     * @var string
+     */
+    protected $username;
+    
+    /**
+     * @var string
+     */
+    protected $password;
     
     
     /**
-     * returns coloumns which shouldn't be deplyoed
+     * Init the class
      * 
-     * @return mixed array or NULL
+     * @param string $mysqlServer
+     * @param string $username
+     * @param string $password
      */
-    public function getNotDeployableColumns(){
-        $columns = $this->getAllEntries();
-        $conArr = GeneralUtility::trimExplode(',', $columns['notDeployableColumns']);
+    public function init($mysqlServer, $database, $username, $password){
+        $this->setMysqlServer($mysqlServer);
+        $this->setDatabase($database);
+        $this->setUsername($username);
+        $this->setPassword($password);
+    }
+    
+    
+    /**
+     * Check if a path is defined and not empty
+     * 
+     * @return boolean
+     */
+    public function checkIfMysqldumpPathIsNotEmpty(){
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
+        $configurationService = new ConfigurationService();
+        $path = $configurationService->getMysqldumpPath();
         
-        return (!empty($conArr)) ? $conArr : NULL;
+        if(!empty($path) && $path != ''){
+            return true;
+        }
+        return false;
     }
     
     
     /**
-     * Returns the PHP path
-     *
-     * @return mixed string or NULL
+     * Creates the database dump
      */
-    public function getPhpPath() {
-        $configuration = $this->getAllEntries();
-        return isset($configuration['phpPath']) ? $configuration['phpPath'] : NULL;
+    public function createDbDump(){
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
+        $configurationService = new ConfigurationService();
+        /** @var \TYPO3\Deployment\Service\FileService $fieService */
+        $fileService = new FileService();
+        
+        $mysqldumpPath = $configurationService->getMysqldumpPath();
+        $tablelist = $this->getTableList();
+        //DebuggerUtility::var_dump('cd "'.$mysqldumpPath.'"');
+        //DebuggerUtility::var_dump('mysqldump --opt --skip-disable-keys --user='.$this->username.' --password='.$this->password.' --database '.$this->database.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->database.'.sql" --tables '.$tablelist);die();
+        CommandUtility::exec('cd "'.$mysqldumpPath.'"');
+        CommandUtility::exec('mysqldump --opt --skip-disable-keys --user='.$this->username.' --password='.$this->password.' --database '.$this->database.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->database.'.sql" --tables '.$tablelist);
+    }
+    
+    
+    /**
+     * Returns a list of tables without caching tables
+     * 
+     * @return string
+     */
+    protected function getTableList(){
+        $list = '';
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $databaseConnection */
+        $databaseConnection = new DatabaseConnection();
+        
+        $databaseConnection->setDatabaseHost($this->mysqlServer);
+        $databaseConnection->setDatabaseName($this->database);
+        $databaseConnection->setDatabaseUsername($this->username);
+        $databaseConnection->setDatabasePassword($this->password);
+        $databaseConnection->connectDB();
+        
+        $tableprop = $databaseConnection->admin_get_tables();
+        foreach($tableprop as $key => $value){
+            if(strstr($key, 'cache') == FALSE && strstr($key, 'cf_') == FALSE){
+                $list .= $key.' ';
+            }
+        }
+        
+        return $list;
+    }
+    
+    
+    // ========================= Getter & Setter ===============================
+    
+    /**
+     * @return string
+     */
+    public function getMysqlServer() {
+        return $this->mysqlServer;
     }
 
-    
     /**
-     * Returns the delete state
-     *
-     * @return mixed int or NULL
+     * @param string $mysqlServer
      */
-    public function getDeleteState() {
-        $configuration = $this->getAllEntries();
-        return isset($configuration['deleteOlderFiles']) ? (int) $configuration['deleteOlderFiles'] : NULL;
+    public function setMysqlServer($mysqlServer) {
+        $this->mysqlServer = $mysqlServer;
     }
     
-    
     /**
-     * Returns the address of the pull server
-     *
-     * @return mixed string or NULL
+     * @return string
      */
-    public function getPullserver() {
-        $configuration = $this->getAllEntries();
-        return isset($configuration['pullServer']) ? $configuration['pullServer'] : NULL;
+    public function getDatabase() {
+        return $this->database;
     }
 
-    
     /**
-     * Returns the username
-     *
-     * @return mixed string or NULL
+     * @param string $database
+     */
+    public function setDatabase($database) {
+        $this->database = $database;
+    }
+
+    /**
+     * @return string
      */
     public function getUsername() {
-        $configuration = $this->getAllEntries();
-        return isset($configuration['username']) ? $configuration['username'] : NULL;
+        return $this->username;
     }
 
-    
     /**
-     * Returns the password
-     *
-     * @return mixed string or NULL
+     * @param string $username
+     */
+    public function setUsername($username) {
+        $this->username = $username;
+    }
+
+    /**
+     * @return string
      */
     public function getPassword() {
-        $configuration = $this->getAllEntries();
-        return isset($configuration['password']) ? $configuration['password'] : NULL;
+        return $this->password;
     }
 
-    
     /**
-     * Returns all deplyoment entries
-     *
-     * @return array
+     * @param string $password
      */
-    protected function getAllEntries() {
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['deployment']);
-        return is_array($configuration) ? $configuration : array();
+    public function setPassword($password) {
+        $this->password = $password;
     }
 }

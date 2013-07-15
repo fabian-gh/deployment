@@ -93,6 +93,12 @@ class DeploymentController extends ActionController {
     protected $copyService;
     
     /**
+     * @var \TYPO3\Deployment\Service\BoundlessBackdeploymentService
+     * @inject
+     */
+    protected $backdeployment;
+    
+    /**
      * @var \TYPO3\Deployment\Scheduler\UuidTask
      * @inject
      */
@@ -358,7 +364,7 @@ class DeploymentController extends ActionController {
     
     
     /**
-     * Start a boundless Backdeployment by copying whole database and resources
+     * Start a boundless Backdeployment by copying whole database
      * 
      * @param \TYPO3\Deployment\Domain\Model\Request\Backdeploy $backdeploy
      * @dontvalidate                                            $backdeploy
@@ -368,14 +374,26 @@ class DeploymentController extends ActionController {
             $backdeploy = new Backdeploy();
         }
         
+        if(!$this->backdeployment->checkIfMysqldumpPathIsNotEmpty()){
+            $this->addFlashMessage('Please enter the path to the mysqldump binary', 'No mysqldump path defined', FlashMessage::ERROR);
+        }
+        
         $this->view->assign('backdeploy', $backdeploy);
     }
     
+    
     /**
      * Execute the boundless backdeployment
+     * 
+     * @param \TYPO3\Deployment\Domain\Model\Request\Backdeploy $backdeploy
+     * @dontvalidate                                            $backdeploy
      */
-    public function boundlessBackdeploymentAction(){
+    public function boundlessBackdeploymentAction(Backdeploy $backdeploy){
+        $this->backdeployment->init($backdeploy->getMysqlServer(), $backdeploy->getDatabase(), $backdeploy->getUsername(), $backdeploy->getPassword());
+        $this->backdeployment->createDbDump();
         
+        $this->addFlashMessage('', 'Dump was created succesfully', FlashMessage::OK);
+        $this->redirect('index');
     }
 
     

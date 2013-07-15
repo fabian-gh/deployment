@@ -34,6 +34,12 @@ class Backdeploy extends AbstractModel{
      * @var string
      * @validate NotEmpty
      */
+    protected $database;
+    
+    /**
+     * @var string
+     * @validate NotEmpty
+     */
     protected $username;
     
     /**
@@ -54,6 +60,20 @@ class Backdeploy extends AbstractModel{
      */
     public function setMysqlServer($mysqlServer) {
         $this->mysqlServer = $mysqlServer;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getDatabase() {
+        return $this->database;
+    }
+
+    /**
+     * @param string $database
+     */
+    public function setDatabase($database) {
+        $this->database = $database;
     }
 
     /**

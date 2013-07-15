@@ -58,6 +58,17 @@ class ConfigurationService extends AbstractDataService {
     
     
     /**
+     * Returns the mysqldump path
+     *
+     * @return mixed string or NULL
+     */
+    public function getMysqldumpPath() {
+        $configuration = $this->getAllEntries();
+        return isset($configuration['mysqldumpPath']) ? $configuration['mysqldumpPath'] : NULL;
+    }
+    
+    
+    /**
      * Returns the PHP path
      *
      * @return mixed string or NULL

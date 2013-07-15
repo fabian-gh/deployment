@@ -361,19 +361,15 @@ class FileService extends AbstractDataService {
 
     /**
      * @return string
-     * 
-     * @deprecated since version 2
      */
-    public function getDeploymentResourcePathWithoutTrailingSlash() {
-        return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource';
+    public function getDeploymentBBDeploymentPathWithoutTrailingSlash() {
+        return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/bbdeployment';
     }
 
     /**
      * @return string
-     * 
-     * @deprecated since version 2
      */
-    public function getDeploymentResourcePathWithTrailingSlash() {
-        return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource/';
+    public function getDeploymentBBDeploymentPathWithTrailingSlash() {
+        return GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/bbdeployment/';
     }
 }
