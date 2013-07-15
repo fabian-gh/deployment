@@ -18,6 +18,7 @@ use \TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use \TYPO3\Deployment\Domain\Model\Log;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\Deployment\Domain\Model\Request\Failure;
+use \TYPO3\Deployment\Domain\Model\Request\Backdeploy;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -354,6 +355,28 @@ class DeploymentController extends ActionController {
             $this->forward('listFailure', NULL, NULL, array('failures' => $storedFailures));
         }
     }
+    
+    
+    /**
+     * Start a boundless Backdeployment by copying whole database and resources
+     * 
+     * @param \TYPO3\Deployment\Domain\Model\Request\Backdeploy $backdeploy
+     * @dontvalidate                                            $backdeploy
+     */
+    public function enterBoundlessBackdeploymentAction(Backdeploy $backdeploy = NULL){
+        if ($backdeploy === NULL) {
+            $backdeploy = new Backdeploy();
+        }
+        
+        $this->view->assign('backdeploy', $backdeploy);
+    }
+    
+    /**
+     * Execute the boundless backdeployment
+     */
+    public function boundlessBackdeploymentAction(){
+        
+    }
 
     
     /**
@@ -366,5 +389,4 @@ class DeploymentController extends ActionController {
     protected function addFlashMessage($message, $title, $mode) {
         $this->controllerContext->getFlashMessageQueue()->addMessage(new FlashMessage($message, $title, $mode, true));
     }
-
 }

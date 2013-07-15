@@ -27,6 +27,14 @@ table.typo3-dblist tr td{
     max-width: 400px;
 }
 
+.table4{
+    font-size: 11px;
+    border-collapse: collapse;
+}
+.table4 td{
+    padding: 3px;
+}
+
 .inner-table{
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;

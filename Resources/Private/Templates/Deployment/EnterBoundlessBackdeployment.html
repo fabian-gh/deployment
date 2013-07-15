@@ -1,0 +1,20 @@
+{namespace deployment=\TYPO3\Deployment\ViewHelpers}
+
+<f:layout name="Backend"/>
+
+<f:section name="iconButtons">
+    <f:be.buttons.icon uri="{f:uri.action(action:'index')}" icon="actions-document-close" title="Close this site" />
+</f:section>
+
+<f:section name="content">
+
+    <f:form.errors>
+        <div class="error">
+            <strong>{error.propertyName}</strong>:
+            <f:for each="{error.errors}" as="errorDetail">{errorDetail.message}</f:for>
+        </div>
+    </f:form.errors>
+
+    <f:render partial="Backdeployment" arguments="{_all}" />
+    
+</f:section>

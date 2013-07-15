@@ -1,5 +1,8 @@
-# cat=Access; type=text; label=PHP-Path: Path to the PHP binaries
+# cat=Paths; type=text; label=PHP-Path: Path to the PHP binaries
 phpPath =
+
+# cat=Paths; type=text; label=mysqldump-Path: Path to the MySQL-Dump binary
+mysqldumpPath =
 
 # cat=Access; type=text; label=Pull-Server: Address of pull server
 pullServer =
