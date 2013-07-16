@@ -44,7 +44,6 @@ class Backdeploy extends AbstractModel{
     
     /**
      * @var string
-     * @validate NotEmpty
      */
     protected $password;
     
