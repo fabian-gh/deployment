@@ -91,11 +91,67 @@ class DatabaseService extends AbstractDataService {
      * @param string $pass
      * @param string $db
      */
-    public function connect($host, $user, $pass, $db) {
+    protected function connect($host, $user, $pass, $db) {
         $this->getDatabase()->setDatabaseHost($host);
         $this->getDatabase()->setDatabaseUsername($user);
         $this->getDatabase()->setDatabasePassword($pass);
         $this->getDatabase()->setDatabaseName($db);
         $this->getDatabase()->connectDB();
+    }
+    
+    /**
+     * @return string
+     */
+    public function getHost() {
+        return $this->host;
+    }
+
+    /**
+     * @param string $host
+     */
+    public function setHost($host) {
+        $this->host = $host;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUser() {
+        return $this->user;
+    }
+
+    /**
+     * @param string $user
+     */
+    public function setUser($user) {
+        $this->user = $user;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPass() {
+        return $this->pass;
+    }
+
+    /**
+     * @param string $pass
+     */
+    public function setPass($pass) {
+        $this->pass = $pass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDb() {
+        return $this->db;
+    }
+
+    /**
+     * @param string $db
+     */
+    public function setDb($db) {
+        $this->db = $db;
     }
 }

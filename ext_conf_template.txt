@@ -16,6 +16,9 @@ password =
 # cat=Datahandling; type=text; label=Not deployable columns (Only for development system)
 notDeployableColumns = l18n_diffsource, l10n_diffsource, tx_phpunit_is_dummy_record
 
+# cat=Datahandling; type=text; label=Not deployable tables: Add some tables which explicitly shouldn't been deployed
+notDeployableTables = tx_phpunit_test,tx_phpunit_testchild,tx_phpunit_test_article_mm
+
 # cat=Datahandling; type=text; label=Additional Deployment Tables: The list of deplyoment tables (tt_content, pages, sys_file and sys_file_reference are default tables)
 deploymentTables =
 

@@ -50,8 +50,21 @@ class ConfigurationService extends AbstractDataService {
      * @return mixed array or NULL
      */
     public function getNotDeployableColumns(){
-        $columns = $this->getAllEntries();
-        $conArr = GeneralUtility::trimExplode(',', $columns['notDeployableColumns']);
+        $configuration = $this->getAllEntries();
+        $conArr = GeneralUtility::trimExplode(',', $configuration['notDeployableColumns']);
+        
+        return (!empty($conArr)) ? $conArr : NULL;
+    }
+    
+    
+    /**
+     * returns tables which shouldn't be deplyoed
+     * 
+     * @return mixed array or NULL
+     */
+    public function getNotDeployableTables(){
+        $configuration = $this->getAllEntries();
+        $conArr = GeneralUtility::trimExplode(',', $configuration['notDeployableTables']);
         
         return (!empty($conArr)) ? $conArr : NULL;
     }

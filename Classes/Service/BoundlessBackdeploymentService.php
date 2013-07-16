@@ -15,7 +15,6 @@ namespace TYPO3\Deployment\Service;
 use \TYPO3\Deployment\Service\FileService;
 use \TYPO3\Deployment\Service\DatabaseService;
 use \TYPO3\CMS\Core\Utility\CommandUtility;
-use \TYPO3\CMS\Core\Database\DatabaseConnection;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -33,22 +32,22 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * @var string
      */
     protected $mysqlServer;
-    
+
     /**
      * @var string
      */
-    protected $database;
-    
+    protected $databaseName;
+
     /**
      * @var string
      */
     protected $username;
-    
+
     /**
      * @var string
      */
     protected $password;
-    
+
     
     /**
      * Init the class
@@ -57,13 +56,13 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * @param string $username
      * @param string $password
      */
-    public function init($mysqlServer, $database, $username, $password){
+    public function init($mysqlServer, $databaseName, $username, $password){
         $this->setMysqlServer($mysqlServer);
-        $this->setDatabase($database);
+        $this->setDatabaseName($databaseName);
         $this->setUsername($username);
         $this->setPassword($password);
     }
-    
+
     
     /**
      * Check if a path is defined and not empty
@@ -74,7 +73,7 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
         $configurationService = new ConfigurationService();
         $path = $configurationService->getMysqldumpPath();
-        
+
         if(!empty($path) && $path != ''){
             return true;
         }
@@ -83,22 +82,87 @@ class BoundlessBackdeploymentService extends AbstractDataService {
     
     
     /**
-     * Creates the database dump
+     * Check if the db dump exists
+     * 
+     * @return boolean
+     */
+    public function checkIfDbDumpExists(){
+        $fileArr = array();
+        /** @var \TYPO3\Deployment\Service\FileService $fieService */
+        $fileService = new FileService();
+        
+        $path = $fileService->getDeploymentBBDeploymentPathWithTrailingSlash();
+        $fileList = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $path);
+        
+        foreach($fileList as $file){
+            if(strstr($file, $this->databaseName.'.sql') !== FALSE){
+                return true;
+            }
+        }
+    }
+    
+    
+    /**
+     * Returns an array with single create and insert commands
+     * 
+     * @return array
+     */
+    public function getDumpContent(){
+        $fileArr = array();
+        $content = array();
+        /** @var \TYPO3\Deployment\Service\FileService $fieService */
+        $fileService = new FileService();
+        
+        $path = $fileService->getDeploymentBBDeploymentPathWithTrailingSlash();
+        $fileList = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $path);
+        
+        foreach($fileList as $file){
+            $contentStr = file_get_contents($file);
+        }
+        
+        $contentArr = explode('DROP', $contentStr);
+        foreach($contentArr as $con){
+            if(!empty($con) || $con != ''){
+                $content[] = 'DROP'.$con;
+            }
+        }
+        
+        foreach($content as $con){
+            $replaces = array('= @@character_set_client', '= utf8', '= @saved_cs_client', 'SET @saved_cs_client','SET character_set_client','/*!40101', '*/;');
+            $newContent[] = str_replace($replaces, '', $con);
+        }
+        
+        return $newContent;
+    }
+
+    
+    /**
+     * Creates the database dump and inserts into the davelopment/integration database
      */
     public function createDbDump(){
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
         $configurationService = new ConfigurationService();
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService();
-        
+
         $mysqldumpPath = $configurationService->getMysqldumpPath();
         $tablelist = $this->getTableList();
-        //DebuggerUtility::var_dump('cd "'.$mysqldumpPath.'"');
-        //DebuggerUtility::var_dump('mysqldump --opt --skip-disable-keys --user='.$this->username.' --password='.$this->password.' --database '.$this->database.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->database.'.sql" --tables '.$tablelist);die();
+        
         CommandUtility::exec('cd "'.$mysqldumpPath.'"');
-        CommandUtility::exec('mysqldump --opt --skip-disable-keys --user='.$this->username.' --password='.$this->password.' --database '.$this->database.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->database.'.sql" --tables '.$tablelist);
+        CommandUtility::exec('mysqldump --compact --opt --skip-diable-keys --skip-comments --user='.$this->username.' --password='.$this->password.' --database '.$this->databaseName.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->databaseName.'.sql" --tables '.$tablelist);
+        
+        if($this->checkIfDbDumpExists()){
+            CommandUtility::exec("mysql --user=$this->username --password=$this->password");
+            CommandUtility::exec("use database ".TYPO3_db);
+            
+            foreach($this->getDumpContent() as $command){
+                CommandUtility::exec("$command");
+            }
+            
+            CommandUtility::exec("exit");
+        }
     }
-    
+
     
     /**
      * Returns a list of tables without caching tables
@@ -107,28 +171,32 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      */
     protected function getTableList(){
         $list = '';
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $databaseConnection */
-        $databaseConnection = new DatabaseConnection();
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $confService */
+        $confService = new ConfigurationService();
         
-        $databaseConnection->setDatabaseHost($this->mysqlServer);
-        $databaseConnection->setDatabaseName($this->database);
-        $databaseConnection->setDatabaseUsername($this->username);
-        $databaseConnection->setDatabasePassword($this->password);
-        $databaseConnection->connectDB();
+        $this->getDatabase()->setDatabaseHost($this->mysqlServer);
+        $this->getDatabase()->setDatabaseName($this->databaseName);
+        $this->getDatabase()->setDatabaseUsername($this->username);
+        $this->getDatabase()->setDatabasePassword($this->password);
+        $this->getDatabase()->connectDB();
         
-        $tableprop = $databaseConnection->admin_get_tables();
-        foreach($tableprop as $key => $value){
-            if(strstr($key, 'cache') == FALSE && strstr($key, 'cf_') == FALSE){
-                $list .= $key.' ';
+        if($this->getDatabase()->isConnected()){
+            $tableprop = $this->getDatabase()->admin_get_tables();
+            foreach($tableprop as $key => $value) {
+                if(strstr($key, 'cache') == FALSE && strstr($key, 'cf_') == FALSE && !in_array($key, $confService->getNotDeployableTables())) {
+                    $list .= $key . ' ';
+                }
             }
         }
         
-        return $list;
+        DatabaseService::reset();
+        
+        return trim($list);
     }
     
-    
+
     // ========================= Getter & Setter ===============================
-    
+
     /**
      * @return string
      */
@@ -142,19 +210,19 @@ class BoundlessBackdeploymentService extends AbstractDataService {
     public function setMysqlServer($mysqlServer) {
         $this->mysqlServer = $mysqlServer;
     }
-    
+
     /**
      * @return string
      */
-    public function getDatabase() {
-        return $this->database;
+    public function getDatabaseName() {
+        return $this->databaseName;
     }
 
     /**
      * @param string $database
      */
-    public function setDatabase($database) {
-        $this->database = $database;
+    public function setDatabaseName($databaseName) {
+        $this->databaseName = $databaseName;
     }
 
     /**
