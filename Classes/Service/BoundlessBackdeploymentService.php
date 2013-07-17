@@ -144,10 +144,13 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         $configurationService = new ConfigurationService();
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService();
+        
+        //$fileService->deleteXmlFileDirectory();
+        //$fileService->deleteDbDumpDirectory();
 
         $mysqldumpPath = $configurationService->getMysqldumpPath();
         $tablelist = $this->getTableList();
-        
+        DebuggerUtility::var_dump($tablelist);die();
         CommandUtility::exec('cd "'.$mysqldumpPath.'"');
         CommandUtility::exec('mysqldump --compact --opt --skip-diable-keys --skip-comments --user='.$this->username.' --password='.$this->password.' --database '.$this->databaseName.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->databaseName.'.sql" --tables '.$tablelist);
         
