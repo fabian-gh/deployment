@@ -133,14 +133,14 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     /**
      * @test
      */
-    function testGetDeploymentResourcePathWithoutTrailingSlashIsString() {
-        $this->assertInternalType('string', $this->fileService->getDeploymentResourcePathWithoutTrailingSlash());
+    function testGetDeploymentBbdeploymentPathWithoutTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentBBDeploymentPathWithoutTrailingSlash());
     }
 
     /**
      * @test
      */
-    function testGetDeploymentResourcePathWithTrailingSlashIsString() {
-        $this->assertInternalType('string', $this->fileService->getDeploymentResourcePathWithTrailingSlash());
+    function testGetDeploymentBbdeploymentPathWithTrailingSlashIsString() {
+        $this->assertInternalType('string', $this->fileService->getDeploymentBBDeploymentPathWithTrailingSlash());
     }
 }

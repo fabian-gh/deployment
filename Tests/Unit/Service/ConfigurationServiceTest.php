@@ -35,6 +35,20 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     /**
      * @test
      */
+    public function testGetNotDeploymentTablesNotNull() {
+        $this->assertNotNull($this->configurationService->getNotDeployableTables());
+    }
+    
+    /**
+     * @test
+     */
+    public function testGetNotDeploymentTablesIsArray() {
+        $this->assertInternalType('array', $this->configurationService->getNotDeployableTables());
+    }
+
+    /**
+     * @test
+     */
     public function testGetDeploymentTablesContainsTtContent() {
         $this->assertContains('tt_content', $this->configurationService->getDeploymentTables());
     }
