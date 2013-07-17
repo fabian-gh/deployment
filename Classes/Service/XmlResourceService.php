@@ -49,7 +49,6 @@ class XmlResourceService extends AbstractDataService {
      * Writes a xml-file with all files inside the fileadmin
      */
     public function writeXmlResourceList() {
-
         /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
         $resFact = ResourceFactory::getInstance();
         /** @var \TYPO3\Deployment\Service\FileService $fileService */

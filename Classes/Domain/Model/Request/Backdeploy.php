@@ -28,6 +28,12 @@ class Backdeploy extends AbstractModel{
      * @var string
      * @validate NotEmpty
      */
+    protected $resourceServer;
+    
+    /**
+     * @var string
+     * @validate NotEmpty
+     */
     protected $mysqlServer;
     
     /**
@@ -46,6 +52,20 @@ class Backdeploy extends AbstractModel{
      * @var string
      */
     protected $password;
+    
+    /**
+     * @return string
+     */
+    public function getResourceServer() {
+        return $this->resourceServer;
+    }
+
+    /**
+     * @param string $resourceServer
+     */
+    public function setResourceServer($resourceServer) {
+        $this->resourceServer = $resourceServer;
+    }
     
     /**
      * @return string

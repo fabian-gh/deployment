@@ -34,6 +34,11 @@ class BoundlessBackdeploymentService extends AbstractDataService {
     /**
      * @var string
      */
+    protected $resourceServer;
+    
+    /**
+     * @var string
+     */
     protected $mysqlServer;
 
     /**
@@ -59,7 +64,8 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * @param string $username
      * @param string $password
      */
-    public function init($mysqlServer, $databaseName, $username, $password){
+    public function init($resourceServer, $mysqlServer, $databaseName, $username, $password){
+        $this->setResourceServer($resourceServer);
         $this->setMysqlServer($mysqlServer);
         $this->setDatabaseName($databaseName);
         $this->setUsername($username);
@@ -140,15 +146,19 @@ class BoundlessBackdeploymentService extends AbstractDataService {
 
     
     /**
-     * Creates the database dump and inserts into the davelopment/integration database
+     * Creates the database dump and inserts into the davelopment/integration 
+     * database. Also executes the file checker
      */
-    public function createDbDump(){
+    public function executeBoundlessBackdeployment(){
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
         $configurationService = new ConfigurationService();
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService(); 
         
+        $fileService->fileChecker($this->resourceServer);die();
+        
         // TODO: Entkommentieren
+        // delete old files
         //$fileService->deleteXmlFileDirectory();
         //$fileService->deleteDbDumpDirectory();
 
@@ -176,6 +186,8 @@ class BoundlessBackdeploymentService extends AbstractDataService {
             }
             
             CommandUtility::exec("exit");
+            
+            //$fileService->fileChecker();
         }
     }
 
@@ -299,6 +311,24 @@ class BoundlessBackdeploymentService extends AbstractDataService {
     
 
     // ========================= Getter & Setter ===============================
+
+    /**
+     * @return string
+     */
+    public function getResourceServer() {
+        return $this->resourceServer;
+    }
+
+    /**
+     * @param string $resourceServer
+     */
+    public function setResourceServer($resourceServer) {
+        if(substr($resourceServer, -1) == '/'){
+            $this->resourceServer = substr($resourceServer, 0, -1);
+        } else {
+            $this->resourceServer = $resourceServer;
+        }   
+    }
 
     /**
      * @return string

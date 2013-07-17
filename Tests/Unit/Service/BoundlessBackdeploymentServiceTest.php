@@ -16,7 +16,28 @@ class BoundlessBackdeploymentServiceTest extends \TYPO3\Deployment\Tests\Unit\Ba
      */
     public function __construct(){
         $this->bbdService = new \TYPO3\Deployment\Service\BoundlessBackdeploymentService();
-        $this->bbdService->init('string', 'string', 'string', 'string');
+        $this->bbdService->init('string', 'string', 'string', 'string', 'string');
+    }
+    
+    /**
+     * @test
+     */
+    public function testResourceServerIsString() {
+        $this->assertInternalType('string', $this->bbdService->getResourceServer());
+    }
+    
+    /**
+     * @test
+     */
+    public function testResourceServerIsNotNull() {
+        $this->assertNotNull($this->bbdService->getResourceServer());
+    }
+    
+    /**
+     * @test
+     */
+    public function testResourceServerIsNotEmpty() {
+        $this->assertNotEmpty($this->bbdService->getResourceServer());
     }
     
     /**

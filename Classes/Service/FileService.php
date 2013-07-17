@@ -93,37 +93,6 @@ class FileService extends AbstractDataService {
 
     
     /**
-     * Check if the files in the resource directory are available. If not copy them.
-     * 
-     * @deprecated since version 2
-     */
-    public function checkIfFileExists() {
-        $resourceFiles = $newArr = $newFileList = array();
-        $path = $this->getFileadminPathWithTrailingSlash();
-        $resPath = $this->getDeploymentResourcePathWithTrailingSlash();
-
-        // data lists
-        $fileadminFiles = $this->readFilesInFileadmin();
-        $fileList = GeneralUtility::getAllFilesAndFoldersInPath($resourceFiles, $resPath);
-
-        // chop the path and save in array
-        foreach ($fileList as $paths) {
-            $newFileList[] = str_replace('resource/', '', strstr($paths, 'resource'));
-        }
-
-        // determine differences
-        $diffFiles = array_diff($newFileList, $fileadminFiles);
-
-        // copy resources from fileadmin
-        foreach ($diffFiles as $file) {
-            if (!file_exists($path . '/' . $file)) {
-                copy($resPath . $file, $path . '/' . $file);
-            }
-        }
-    }
-
-    
-    /**
      * Index not indexed files
      *
      * @param array $fileArr
@@ -329,6 +298,27 @@ class FileService extends AbstractDataService {
             }
         }
         return $newArr;
+    }
+    
+    
+    /**
+     * Copy all resources which didn't exists on your server
+     * 
+     * @param string $resourceServerPath
+     */
+    public function fileChecker($resourceServerPath){
+        /** @var \TYPO3\CMS\Core\Resource\ResourceFactory $resFact */
+        $resFact = ResourceFactory::getInstance();
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $result */
+        $result = $this->getDatabase()->exec_SELECTgetRows('*', 'sys_file', '1=1');
+        
+        foreach($result as $res){
+            $obj = $resFact->getFileObject($res['uid']);
+            
+            if(!$obj->exists() && $resourceServerPath !== ''){
+                copy($resourceServerPath.$obj->getIdentifier(), $this->getFileadminPathWithoutTrailingSlash().$obj->getIdentifier());
+            }
+        }
     }
 
     // ======================================= Getter ===============================================

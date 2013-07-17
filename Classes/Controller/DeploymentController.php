@@ -389,8 +389,8 @@ class DeploymentController extends ActionController {
      * @dontvalidate                                            $backdeploy
      */
     public function boundlessBackdeploymentAction(Backdeploy $backdeploy){
-        $this->backdeployment->init($backdeploy->getMysqlServer(), $backdeploy->getDatabase(), $backdeploy->getUsername(), $backdeploy->getPassword());
-        $this->backdeployment->createDbDump();
+        $this->backdeployment->init($backdeploy->getResourceServer(), $backdeploy->getMysqlServer(), $backdeploy->getDatabase(), $backdeploy->getUsername(), $backdeploy->getPassword());
+        $this->backdeployment->executeBoundlessBackdeployment();
         
         $this->addFlashMessage('', 'Dump was created succesfully', FlashMessage::OK);
         $this->redirect('index');
