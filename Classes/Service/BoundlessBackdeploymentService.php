@@ -17,6 +17,9 @@ use \TYPO3\Deployment\Service\DatabaseService;
 use \TYPO3\CMS\Core\Utility\CommandUtility;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Core\Core\Bootstrap;
+use \TYPO3\CMS\Core\Cache\Cache;
+use \TYPO3\CMS\Core\Category\CategoryRegistry;
 
 /**
  * BoundlessBackdeploymentService
@@ -143,7 +146,7 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
         $configurationService = new ConfigurationService();
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
-        $fileService = new FileService();
+        $fileService = new FileService(); 
         
         // TODO: Entkommentieren
         //$fileService->deleteXmlFileDirectory();
@@ -159,8 +162,17 @@ class BoundlessBackdeploymentService extends AbstractDataService {
             CommandUtility::exec("mysql --user=$this->username --password=$this->password");
             CommandUtility::exec("use database ".TYPO3_db);
             
+            // execute command from databse dump
             foreach($this->getDumpContent() as $command){
                 CommandUtility::exec("$command");
+            }
+            
+            // execute command from databse compare
+            $addChangeArray = $this->getDatabaseIntegrity();
+            foreach($addChangeArray as $aCArr){
+                foreach($aCArr as $change){
+                    CommandUtility::exec("$change");
+                }
             }
             
             CommandUtility::exec("exit");
@@ -196,6 +208,93 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         DatabaseService::reset();
         
         return trim($list);
+    }
+    
+    
+    /**
+     * Get database integrity information
+     *
+     * @return array
+     * @throws \UnexpectedValueException
+     * @see typo3/sysext/install/Classes/Installer.php
+     */
+    protected function getDatabaseIntegrity() {
+        /** @var \TYPO3\CMS\Install\Sql\SchemaMigrator $shema */
+        $shema = GeneralUtility::makeInstance('TYPO3\\CMS\\Install\\Sql\\SchemaMigrator');
+        /** @var \TYPO3\Deployment\Service\DummyInstaller $installer */
+        $installer = GeneralUtility::makeInstance('TYPO3\\Deployment\\Service\\DummyInstaller');
+
+        $hookObjects = array();
+        // Load TCA first
+        Bootstrap::getInstance()->loadExtensionTables(FALSE);
+
+        // check hooks
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install/mod/class.tx_install.php']['checkTheDatabase'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install/mod/class.tx_install.php']['checkTheDatabase'] as $classData) {
+                $hookObject = GeneralUtility::getUserObj($classData);
+                if (!$hookObject instanceof \TYPO3\CMS\Install\CheckTheDatabaseHookInterface) {
+                    throw new \UnexpectedValueException('$hookObject must implement interface TYPO3\\CMS\\Install\\CheckTheDatabaseHookInterface', 1315554770);
+                }
+                $hookObjects[] = $hookObject;
+            }
+        }
+        
+        // load information from tables.sql
+        $tblFileContent = GeneralUtility::getUrl(PATH_t3lib . 'stddb/tables.sql');
+        foreach ($GLOBALS['TYPO3_LOADED_EXT'] as $extKey => $loadedExtConf) {
+            if (is_array($loadedExtConf) && $loadedExtConf['ext_tables.sql']) {
+                $extensionSqlContent = GeneralUtility::getUrl($loadedExtConf['ext_tables.sql']);
+                $tblFileContent .= LF . LF . LF . LF . $extensionSqlContent;
+                
+                foreach ($hookObjects as $hookObject) {
+                    $appendableTableDefinitions = $hookObject->appendExtensionTableDefinitions($extKey, $loadedExtConf, $extensionSqlContent, $shema, $installer);
+                    if ($appendableTableDefinitions) {
+                        $tblFileContent .= $appendableTableDefinitions;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        foreach ($hookObjects as $hookObject) {
+            $appendableTableDefinitions = $hookObject->appendGlobalTableDefinitions($tblFileContent, $shema, $installer);
+            if ($appendableTableDefinitions) {
+                $tblFileContent .= $appendableTableDefinitions;
+                break;
+            }
+        }
+        
+        // Add SQL content coming from the caching framework
+        $tblFileContent .= Cache::getDatabaseTableDefinitions();
+        // Add SQL content coming from the category registry
+        $tblFileContent .= CategoryRegistry::getInstance()->getDatabaseTableDefinitions();
+        if (!$tblFileContent) {
+            return array();
+        }
+
+        $fileContent = implode(LF, $shema->getStatementArray($tblFileContent, 1, '^CREATE TABLE '));
+        
+        $FDfile = $shema->getFieldDefinitions_fileContent($fileContent);
+        $FDdb = $shema->getFieldDefinitions_database();
+        $diff = $shema->getDatabaseExtra($FDfile, $FDdb);
+        $update_statements = $shema->getUpdateSuggestions($diff);
+        $diff = $shema->getDatabaseExtra($FDdb, $FDfile);
+        $remove_statements = $shema->getUpdateSuggestions($diff, 'remove');
+
+        $all = array_merge_recursive($update_statements, $remove_statements);
+
+        $remove = array(
+            'change_currentValue',
+            'tables_count'
+        );
+        
+        foreach ($remove as $r) {
+            if (isset($all[$r])) {
+                unset($all[$r]);
+            }
+        }
+        
+        return $all;
     }
     
 
