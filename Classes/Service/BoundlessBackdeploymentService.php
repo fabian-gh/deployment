@@ -290,8 +290,8 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         $FDdb = $shema->getFieldDefinitions_database();
         $diff = $shema->getDatabaseExtra($FDfile, $FDdb);
         $update_statements = $shema->getUpdateSuggestions($diff);
-        $diff = $shema->getDatabaseExtra($FDdb, $FDfile);
-        $remove_statements = $shema->getUpdateSuggestions($diff, 'remove');
+        $diff1 = $shema->getDatabaseExtra($FDdb, $FDfile);
+        $remove_statements = $shema->getUpdateSuggestions($diff1, 'remove');
 
         $all = array_merge_recursive($update_statements, $remove_statements);
 
@@ -316,18 +316,18 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * @return string
      */
     public function getResourceServer() {
-        return $this->resourceServer;
+        if(substr($this->resourceServer, -1) == '/'){
+            return $this->resourceServer = substr($this->resourceServer, 0, -1);
+        } else {
+            return $this->resourceServer;
+        }
     }
 
     /**
      * @param string $resourceServer
      */
     public function setResourceServer($resourceServer) {
-        if(substr($resourceServer, -1) == '/'){
-            $this->resourceServer = substr($resourceServer, 0, -1);
-        } else {
-            $this->resourceServer = $resourceServer;
-        }   
+        $this->resourceServer = $resourceServer;  
     }
 
     /**
