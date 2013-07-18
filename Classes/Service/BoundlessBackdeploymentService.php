@@ -155,13 +155,11 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService(); 
         
-        $fileService->fileChecker($this->resourceServer);die();
-        
         // TODO: Entkommentieren
         // delete old files
         //$fileService->deleteXmlFileDirectory();
         //$fileService->deleteDbDumpDirectory();
-
+        
         $mysqldumpPath = $configurationService->getMysqldumpPath();
         $tablelist = $this->getTableList();
         
@@ -187,7 +185,9 @@ class BoundlessBackdeploymentService extends AbstractDataService {
             
             CommandUtility::exec("exit");
             
-            //$fileService->fileChecker();
+            // TODO: Entkommentieren
+            // check if file exists
+            //$fileService->fileChecker($this->resourceServer);
         }
     }
 
