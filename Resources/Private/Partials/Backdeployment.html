@@ -1,23 +1,21 @@
-<f:form action="boundlessBackdeployment" name="backdeploy" object="{backdeploy}">
-    
-    <table class="table4">
-        <tr>
-            <td>Resource Server: </td><td><f:form.textfield property="resourceServer" size="30" placeholder="Resource Server" /></td>
-        </tr>
-        <tr>
-            <td>MySQL Server: </td><td><f:form.textfield property="mysqlServer" size="30" placeholder="MySQL Server" /></td>
-        </tr>
-        <tr>
-            <td>Database: </td><td><f:form.textfield property="database" size="30" placeholder="Database name" /></td>
-        </tr>
-        <tr>
-            <td>Username: </td><td><f:form.textfield property="username" size="30" placeholder="Username" /></td>
-        </tr>
-        <tr>
-            <td>Password: </td><td><f:form.password property="password" size="30" /></td>
-        </tr>
-    </table>
-    <br />
-    <f:form.submit value="Create database dump and copy resources" />  
-    
-</f:form>
+<table class="table">
+    <tr class="column">
+        <td class="column">
+            <h4>Create database dump</h4><br />
+            <p>Create a databse dump from this TYPO3 instance 
+            and save it under fileadmin.</p><br />
+            <f:form action="createDatabaseDump" name="createDbDump">
+                <f:form.submit value="Execute" />   
+            </f:form>
+        </td>
+    </tr>
+    <tr class="column">
+        <td class="column">
+            <h4>Insert database dump</h4><br />
+            <p>Insert the created databse dump into the typo3 databse.</p><br />
+            <f:form action="boundlessBackdeployment" name="bbDeployment">
+                <f:form.submit value="Execute" />   
+            </f:form>
+        </td>
+    </tr>
+</table>

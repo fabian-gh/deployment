@@ -1,10 +1,7 @@
-# cat=Paths; type=text; label=PHP-Path: Path to the PHP binaries
-phpPath =
-
 # cat=Paths; type=text; label=mysqldump-Path: Path to the MySQL-Dump binary folder
 mysqldumpPath =
 
-# cat=Access; type=text; label=Pull-Server: Address of pull server
+# cat=Access; type=text; label=Pull-Server: Address of pull server (On development/integration systems address of the live server and vise versa)
 pullServer =
 
 # cat=Access; type=text; label=Username: Username for login on pull server

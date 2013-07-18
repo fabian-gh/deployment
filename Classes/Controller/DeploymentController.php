@@ -18,7 +18,6 @@ use \TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use \TYPO3\Deployment\Domain\Model\Log;
 use \TYPO3\Deployment\Domain\Model\Request\Deploy;
 use \TYPO3\Deployment\Domain\Model\Request\Failure;
-use \TYPO3\Deployment\Domain\Model\Request\Backdeploy;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -369,16 +368,18 @@ class DeploymentController extends ActionController {
      * @param \TYPO3\Deployment\Domain\Model\Request\Backdeploy $backdeploy
      * @dontvalidate                                            $backdeploy
      */
-    public function enterBoundlessBackdeploymentAction(Backdeploy $backdeploy = NULL){
-        if ($backdeploy === NULL) {
-            $backdeploy = new Backdeploy();
-        }
-        
+    public function enterBoundlessBackdeploymentAction(){
         if(!$this->backdeployment->checkIfMysqldumpPathIsNotEmpty()){
             $this->addFlashMessage('Please enter the path to the mysqldump binary', 'No mysqldump path defined', FlashMessage::ERROR);
         }
-        
-        $this->view->assign('backdeploy', $backdeploy);
+    }
+    
+    
+    
+    public function createDatabaseDumpAction(){
+        $this->backdeployment->executeDumpCreating();
+        $this->addFlashMessage('', 'Dump was created succesfully', FlashMessage::OK);
+        $this->redirect('enterBoundlessBackdeployment');
     }
     
     
@@ -388,11 +389,9 @@ class DeploymentController extends ActionController {
      * @param \TYPO3\Deployment\Domain\Model\Request\Backdeploy $backdeploy
      * @dontvalidate                                            $backdeploy
      */
-    public function boundlessBackdeploymentAction(Backdeploy $backdeploy){
-        $this->backdeployment->init($backdeploy->getResourceServer(), $backdeploy->getMysqlServer(), $backdeploy->getDatabase(), $backdeploy->getUsername(), $backdeploy->getPassword());
-        $this->backdeployment->executeBoundlessBackdeployment();
-        
-        $this->addFlashMessage('', 'Dump was created succesfully', FlashMessage::OK);
+    public function boundlessBackdeploymentAction(){
+        $this->backdeployment->executeDumpInserting();
+        $this->addFlashMessage('', 'Dump was inserted succesfully', FlashMessage::OK);
         $this->redirect('index');
     }
 
@@ -404,7 +403,7 @@ class DeploymentController extends ActionController {
      * @param string $title
      * @param string $mode
      */
-    protected function addFlashMessage($message, $title, $mode) {
+    protected function addFlashMessage($message, $title, $mode){
         $this->controllerContext->getFlashMessageQueue()->addMessage(new FlashMessage($message, $title, $mode, true));
     }
 }

@@ -13,7 +13,6 @@
 namespace TYPO3\Deployment\Service;
 
 use \TYPO3\Deployment\Service\FileService;
-use \TYPO3\Deployment\Service\DatabaseService;
 use \TYPO3\CMS\Core\Utility\CommandUtility;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -32,60 +31,17 @@ use \TYPO3\CMS\Core\Category\CategoryRegistry;
 class BoundlessBackdeploymentService extends AbstractDataService {
 
     /**
-     * @var string
-     */
-    protected $resourceServer;
-    
-    /**
-     * @var string
-     */
-    protected $mysqlServer;
-
-    /**
-     * @var string
-     */
-    protected $databaseName;
-
-    /**
-     * @var string
-     */
-    protected $username;
-
-    /**
-     * @var string
-     */
-    protected $password;
-
-    
-    /**
-     * Init the class
-     * 
-     * @param string $mysqlServer
-     * @param string $username
-     * @param string $password
-     */
-    public function init($resourceServer, $mysqlServer, $databaseName, $username, $password){
-        $this->setResourceServer($resourceServer);
-        $this->setMysqlServer($mysqlServer);
-        $this->setDatabaseName($databaseName);
-        $this->setUsername($username);
-        $this->setPassword($password);
-    }
-
-    
-    /**
      * Check if a path is defined and not empty
      * 
      * @return boolean
      */
     public function checkIfMysqldumpPathIsNotEmpty(){
-        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
-        $configurationService = new ConfigurationService();
-        $path = $configurationService->getMysqldumpPath();
+        $path = $this->getMysqldumpPath();
 
         if(!empty($path) && $path != ''){
             return true;
         }
+        
         return false;
     }
     
@@ -104,7 +60,7 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         $fileList = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $path);
         
         foreach($fileList as $file){
-            if(strstr($file, $this->databaseName.'.sql') !== FALSE){
+            if(strstr($file, TYPO3_db.'.sql') !== FALSE){
                 return true;
             }
         }
@@ -146,12 +102,9 @@ class BoundlessBackdeploymentService extends AbstractDataService {
 
     
     /**
-     * Creates the database dump and inserts into the davelopment/integration 
-     * database. Also executes the file checker
+     * Creates the database dump and save it
      */
-    public function executeBoundlessBackdeployment(){
-        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
-        $configurationService = new ConfigurationService();
+    public function executeDumpCreating(){
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService(); 
         
@@ -160,24 +113,29 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         //$fileService->deleteXmlFileDirectory();
         //$fileService->deleteDbDumpDirectory();
         
-        $mysqldumpPath = $configurationService->getMysqldumpPath();
         $tablelist = $this->getTableList();
         
-        CommandUtility::exec('cd "'.$mysqldumpPath.'"');
-        CommandUtility::exec('mysqldump --compact --opt --skip-diable-keys --skip-comments --user='.$this->username.' --password='.$this->password.' --database '.$this->databaseName.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->databaseName.'.sql" --tables '.$tablelist);
-        
+        CommandUtility::exec('cd "'.$this->getMysqldumpPath().'"');
+        CommandUtility::exec('mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.TYPO3_db_username.' --password='.TYPO3_db_password.' --database '.TYPO3_db.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().TYPO3_db.'.sql" --tables '.$tablelist);  
+    }
+    
+    
+    /**
+     * Execute inserting of data from the database dump
+     */
+    public function executeDumpInserting(){
         if($this->checkIfDbDumpExists()){
-            CommandUtility::exec("mysql --user=$this->username --password=$this->password");
-            CommandUtility::exec("use database ".TYPO3_db);
+            CommandUtility::exec('cd "'.$this->getMysqldumpPath().'"');
+            CommandUtility::exec('mysql --user='.TYPO3_db_username.' --password='.TYPO3_db_password);
+            CommandUtility::exec('use database '.TYPO3_db);
             
             // execute command from databse dump
             foreach($this->getDumpContent() as $command){
                 CommandUtility::exec("$command");
             }
             
-            // execute command from databse compare
-            $addChangeArray = $this->getDatabaseIntegrity();
-            foreach($addChangeArray as $aCArr){
+            // execute command from database compare
+            foreach($this->getDatabaseIntegrity() as $aCArr){
                 foreach($aCArr as $change){
                     CommandUtility::exec("$change");
                 }
@@ -202,22 +160,18 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         /** @var \TYPO3\Deployment\Service\ConfigurationService $confService */
         $confService = new ConfigurationService();
         
-        $this->getDatabase()->setDatabaseHost($this->mysqlServer);
-        $this->getDatabase()->setDatabaseName($this->databaseName);
-        $this->getDatabase()->setDatabaseUsername($this->username);
-        $this->getDatabase()->setDatabasePassword($this->password);
-        $this->getDatabase()->connectDB();
-        
         if($this->getDatabase()->isConnected()){
             $tableprop = $this->getDatabase()->admin_get_tables();
             foreach($tableprop as $key => $value) {
-                if(strstr($key, 'cache') == FALSE && strstr($key, 'cf_') == FALSE && !in_array($key, $confService->getNotDeployableTables())) {
+                if(strstr($key, 'cache') == FALSE && 
+                    strstr($key, 'cf_') == FALSE && 
+                    strstr($key, 'be_users') == FALSE &&
+                    strstr($key, 'fe_users') == FALSE &&
+                    !in_array($key, $confService->getNotDeployableTables())) {
                     $list .= $key . ' ';
                 }
             }
         }
-        
-        DatabaseService::reset();
         
         return trim($list);
     }
@@ -309,80 +263,16 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         return $all;
     }
     
-
-    // ========================= Getter & Setter ===============================
-
+    
     /**
+     * Returns the mysqldump path
+     * 
      * @return string
      */
-    public function getResourceServer() {
-        if(substr($this->resourceServer, -1) == '/'){
-            return $this->resourceServer = substr($this->resourceServer, 0, -1);
-        } else {
-            return $this->resourceServer;
-        }
-    }
-
-    /**
-     * @param string $resourceServer
-     */
-    public function setResourceServer($resourceServer) {
-        $this->resourceServer = $resourceServer;  
-    }
-
-    /**
-     * @return string
-     */
-    public function getMysqlServer() {
-        return $this->mysqlServer;
-    }
-
-    /**
-     * @param string $mysqlServer
-     */
-    public function setMysqlServer($mysqlServer) {
-        $this->mysqlServer = $mysqlServer;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDatabaseName() {
-        return $this->databaseName;
-    }
-
-    /**
-     * @param string $database
-     */
-    public function setDatabaseName($databaseName) {
-        $this->databaseName = $databaseName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUsername() {
-        return $this->username;
-    }
-
-    /**
-     * @param string $username
-     */
-    public function setUsername($username) {
-        $this->username = $username;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPassword() {
-        return $this->password;
-    }
-
-    /**
-     * @param string $password
-     */
-    public function setPassword($password) {
-        $this->password = $password;
+    protected function getMysqldumpPath(){
+        /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
+        $configurationService = new ConfigurationService();
+        
+        return $configurationService->getMysqldumpPath();
     }
 }
