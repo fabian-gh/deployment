@@ -10,7 +10,7 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Deployment',
-	'description' => 'With this extension you are able to deploy databse entries from one to another system',
+	'description' => 'With this extension you are able to deploy database entries from one to another system',
 	'category' => '',
 	'shy' => 0,
 	'version' => '3.0.0',

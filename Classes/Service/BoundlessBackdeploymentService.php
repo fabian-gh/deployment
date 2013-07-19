@@ -116,7 +116,7 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         $tablelist = $this->getTableList();
         
         CommandUtility::exec('cd "'.$this->getMysqldumpPath().'"');
-        CommandUtility::exec('mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.TYPO3_db_username.' --password='.TYPO3_db_password.' --database '.TYPO3_db.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().TYPO3_db.'.sql" --tables '.$tablelist);  
+        CommandUtility::exec('mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.TYPO3_db_username.' --password='.TYPO3_db_password.' --database '.TYPO3_db.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().TYPO3_db.'.sql" --tables '.$tablelist);
     }
     
     
