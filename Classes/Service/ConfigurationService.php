@@ -75,9 +75,9 @@ class ConfigurationService extends AbstractDataService {
      *
      * @return mixed string or NULL
      */
-    public function getMysqldumpPath() {
+    public function getMysqlBinariesPath() {
         $configuration = $this->getAllEntries();
-        return isset($configuration['mysqldumpPath']) ? $configuration['mysqldumpPath'] : NULL;
+        return isset($configuration['mysqlBinariesPath']) ? $configuration['mysqlBinariesPath'] : NULL;
     }
     
     

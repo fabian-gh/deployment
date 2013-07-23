@@ -36,7 +36,7 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * @return boolean
      */
     public function checkIfMysqldumpPathIsNotEmpty(){
-        $path = $this->getMysqldumpPath();
+        $path = $this->getMysqlBinariesPath();
 
         if(!empty($path) && $path != ''){
             return true;
@@ -104,7 +104,7 @@ class BoundlessBackdeploymentService extends AbstractDataService {
     /**
      * Creates the database dump and save it
      */
-    public function executeDumpCreating(){
+    public function executeDumpCreation(){
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService(); 
         
@@ -115,36 +115,29 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         
         $tablelist = $this->getTableList();
         
-        CommandUtility::exec('cd "'.$this->getMysqldumpPath().'"');
-        CommandUtility::exec('sudo mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.TYPO3_db_username.' --password='.TYPO3_db_password.' --database '.TYPO3_db.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().TYPO3_db.'.sql" --tables '.$tablelist);
+        CommandUtility::exec('cd "'.$this->getMysqlBinariesPath().'"');
+        CommandUtility::exec('sudo mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' --database '.$this->getCurrentDatabaseName().' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->getCurrentDatabaseName().'.sql" --tables '.$tablelist);
     }
     
     
     /**
      * Execute inserting of data from the database dump
      */
-    public function executeDumpInserting(){
+    public function executeDumpInsertion(){
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService(); 
         
         if($this->checkIfDbDumpExists()){
-            CommandUtility::exec('cd "'.$this->getMysqldumpPath().'"');
-            // fkt. leider noch nicht richtig
-            CommandUtility::exec('mysql --user='.TYPO3_db_username.' --password='.TYPO3_db_password.' '.TYPO3_db.' <'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().TYPO3_db.'.sql');
-            
-            // execute command from databse dump
-            foreach($this->getDumpContent() as $command){
-                CommandUtility::exec("$command");
-            }
-            
-            // execute command from database compare
+            // execute command from database compare and write to file for future inserting
             foreach($this->getDatabaseIntegrity() as $aCArr){
                 foreach($aCArr as $change){
-                    CommandUtility::exec("$change");
+                    file_put_contents($fileService->getDeploymentBBDeploymentPathWithTrailingSlash().'changes.sql', $change.LF, FILE_APPEND);
                 }
             }
             
-            CommandUtility::exec("exit");
+            CommandUtility::exec('cd "'.$this->getMysqlBinariesPath().'"');
+            CommandUtility::exec('mysql --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' '.$this->getCurrentDatabaseName().' <'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->getCurrentDatabaseName().'.sql');
+            CommandUtility::exec('mysql --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' '.$this->getCurrentDatabaseName().' <'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().'changes.sql');
             
             // TODO: Entkommentieren
             // check if file exists
@@ -272,10 +265,10 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * 
      * @return string
      */
-    protected function getMysqldumpPath(){
+    protected function getMysqlBinariesPath(){
         /** @var \TYPO3\Deployment\Service\ConfigurationService $configurationService */
         $configurationService = new ConfigurationService();
         
-        return $configurationService->getMysqldumpPath();
+        return $configurationService->getMysqlBinariesPath();
     }
 }

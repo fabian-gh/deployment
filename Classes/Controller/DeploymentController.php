@@ -377,7 +377,7 @@ class DeploymentController extends ActionController {
     
     
     public function createDatabaseDumpAction(){
-        $this->backdeployment->executeDumpCreating();
+        $this->backdeployment->executeDumpCreation();
         $this->addFlashMessage('', 'Dump was created succesfully', FlashMessage::OK);
         $this->redirect('enterBoundlessBackdeployment');
     }
@@ -390,7 +390,7 @@ class DeploymentController extends ActionController {
      * @dontvalidate                                            $backdeploy
      */
     public function boundlessBackdeploymentAction(){
-        $this->backdeployment->executeDumpInserting();
+        $this->backdeployment->executeDumpInsertion();
         $this->addFlashMessage('', 'Dump was inserted succesfully', FlashMessage::OK);
         $this->redirect('index');
     }

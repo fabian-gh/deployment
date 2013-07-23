@@ -90,4 +90,44 @@ class AbstractDataService {
     protected function getDatabase() {
         return $GLOBALS['TYPO3_DB'];
     }
+    
+    
+    /**
+     * Returns the current database name
+     * 
+     * @return string
+     */
+    protected function getCurrentDatabaseName(){
+        return $GLOBALS['TYPO3_CONF_VARS']['DB']['database'];
+    }
+    
+    
+    /**
+     * Returns the current database hostname
+     * 
+     * @return string
+     */
+    protected function getCurrentDatabaseHost(){
+        return $GLOBALS['TYPO3_CONF_VARS']['DB']['host'];
+    }
+    
+    
+    /**
+     * Returns the current database username
+     * 
+     * @return string
+     */
+    protected function getCurrentDatabaseUser(){
+        return $GLOBALS['TYPO3_CONF_VARS']['DB']['username'];
+    }
+    
+    
+    /**
+     * Returns the current database password
+     * 
+     * @return string
+     */
+    protected function getCurrentDatabasePassword(){
+        return $GLOBALS['TYPO3_CONF_VARS']['DB']['password'];
+    }
 }

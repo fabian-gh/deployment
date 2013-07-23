@@ -65,10 +65,10 @@ class DatabaseService extends AbstractDataService {
      * Reset the connection to the database
      */
     public function resetInternal() {
-        $this->getDatabase()->setDatabaseHost(TYPO3_db_host);
-        $this->getDatabase()->setDatabaseUsername(TYPO3_db_username);
-        $this->getDatabase()->setDatabasePassword(TYPO3_db_password);
-        $this->getDatabase()->setDatabaseName(TYPO3_db);
+        $this->getDatabase()->setDatabaseHost($this->getCurrentDatabaseHost());
+        $this->getDatabase()->setDatabaseUsername($this->getCurrentDatabaseUser());
+        $this->getDatabase()->setDatabasePassword($this->getCurrentDatabasePassword());
+        $this->getDatabase()->setDatabaseName($this->getCurrentDatabaseName());
         $this->getDatabase()->connectDB();
     }
 
