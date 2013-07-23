@@ -116,7 +116,7 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         $tablelist = $this->getTableList();
         
         CommandUtility::exec('cd "'.$this->getMysqldumpPath().'"');
-        CommandUtility::exec('mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.TYPO3_db_username.' --password='.TYPO3_db_password.' --database '.TYPO3_db.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().TYPO3_db.'.sql" --tables '.$tablelist);
+        CommandUtility::exec('sudo mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.TYPO3_db_username.' --password='.TYPO3_db_password.' --database '.TYPO3_db.' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().TYPO3_db.'.sql" --tables '.$tablelist);
     }
     
     
@@ -124,10 +124,13 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * Execute inserting of data from the database dump
      */
     public function executeDumpInserting(){
+        /** @var \TYPO3\Deployment\Service\FileService $fieService */
+        $fileService = new FileService(); 
+        
         if($this->checkIfDbDumpExists()){
             CommandUtility::exec('cd "'.$this->getMysqldumpPath().'"');
-            CommandUtility::exec('mysql --user='.TYPO3_db_username.' --password='.TYPO3_db_password);
-            CommandUtility::exec('use database '.TYPO3_db);
+            // fkt. leider noch nicht richtig
+            CommandUtility::exec('mysql --user='.TYPO3_db_username.' --password='.TYPO3_db_password.' '.TYPO3_db.' <'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().TYPO3_db.'.sql');
             
             // execute command from databse dump
             foreach($this->getDumpContent() as $command){
