@@ -230,8 +230,6 @@ class FileService extends AbstractDataService {
         $exFold[] = $folder->folderExists($this->getDeploymentPathWithTrailingSlash());
         $exFold[] = $folder->folderExists($this->getDeploymentDatabasePathWithTrailingSlash());
         $exFold[] = $folder->folderExists($this->getDeploymentMediaPathWithTrailingSlash());
-        // TODO: Löschen des Pfades
-        $exFold[] = $folder->folderExists($this->getDeploymentResourcePathWithTrailingSlash());
 
         foreach ($exFold as $ergkey => $ergvalue) {
             if (!$ergvalue) {
@@ -245,11 +243,6 @@ class FileService extends AbstractDataService {
                         break;
 
                     case 2:
-                        GeneralUtility::mkdir($ergvalue);
-                        break;
-					
-                    // TODO: Pfad löschen
-                    case 3:
                         GeneralUtility::mkdir($ergvalue);
                         break;
                 }
