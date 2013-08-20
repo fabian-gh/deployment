@@ -92,12 +92,7 @@ class BoundlessBackdeploymentService extends AbstractDataService {
             }
         }
         
-        foreach($content as $con){
-            $replaces = array('= @@character_set_client', '= utf8', '= @saved_cs_client', 'SET @saved_cs_client','SET character_set_client','/*!40101', '*/;');
-            $newContent[] = str_replace($replaces, '', $con);
-        }
-        
-        return $newContent;
+        return $content;
     }
 
     
@@ -105,6 +100,8 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * Creates the database dump and save it
      */
     public function executeDumpCreation(){
+        $output = '';       // output content from cli
+        $returnValue = '';  // failurecode
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService(); 
         
@@ -116,7 +113,12 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         $tablelist = $this->getTableList();
         
         CommandUtility::exec('cd "'.$this->getMysqlBinariesPath().'"');
-        CommandUtility::exec('sudo mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' --database '.$this->getCurrentDatabaseName().' --result-file="'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->getCurrentDatabaseName().'.sql" --tables '.$tablelist);
+        $command = 'mysqldump --compact --opt --skip-disable-keys --skip-comments --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' --database '.$this->getCurrentDatabaseName().' --tables '.$tablelist.' | gzip > .'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->getCurrentDatabaseName().'.sql.gz';
+        CommandUtility::exec($command, $output, $returnValue);
+        
+        if($returnValue != 0){
+            throw new \Exception(var_export($output, TRUE) . "\n" . var_export($returnValue, TRUE) . "\n" . $command , 100235);
+        }
     }
     
     
@@ -124,6 +126,10 @@ class BoundlessBackdeploymentService extends AbstractDataService {
      * Execute inserting of data from the database dump
      */
     public function executeDumpInsertion(){
+        $output1 = '';
+        $output2 = '';
+        $return1 = '';
+        $return2 = '';
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService(); 
         
@@ -136,8 +142,19 @@ class BoundlessBackdeploymentService extends AbstractDataService {
             }
             
             CommandUtility::exec('cd "'.$this->getMysqlBinariesPath().'"');
-            CommandUtility::exec('mysql --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' '.$this->getCurrentDatabaseName().' <'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->getCurrentDatabaseName().'.sql');
-            CommandUtility::exec('mysql --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' '.$this->getCurrentDatabaseName().' <'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().'changes.sql');
+            
+            $command1 = 'gunzip < '.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().$this->getCurrentDatabaseName().'.sql.gz | mysql --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' '.$this->getCurrentDatabaseName();
+            CommandUtility::exec($command1, $output1, $return1);
+            if($return1 != 0){
+                throw new \Exception(var_export($output1, TRUE) . "\n" . var_export($return1, TRUE) . "\n" . $command1 , 100235);
+            }
+            
+            $command2 = 'mysql --user='.$this->getCurrentDatabaseUser().' --password='.$this->getCurrentDatabasePassword().' '.$this->getCurrentDatabaseName().' <'.$fileService->getDeploymentBBDeploymentPathWithTrailingSlash().'changes.sql';
+            CommandUtility::exec($command2, $output2, $return2);
+            if($return1 != 0){
+                throw new \Exception(var_export($output2, TRUE) . "\n" . var_export($return2, TRUE) . "\n" . $command2 , 100235);
+            }
+            
             
             // TODO: Entkommentieren
             // check if file exists

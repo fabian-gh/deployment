@@ -12,9 +12,9 @@
     <tr class="column">
         <td class="column">
             <h4>Insert database dump</h4><br />
-            <p>Insert the created database dump into the typo3 database.</p><br />
+            <p>Insert the created database dump into the TYPO3 database.</p><br />
             <f:form action="boundlessBackdeployment" name="bbDeployment">
-                <f:form.submit value="Execute" />   
+                <f:form.submit value="Execute" onclick="return confirm('The database will be replaced!');" />
             </f:form>
         </td>
     </tr>

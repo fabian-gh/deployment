@@ -44,7 +44,7 @@ class UuidTask extends AbstractTask{
      * @return boolean
      */
     public function checkIfTaskIsRegistered(){
-        $res = $this->getDatabase()->exec_SELECTgetRows('serialized_task_object', 'tx_scheduler_task');
+        $res = $this->getDatabase()->exec_SELECTgetRows('serialized_task_object', 'tx_scheduler_task', '1=1');
         
         foreach($res as $result){
             $object = unserialize($result['serialized_task_object']);

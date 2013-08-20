@@ -16,7 +16,7 @@ use \TYPO3\CMS\Core\Utility\CommandUtility;
 use \TYPO3\CMS\Core\Utility\HttpUtility;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use \TYPO3\CMS\Scheduler\Task\AbstractTask;
+use \TYPO3\CMS\Extbase\Scheduler\Task;
 use \TYPO3\Deployment\Service\FileService;
 use \TYPO3\CMS\Core\Resource\ResourceFactory;
 use \TYPO3\Deployment\Service\ConfigurationService;
@@ -56,9 +56,6 @@ class CopyService extends AbstractDataService {
             
             $userAgent = $_SERVER['HTTP_USER_AGENT'];
             if (preg_match('/linux/i', $userAgent) == 1 || preg_match('/mac/i', $userAgent) == 1) {
-                /*// search php path
-                CommandUtility::exec('whereis -b php', $arr);
-                $phpPath = GeneralUtility::trimExplode(':', $arr[0]);*/
                 $phpPath = $configurationService->getPhpPath();
                 
                 CommandUtility::exec(escapeshellcmd("$phpPath $path scheduler -f -i $taskUid"));
@@ -91,7 +88,7 @@ class CopyService extends AbstractDataService {
             /** @var \TYPO3\CMS\Extbase\Scheduler\Task $object */
             $object = unserialize($res['serialized_task_object']);
             
-            if($object instanceof AbstractTask) {
+            if($object instanceof Task) {
                 if($object->getCommandIdentifier() !== '' || $object->getCommandIdentifier() !== null){
                     $this->setDisable($res['disable']);
                     $this->taskUid = $object->getTaskUid();

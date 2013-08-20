@@ -19,7 +19,7 @@ $TCA['sys_log'] = array(
             'title'             => 'Log',
             'adminOnly'         => 1,
             'rootLevel'         => 1,
-            'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'Configuration/Tca/Log.php'
+            'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'Configuration/TCA/Log.php'
     ),
 );
 
@@ -28,7 +28,7 @@ $TCA['sys_history'] = array (
         'title'             => 'History',
         'adminOnly'         => 1,
         'rootLevel'         => 1,
-        'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'Configuration/Tca/History.php'
+        'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'Configuration/TCA/History.php'
     )
 );
 
