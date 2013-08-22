@@ -104,11 +104,10 @@ class BoundlessBackdeploymentService extends AbstractDataService {
         $returnValue = '';  // failurecode
         /** @var \TYPO3\Deployment\Service\FileService $fieService */
         $fileService = new FileService(); 
-        
-        // TODO: Entkommentieren
+
         // delete old files
-        //$fileService->deleteXmlFileDirectory();
-        //$fileService->deleteDbDumpDirectory();
+        $fileService->deleteXmlFileDirectory();
+        $fileService->deleteDbDumpDirectory();
         
         $tablelist = $this->getTableList();
         
@@ -154,11 +153,9 @@ class BoundlessBackdeploymentService extends AbstractDataService {
             if($return1 != 0){
                 throw new \Exception(var_export($output2, TRUE) . "\n" . var_export($return2, TRUE) . "\n" . $command2 , 100235);
             }
-            
-            
-            // TODO: Entkommentieren
+
             // check if file exists
-            //$fileService->fileChecker($this->resourceServer);
+            $fileService->fileChecker($this->resourceServer);
         }
     }
 

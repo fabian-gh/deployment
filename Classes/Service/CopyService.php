@@ -142,8 +142,7 @@ class CopyService extends AbstractDataService {
         // read user agent
         $userAgent = $_SERVER['HTTP_USER_AGENT'];
 
-        // TODO: Pfad zu fileadmin ändern
-        $path = $fileService->getDeploymentResourcePathWithoutTrailingSlash();
+        $path = $fileService->getFileadminPathWithoutTrailingSlash();
         // get data from configuration
         $server = $configuration->getPullserver();
         $username = $configuration->getUsername();
@@ -187,7 +186,6 @@ class CopyService extends AbstractDataService {
                 // (only if the file is newer than destination)
                 CommandUtility::exec("cd $dest; wget --user=$username --password=$password --timestamping $source");
             } else {
-                //TODO: Pfad ändern
                 GeneralUtility::upload_copy_move($source, $dest.$filename);
             }
         }

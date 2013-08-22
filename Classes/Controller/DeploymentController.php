@@ -260,8 +260,7 @@ class DeploymentController extends ActionController {
         // if there are no errors
         if ($result1 === TRUE && $result2 === TRUE) {
             // register last deployment status
-            // TODO: Entkommentieren
-            //$this->registry->setLastDeploy();
+            $this->registry->setLastDeploy();
             // display ok-message
             $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
 
@@ -325,8 +324,7 @@ class DeploymentController extends ActionController {
         //$diffData = $this->failureService->convertTimestamps($diff);
         
         if(empty($diff)){
-            // TODO: Entkomentieren
-            //$this->registry->setLastDeploy();
+            $this->registry->setLastDeploy();
             $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
             $this->redirect('index');
         }
@@ -352,8 +350,7 @@ class DeploymentController extends ActionController {
         $res = $this->failureService->proceedFailureEntries($failure->getFailureEntries(), $storedFailures);
         
         if ($res) {
-            // TODO: Entkomentieren
-            //$this->registry->setLastDeploy();
+            $this->registry->setLastDeploy();
             $this->addFlashMessage('Please clear the cache now', 'Deployment was created succesfully', FlashMessage::OK);
             $this->redirect('index');
         } else {
