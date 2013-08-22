@@ -25,7 +25,9 @@ use \TYPO3\Deployment\Domain\Model\AbstractModel;
 class Deploy extends AbstractModel{
 
     /**
-     * @var array
+     * Checked deploy entries
+     * 
+     * @var array $deployEntries
      * @validate NotEmpty
      */
     protected $deployEntries;

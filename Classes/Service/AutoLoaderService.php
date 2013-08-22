@@ -34,6 +34,8 @@ class AutoLoaderService {
 
     
     /**
+     * Class constructor
+     * 
      * @param string $extensionKey
      *
      * @throws \Exception

@@ -1,13 +1,31 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Service;
 
+/**
+ * XmlDatabaseServiceTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
     /**
      * XmlDatabaseService
      * 
-     * @var \TYPO3\Deployment\Service\XmlDatabaseService
+     * @var \TYPO3\Deployment\Service\XmlDatabaseService $xmlDatabaseService
      */
     protected $xmlDatabaseService = NULL;
     
@@ -20,6 +38,8 @@ class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testReadXmlIsArray(){
@@ -30,6 +50,8 @@ class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testReadXmlIsNotEmpty(){
@@ -40,6 +62,8 @@ class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testReadXmlIsNotNull(){
@@ -50,6 +74,8 @@ class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCheckLinksIsString(){
@@ -57,6 +83,8 @@ class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCheckLinksIsNotEmpty(){
@@ -64,6 +92,8 @@ class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCheckLinksIsNotNull(){
@@ -71,6 +101,8 @@ class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCompareDataWithRegistryIsHistoryData(){
@@ -78,6 +110,8 @@ class XmlDatabaseServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCompareDataWithRegistryIsNotNull(){

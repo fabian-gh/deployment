@@ -32,27 +32,37 @@ use \TYPO3\Deployment\Service\RegistryService;
 class XmlDatabaseService extends AbstractDataService {
 
     /**
-     * @var \TYPO3\Deployment\Domain\Model\HistoryData
+     * History data
+     * 
+     * @var \TYPO3\Deployment\Domain\Model\HistoryData $historyData
      */
     protected $historyData;
 
     /**
-     * @var \TYPO3\Deployment\Domain\Model\LogData
+     * Log data
+     * 
+     * @var \TYPO3\Deployment\Domain\Model\LogData $logData
      */
     protected $logData;
 
     /**
-     * @var array
+     * Deploy data
+     * 
+     * @var array $deployData
      */
     protected $deployData;
 
     /**
-     * @var \XmlWriter
+     * XMLWriter
+     * 
+     * @var \XmlWriter $xmlwriter
      */
     protected $xmlwriter;
 
-    /**
-     * @var \SimpleXml
+    /** 
+     * XMLReader
+     * 
+     * @var \SimpleXml $xmlreader
      */
     protected $xmlreader;
 
@@ -474,6 +484,8 @@ class XmlDatabaseService extends AbstractDataService {
 
     
     /**
+     * Returns history data
+     * 
      * @return Array $logdata
      */
     public function getHistoryData() {
@@ -481,6 +493,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets history data
+     * 
      * @param array $historyEntries
      */
     public function setHistoryData($historyEntries) {
@@ -488,6 +502,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Returns log data
+     * 
      * @return \TYPO3\Deployment\Domain\Model\LogData
      */
     public function getLogData() {
@@ -495,6 +511,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets log data
+     * 
      * @param \TYPO3\Deployment\Domain\Model\LogData $logData
      */
     public function setLogData(\TYPO3\Deployment\Domain\Model\LogData $logData) {
@@ -502,6 +520,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Returns deploy data
+     * 
      * @return array
      */
     public function getDeployData() {
@@ -509,6 +529,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets deploy data
+     * 
      * @param array $deployData
      */
     public function setDeployData($deployData) {
@@ -516,6 +538,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Returns XMLWriter
+     * 
      * @return \XmlWriter
      */
     public function getXmlwriter() {
@@ -523,6 +547,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets XMLWriter
+     * 
      * @param \XmlWriter $xmlwriter
      */
     public function setXmlwriter(\XmlWriter $xmlwriter) {
@@ -530,6 +556,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Returns XMLReader
+     * 
      * @return \SimpleXml
      */
     public function getXmlreader() {
@@ -537,6 +565,8 @@ class XmlDatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets XMLReader
+     * 
      * @param \SimpleXml $xmlreader
      */
     public function setXmlreader(\SimpleXml $xmlreader) {

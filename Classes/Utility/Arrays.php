@@ -23,6 +23,8 @@ namespace TYPO3\Deployment\Utility;
 class Arrays {
 
     /**
+     * Set nodes of Arrays
+     * 
      * @param $data
      * @param $array
      * @see http://www.php.net/manual/de/function.array-walk-recursive.php#106340

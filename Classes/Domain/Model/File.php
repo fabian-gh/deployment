@@ -23,12 +23,16 @@ namespace TYPO3\Deployment\Domain\Model;
 class File extends AbstractModel {   
     
     /**
-     * @var string
+     * File-uid
+     * 
+     * @var string $uid
      */
     protected $uid;
     
     
     /**
+     * Returns the uid
+     * 
      * @return string
      */
     public function getUid() {

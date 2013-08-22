@@ -1,13 +1,31 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Service;
 
+/**
+ * RegistryServiceTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class RegistryServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
     /**
      * RegistryService
      * 
-     * @var \TYPO3\Deployment\Service\RegistryService
+     * @var \TYPO3\Deployment\Service\RegistryService $registryService
      */
     protected $registryService = NULL;
     
@@ -20,6 +38,8 @@ class RegistryServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetLastDeployIsString(){
@@ -27,6 +47,8 @@ class RegistryServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetStoredFailuresIsArray(){
@@ -34,6 +56,8 @@ class RegistryServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetStoredHistoryEntriesIsArray(){

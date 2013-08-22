@@ -1,15 +1,34 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Service;
 
+/**
+ * ConfigurationServiceTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
     /**
      * Configuration Service
      *
-     * @var \TYPO3\Deployment\Service\ConfigurationService|NULL
+     * @var \TYPO3\Deployment\Service\ConfigurationService|NULL $configurationService
      */
     protected $configurationService = NULL;
+    
 
     /**
      * Build up the test
@@ -19,6 +38,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDeploymentTablesNotNull() {
@@ -26,6 +47,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDeploymentTablesIsArray() {
@@ -33,6 +56,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetNotDeploymentTablesNotNull() {
@@ -40,6 +65,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetNotDeploymentTablesIsArray() {
@@ -47,6 +74,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDeploymentTablesContainsTtContent() {
@@ -54,6 +83,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDeploymentTablesCotainsPages() {
@@ -61,6 +92,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDeploymentTablesCotainsSysFile() {
@@ -68,6 +101,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDeploymentTablesCotainsSysFileReference() {
@@ -75,6 +110,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetNotDeployableColumnsIsArray(){
@@ -82,6 +119,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetNotDeployableColumnsIsNotNull() {
@@ -89,6 +128,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDeleteStateIsNotNull() {
@@ -96,6 +137,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDeleteStateIsInt() {
@@ -103,6 +146,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetPullServerIsNotNull() {
@@ -110,6 +155,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetPullServerIsString() {
@@ -117,6 +164,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetUsernameIsNotNull() {
@@ -124,6 +173,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetUsernameIsString() {
@@ -131,6 +182,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetPasswordIsNotNull() {
@@ -138,6 +191,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetPasswordIsString() {
@@ -145,6 +200,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetPhpPathIsNotNull() {
@@ -152,6 +209,8 @@ class ConfigurationServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetPhpPathIsString() {

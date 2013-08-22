@@ -33,12 +33,16 @@ use \TYPO3\Deployment\Service\XmlResourceService;
 class CopyService extends AbstractDataService {
 
     /**
-     * @var string
+     * Task uid
+     * 
+     * @var string $taskUid
      */
     protected $taskUid;
 
     /**
-     * @var int
+     * Disable status
+     * 
+     * @var int $disable
      */
     protected $disable;
 
@@ -204,6 +208,8 @@ class CopyService extends AbstractDataService {
 
     
     /**
+     * Returns CLI path
+     * 
      * @return string
      */
     public function getCliPath() {
@@ -211,6 +217,8 @@ class CopyService extends AbstractDataService {
     }
 
     /**
+     * Returns task uid
+     * 
      * @return string
      */
     public function getTaskUid() {
@@ -218,6 +226,8 @@ class CopyService extends AbstractDataService {
     }
 
     /**
+     * Returns disable status
+     * 
      * @return string
      */
     public function getDisable() {
@@ -225,6 +235,8 @@ class CopyService extends AbstractDataService {
     }
 
     /**
+     * Sets disable status
+     * 
      * @param string $disable
      */
     public function setDisable($disable) {

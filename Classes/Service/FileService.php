@@ -317,6 +317,8 @@ class FileService extends AbstractDataService {
     // ======================================= Getter ===============================================
 
     /**
+     * Returns fieladmin path without trailing slash
+     * 
      * @return string
      */
     public function getFileadminPathWithoutTrailingSlash() {
@@ -324,6 +326,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns fieladmin path with trailing slash
+     * 
      * @return string
      */
     public function getFileadminPathWithTrailingSlash() {
@@ -331,6 +335,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns deployment path without trailing slash
+     * 
      * @return string
      */
     public function getDeploymentPathWithoutTrailingSlash() {
@@ -338,6 +344,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns deployment path with trailing slash
+     * 
      * @return string
      */
     public function getDeploymentPathWithTrailingSlash() {
@@ -345,6 +353,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns deployment database path without trailing slash
+     * 
      * @return string
      */
     public function getDeploymentDatabasePathWithoutTrailingSlash() {
@@ -352,6 +362,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns deployment database path with trailing slash
+     * 
      * @return string
      */
     public function getDeploymentDatabasePathWithTrailingSlash() {
@@ -359,6 +371,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns deployment media path without trailing slash
+     * 
      * @return string
      */
     public function getDeploymentMediaPathWithoutTrailingSlash() {
@@ -366,6 +380,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns deployment media path with trailing slash
+     * 
      * @return string
      */
     public function getDeploymentMediaPathWithTrailingSlash() {
@@ -373,6 +389,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns deployment backdeployment path without trailing slash
+     * 
      * @return string
      */
     public function getDeploymentBBDeploymentPathWithoutTrailingSlash() {
@@ -380,6 +398,8 @@ class FileService extends AbstractDataService {
     }
 
     /**
+     * Returns deployment backdeployment path with trailing slash
+     * 
      * @return string
      */
     public function getDeploymentBBDeploymentPathWithTrailingSlash() {

@@ -1,12 +1,31 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Scheduler;
 
+/**
+ * UuidTaskTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class UuidTaskTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     
     /**
-     *
-     * @var \TYPO3\Deployment\Scheduler\UuidTask
+     * Uuid task
+     * 
+     * @var \TYPO3\Deployment\Scheduler\UuidTask $uuidTask
      */
     protected $uuidTask = NULL;
     
@@ -19,6 +38,8 @@ class UuidTaskTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCheckIfUuidExistsIsBoolean(){
@@ -26,6 +47,8 @@ class UuidTaskTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCheckIfTaskIsRegistered(){

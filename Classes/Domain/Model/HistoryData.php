@@ -23,42 +23,58 @@ namespace TYPO3\Deployment\Domain\Model;
 class HistoryData extends AbstractModel {
 
     /**
-     * @var string 
+     * UID
+     * 
+     * @var string $uid
      */
     protected $uid;
 
     /**
-     * @var string 
+     * Sys log uid
+     * 
+     * @var string $sysLogUid
      */
     protected $sysLogUid;
 
     /**
-     * @var array
+     * History data
+     * 
+     * @var array $historyData
      */
     protected $historyData;
 
     /**
-     * @var string
+     * Fieldlist
+     * 
+     * @var string $fieldlist
      */
     protected $fieldlist;
 
     /**
-     * @var string 
+     * Recuid
+     * 
+     * @var string $recuid
      */
     protected $recuid;
 
     /**
-     * @var string 
+     * Tablename
+     * 
+     * @var string $tablename
      */
     protected $tablename;
 
     /**
-     * @var \DateTime
+     * Timestamp
+     * 
+     * @var \DateTime $tstamp
      */
     protected $tstamp;
 
     
     /**
+     * Returns uid
+     * 
      * @return string
      */
     public function getUid() {
@@ -66,6 +82,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Sets uid
+     * 
      * @param string $uid
      */
     public function setUid($uid) {
@@ -73,6 +91,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Returns sys_log_uid
+     * 
      * @return string
      */
     public function getSysLogUid() {
@@ -80,6 +100,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Sets sys_log_uid
+     * 
      * @param string $sysLogUid
      */
     public function setSysLogUid($sysLogUid) {
@@ -87,6 +109,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Returns history_data
+     * 
      * @return array
      */
     public function getHistoryData() {
@@ -94,6 +118,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Sets history_data
+     * 
      * @param array $historyData
      */
     public function setHistoryData($historyData) {
@@ -101,6 +127,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Returns fieldlist
+     * 
      * @return string
      */
     public function getFieldlist() {
@@ -108,6 +136,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Sets fieldlist
+     * 
      * @param string $fieldlist
      */
     public function setFieldlist($fieldlist) {
@@ -115,6 +145,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Returns recuid
+     * 
      * @return string
      */
     public function getRecuid() {
@@ -122,6 +154,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Sets recuid
+     * 
      * @param string $recuid
      */
     public function setRecuid($recuid) {
@@ -129,6 +163,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Returns tablename
+     * 
      * @return string
      */
     public function getTablename() {
@@ -136,6 +172,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Sets tablename
+     * 
      * @param string $tablename
      */
     public function setTablename($tablename) {
@@ -143,6 +181,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Returns timestamp
+     * 
      * @return \DateTime
      */
     public function getTstamp() {
@@ -150,6 +190,8 @@ class HistoryData extends AbstractModel {
     }
 
     /**
+     * Sets timestamp
+     * 
      * @param \DateTime $tstamp
      */
     public function setTstamp(\DateTime $tstamp) {

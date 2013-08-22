@@ -28,12 +28,13 @@ class RegistryService extends AbstractDataService {
     /**
      * Registry
      *
-     * @var \TYPO3\CMS\Core\Registry
+     * @var \TYPO3\CMS\Core\Registry $registry
      */
     protected $registry = NULL;
 
+    
     /**
-     * Constructor
+     * Class Constructor
      */
     public function __construct() {
         $this->registry = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');

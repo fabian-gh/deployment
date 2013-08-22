@@ -30,17 +30,23 @@ use \TYPO3\Deployment\Service\FileService;
 class XmlResourceService extends AbstractDataService {
 
     /**
-     * @var \TYPO3\Deployment\Domain\Model\File
+     * Filelist
+     * 
+     * @var \TYPO3\Deployment\Domain\Model\File $fileList
      */
     protected $fileList;
 
     /**
-     * @var \XmlWriter
+     * XMLWriter
+     * 
+     * @var \XmlWriter $xmlwriter
      */
     protected $xmlwriter;
 
     /**
-     * @var \SimpleXml
+     * XMLReader
+     * 
+     * @var \SimpleXml $xmlreader
      */
     protected $xmlreader;
 
@@ -198,6 +204,8 @@ class XmlResourceService extends AbstractDataService {
     // ============================ Getter & Setter ================================
 
     /**
+     * Returns filelist
+     * 
      * @return array
      */
     public function getFileList() {
@@ -205,6 +213,8 @@ class XmlResourceService extends AbstractDataService {
     }
 
     /**
+     * Sets filelist
+     * 
      * @param array $fileList
      */
     public function setFileList($fileList) {
@@ -212,6 +222,8 @@ class XmlResourceService extends AbstractDataService {
     }
 
     /**
+     * Returns XMLWriter
+     * 
      * @return \XMLWriter
      */
     public function getXmlwriter() {
@@ -219,6 +231,8 @@ class XmlResourceService extends AbstractDataService {
     }
 
     /**
+     * Sets XMLWriter
+     * 
      * @param \XmlWriter $xmlwriter
      */
     public function setXmlwriter(\XmlWriter $xmlwriter) {
@@ -226,6 +240,8 @@ class XmlResourceService extends AbstractDataService {
     }
 
     /**
+     * Returns XMLReader
+     * 
      * @return \SimpleXml
      */
     public function getXmlreader() {
@@ -233,6 +249,8 @@ class XmlResourceService extends AbstractDataService {
     }
 
     /**
+     * Sets XMLReader
+     * 
      * @param \SimpleXml $xmlreader
      */
     public function setXmlreader(\SimpleXml $xmlreader) {

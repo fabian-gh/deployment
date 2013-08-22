@@ -1,13 +1,31 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Service;
 
+/**
+ * CopyServiceTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
     /**
      * CopyService
      * 
-     * @var \TYPO3\Deployment\Service\CopyService|NULL
+     * @var \TYPO3\Deployment\Service\CopyService|NULL $copyService
      */
     protected $copyService = NULL;
     
@@ -20,6 +38,8 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCheckIfCommandControllerIsRegistered() {
@@ -27,6 +47,8 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testCheckIfCliUserIsRegistered() {
@@ -34,6 +56,8 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetTaskUidIsNotNull() {
@@ -42,6 +66,8 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDisableIsInt() {
@@ -50,6 +76,8 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetDisableNotNull() {
@@ -58,6 +86,8 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testAllPrecausionsSet() {
@@ -65,6 +95,8 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetCliPathIsString() {
@@ -72,6 +104,8 @@ class CopyServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetCliPath() {

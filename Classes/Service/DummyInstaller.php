@@ -24,7 +24,7 @@ use TYPO3\CMS\Install\Installer;
 class DummyInstaller extends Installer {
 
     /**
-     * No init
+     * Class constructor
      */
     public function __construct() {}
 }

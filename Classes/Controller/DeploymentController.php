@@ -32,73 +32,73 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 class DeploymentController extends ActionController {
 
     /**
-     * @var \TYPO3\Deployment\Domain\Repository\LogRepository
+     * @var \TYPO3\Deployment\Domain\Repository\LogRepository LogRepository
      * @inject
      */
     protected $logRepository;
 
     /**
-     * @var \TYPO3\Deployment\Domain\Repository\HistoryRepository
+     * @var \TYPO3\Deployment\Domain\Repository\HistoryRepository HistoryRepository
      * @inject
      */
     protected $historyRepository;
 
     /**
-     * @var \TYPO3\Deployment\Domain\Repository\FileRepository
+     * @var \TYPO3\Deployment\Domain\Repository\FileRepository FileRepository
      * @inject
      */
     protected $fileRepository;
 
     /**
-     * @var \TYPO3\Deployment\Service\XmlDatabaseService
+     * @var \TYPO3\Deployment\Service\XmlDatabaseService XmlDatabaseService
      * @inject
      */
     protected $xmlDatabaseService;
 
     /**
-     * @var \TYPO3\Deployment\Service\InsertDataService
+     * @var \TYPO3\Deployment\Service\InsertDataService InsertDataService
      * @inject
      */
     protected $insertDataService;
 
     /**
-     * @var \TYPO3\Deployment\Service\FailureService
+     * @var \TYPO3\Deployment\Service\FailureService FailureService
      * @inject
      */
     protected $failureService;
 
     /**
-     * @var \TYPO3\Deployment\Service\FileService
+     * @var \TYPO3\Deployment\Service\FileService FileService
      * @inject
      */
     protected $fileService;
 
     /**
-     * @var \TYPO3\Deployment\Service\RegistryService
+     * @var \TYPO3\Deployment\Service\RegistryService RegistryService
      * @inject
      */
     protected $registry;
 
     /**
-     * @var \TYPO3\Deployment\Service\XmlResourceService
+     * @var \TYPO3\Deployment\Service\XmlResourceService XmlResourceService
      * @inject
      */
     protected $xmlResourceService;
 
     /**
-     * @var \TYPO3\Deployment\Service\CopyService
+     * @var \TYPO3\Deployment\Service\CopyService CopyService
      * @inject
      */
     protected $copyService;
     
     /**
-     * @var \TYPO3\Deployment\Service\BoundlessBackdeploymentService
+     * @var \TYPO3\Deployment\Service\BoundlessBackdeploymentService BoundlessBackdeploymentService
      * @inject
      */
     protected $backdeployment;
     
     /**
-     * @var \TYPO3\Deployment\Scheduler\UuidTask
+     * @var \TYPO3\Deployment\Scheduler\UuidTask UuidTask
      * @inject
      */
     protected $scheduler;
@@ -364,9 +364,6 @@ class DeploymentController extends ActionController {
     
     /**
      * Start a boundless Backdeployment by copying whole database
-     * 
-     * @param \TYPO3\Deployment\Domain\Model\Request\Backdeploy $backdeploy
-     * @dontvalidate                                            $backdeploy
      */
     public function enterBoundlessBackdeploymentAction(){
         if(!$this->backdeployment->checkIfMysqldumpPathIsNotEmpty()){
@@ -375,7 +372,9 @@ class DeploymentController extends ActionController {
     }
     
     
-    
+    /**
+     * Creates a database dump
+     */
     public function createDatabaseDumpAction(){
         $this->backdeployment->executeDumpCreation();
         $this->addFlashMessage('', 'Dump was created succesfully', FlashMessage::OK);
@@ -385,9 +384,6 @@ class DeploymentController extends ActionController {
     
     /**
      * Execute the boundless backdeployment
-     * 
-     * @param \TYPO3\Deployment\Domain\Model\Request\Backdeploy $backdeploy
-     * @dontvalidate                                            $backdeploy
      */
     public function boundlessBackdeploymentAction(){
         $this->backdeployment->executeDumpInsertion();

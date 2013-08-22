@@ -23,27 +23,37 @@ namespace TYPO3\Deployment\Domain\Model;
 class Log extends AbstractModel{
     
     /**
-     * @var string
+     * Timestamp
+     * 
+     * @var string $tstamp
      */
     protected $tstamp;
     
     /**
-     * @var string
+     * Log data
+     * 
+     * @var string $log_data
      */
     protected $logData;
     
     /**
-     * @var string
+     * Action
+     * 
+     * @var string $action
      */
     protected $action;
     
     /**
-     * @var string
+     * Tablename
+     * 
+     * @var string $tablename
      */
     protected $tablename;
     
     
     /**
+     * Returns log_data
+     * 
      * @return string
      */
     public function getLogData() {
@@ -51,6 +61,8 @@ class Log extends AbstractModel{
     }
     
     /**
+     * Sets log_data
+     * 
      * @param string $logData
      */
     public function setLogData($logData){
@@ -58,6 +70,8 @@ class Log extends AbstractModel{
     }
 
     /**
+     * Returns timestamp
+     * 
      * @return string
      */
     public function getTstamp() {
@@ -65,6 +79,8 @@ class Log extends AbstractModel{
     }
 
     /**
+     * Sets timestamp
+     * 
      * @param string $tstamp
      */
     public function setTstamp($tstamp) {
@@ -72,6 +88,8 @@ class Log extends AbstractModel{
     }
     
     /**
+     * Returns action
+     * 
      * @return string
      */
     public function getAction() {
@@ -79,6 +97,8 @@ class Log extends AbstractModel{
     }
 
     /**
+     * Sets action
+     * 
      * @param string $action
      */
     public function setAction($action) {
@@ -86,6 +106,8 @@ class Log extends AbstractModel{
     }  
     
     /**
+     * Returns tablename
+     * 
      * @return string
      */
     public function getTablename() {
@@ -93,6 +115,8 @@ class Log extends AbstractModel{
     }
 
     /**
+     * Sets tablename
+     * 
      * @param string $tablename
      */
     public function setTablename($tablename) {

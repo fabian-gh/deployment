@@ -23,22 +23,30 @@ namespace TYPO3\Deployment\Service;
 class DatabaseService extends AbstractDataService {
     
     /**
-     * @var string
+     * Hostname
+     * 
+     * @var string $host
      */
     protected $host = 'localhost';
     
     /**
-     * @var string
+     * Username
+     * 
+     * @var string $user
      */
     protected $user = 'root';
     
     /**
-     * @var string
+     * Password
+     * 
+     * @var string $pass
      */
     protected $pass = 'root';
     
     /**
-     * @var string
+     * Databasename
+     * 
+     * @var string $db
      */
     protected $db = 't3masterdeploy2';
 
@@ -100,6 +108,8 @@ class DatabaseService extends AbstractDataService {
     }
     
     /**
+     * Returns hostname
+     * 
      * @return string
      */
     public function getHost() {
@@ -107,6 +117,8 @@ class DatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets hostname
+     * 
      * @param string $host
      */
     public function setHost($host) {
@@ -114,6 +126,8 @@ class DatabaseService extends AbstractDataService {
     }
 
     /**
+     * Returns Username
+     * 
      * @return string
      */
     public function getUser() {
@@ -121,6 +135,8 @@ class DatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets username
+     * 
      * @param string $user
      */
     public function setUser($user) {
@@ -128,6 +144,8 @@ class DatabaseService extends AbstractDataService {
     }
 
     /**
+     * Returns password
+     * 
      * @return string
      */
     public function getPass() {
@@ -135,6 +153,8 @@ class DatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets password
+     * 
      * @param string $pass
      */
     public function setPass($pass) {
@@ -142,6 +162,8 @@ class DatabaseService extends AbstractDataService {
     }
 
     /**
+     * Returns Databasename
+     * 
      * @return string
      */
     public function getDb() {
@@ -149,6 +171,7 @@ class DatabaseService extends AbstractDataService {
     }
 
     /**
+     * Sets databasename
      * @param string $db
      */
     public function setDb($db) {

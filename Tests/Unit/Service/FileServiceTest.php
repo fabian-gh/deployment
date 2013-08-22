@@ -1,12 +1,31 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Service;
 
+/**
+ * FileServiceTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
 
     /**
-     *
-     * @var \TYPO3\Deployment\Service\FileService
+     * FileService
+     * 
+     * @var \TYPO3\Deployment\Service\FileService $fileService
      */
     protected $fileService = NULL;
     
@@ -19,6 +38,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testReadFilesInFileadminIsArray() {
@@ -26,6 +47,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testReadFilesInFileadminIsNotEmpty(){
@@ -33,6 +56,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testReadFilesInFileadminWithoutDeploymentFiles() {
@@ -40,6 +65,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testReadFilesInFileadminWithoutProcessedFiles() {
@@ -47,6 +74,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testReadFilesInFileadminWithoutTempFiles() {
@@ -54,6 +83,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetNotIndexedFilesIsArray() {
@@ -61,6 +92,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetNotIndexedFilesIsNotEmpty() {
@@ -68,6 +101,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGenerateUuid() {
@@ -75,6 +110,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetFileadminPathWithoutTrailingSlashIsString() {
@@ -82,6 +119,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetFileadminPathWithTrailingSlashIsString() {
@@ -89,6 +128,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetDeploymentPathWithoutTrailingSlashIsString() {
@@ -96,6 +137,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetDeploymentPathWithTrailingSlashIsString() {
@@ -103,6 +146,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetDeploymentDatabasePathWithoutTrailingSlashIsString() {
@@ -110,6 +155,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetDeploymentDatabasePathWithTrailingSlashIsString() {
@@ -117,6 +164,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetDeploymentMediaPathWithoutTrailingSlashIsString() {
@@ -124,6 +173,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetDeploymentMediaPathWithTrailingSlashIsString() {
@@ -131,6 +182,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetDeploymentBbdeploymentPathWithoutTrailingSlashIsString() {
@@ -138,6 +191,8 @@ class FileServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
 
     /**
+     * Testmethod
+     * 
      * @test
      */
     function testGetDeploymentBbdeploymentPathWithTrailingSlashIsString() {

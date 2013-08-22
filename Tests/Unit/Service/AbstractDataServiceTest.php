@@ -1,15 +1,34 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Service;
 
+/**
+ * AbstractDataServiceTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     
     /**
      * AbstractDataService
      *
-     * @var \TYPO3\Deployment\Service\
+     * @var \TYPO3\Deployment\Service\ $abstractDataService
      */
     protected $abstractDataService = NULL;
+    
 
     /**
      * Build up the test
@@ -19,6 +38,8 @@ class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase 
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetUuidByUidIsNotEmpty(){
@@ -26,6 +47,8 @@ class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase 
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetUuidByUidIsString(){
@@ -33,6 +56,8 @@ class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase 
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetUidByUuidIsNotNull(){
@@ -40,6 +65,8 @@ class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase 
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetUidByUuidIsInt(){
@@ -47,6 +74,8 @@ class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase 
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetPidByUuidIsNotNull(){
@@ -54,6 +83,8 @@ class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase 
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testGetPidByUuidIsInt(){
@@ -61,6 +92,8 @@ class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase 
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testControlResultIsNotNull(){
@@ -68,6 +101,8 @@ class AbstractDataServiceTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase 
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testControlResultIsString(){

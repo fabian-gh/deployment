@@ -1,19 +1,38 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Domain\Repository;
 
+/**
+ * HistoryRepositoryTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class HistoryRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     
     /**
      * HistoryRepository
      * 
-     * @var TYPO3\Deployment\Domain\Repository\HistoryRepository
+     * @var TYPO3\Deployment\Domain\Repository\HistoryRepository $historyRepository
      */
     protected $historyRepository = NULL;
     
     /**
-     *
-     * @var array
+     * Log data
+     * 
+     * @var array $logDataArray
      */
     protected $logDataArray = NULL;
     
@@ -42,6 +61,8 @@ class HistoryRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testHistoryRepositoryIsObject(){
@@ -49,6 +70,8 @@ class HistoryRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testLogDataIsArray(){
@@ -56,6 +79,8 @@ class HistoryRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testLogDataArrayContainsOnlyLogDataObjects(){
@@ -63,6 +88,8 @@ class HistoryRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testFindHistoryDataIsNotEmpty(){

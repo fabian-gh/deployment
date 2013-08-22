@@ -1,13 +1,31 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Domain\Repository;
 
+/**
+ * FileRepositoryTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class FileRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     
     /**
      * FileRepository
      * 
-     * @var \TYPO3\Deployment\Domain\Repository\FileRepository
+     * @var \TYPO3\Deployment\Domain\Repository\FileRepository $fileRepository
      */
     protected $fileRepository = NULL;
     
@@ -20,6 +38,8 @@ class FileRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testFindYoungerThenIsQueryResultInterface(){
@@ -30,6 +50,8 @@ class FileRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testFindYoungerThenIsNotNull(){
@@ -40,6 +62,8 @@ class FileRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testFindYoungerThenIsNotEmpty(){

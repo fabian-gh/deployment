@@ -23,12 +23,16 @@ namespace TYPO3\Deployment\Property\TypeConverter;
 class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\ArrayConverter {
 
     /**
-     * @var array<string>
+     * Sourcetype
+     * 
+     * @var array<string> $sourceTypes
      */
     protected $sourceTypes = array('string');
 
     /**
-     * @var integer
+     * Priority
+     * 
+     * @var integer $priority
      */
     protected $priority = 100;
 

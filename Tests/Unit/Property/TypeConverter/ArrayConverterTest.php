@@ -1,13 +1,31 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Property\TypeConverter;
 
+/**
+ * ArrayConverterTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class ArrayConverterTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     
     /**
      * ArrayConverter
      * 
-     * @var \TYPO3\Deployment\Tests\Property\TypeConverter
+     * @var \TYPO3\Deployment\Tests\Property\TypeConverter $arrayConverter
      */
     protected $arrayConverter = NULL;
     
@@ -19,6 +37,8 @@ class ArrayConverterTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testConvertFromIsArray(){

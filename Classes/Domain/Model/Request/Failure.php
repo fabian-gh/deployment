@@ -25,7 +25,9 @@ use \TYPO3\Deployment\Domain\Model\AbstractModel;
 class Failure extends AbstractModel {
 
     /**
-     * @var array
+     * Checked failure entries
+     * 
+     * @var array $failureEntries
      * @validate NotEmpty
      */
     protected $failureEntries;

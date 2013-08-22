@@ -1,13 +1,31 @@
 <?php
 
+/**
+ * Deployment-Extension
+ * This is an extension to integrate a deployment process for TYPO3 CMS
+ * 
+ * @category   Extension
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
+
 namespace TYPO3\Deployment\Tests\Unit\Domain\Repository;
 
+/**
+ * LogRepositoryTest
+ * Test class
+ * 
+ * @package    Deployment
+ * @subpackage Tests
+ * @author     Fabian Martinovic <fabian.martinovic(at)t-online.de>
+ */
 class LogRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     
     /**
      * LogRepository
      * 
-     * @var TYPO3\Deployment\Domain\Repository\LogRepository
+     * @var TYPO3\Deployment\Domain\Repository\LogRepository $logRepository
      */
     protected $logRepository = NULL;
     
@@ -20,6 +38,8 @@ class LogRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testFindYoungerThenIsQueryResult(){
@@ -30,6 +50,8 @@ class LogRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testFindYoungerThenNotNull(){
@@ -40,6 +62,8 @@ class LogRepositoryTest extends \TYPO3\Deployment\Tests\Unit\BaseTestCase {
     }
     
     /**
+     * Testmethod
+     * 
      * @test
      */
     public function testFindYoungerThenContainsLogs(){

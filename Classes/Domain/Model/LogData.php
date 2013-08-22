@@ -23,42 +23,58 @@ namespace TYPO3\Deployment\Domain\Model;
 class LogData extends AbstractModel{
     
     /**
-     * @var string
+     * UID
+     * 
+     * @var string $uid
      */
     protected $uid;
     
     /**
-     * @var string 
+     * PID
+     * 
+     * @var string $pid
      */
     protected $pid;
 
     /**
-     * @var string
+     * Data
+     * 
+     * @var string $data
      */
     protected $data;
     
     /**
-     * @var string
+     * Table
+     * 
+     * @var string $table
      */
     protected $table;
     
     /**
-     * @var string
+     * Recuid
+     * 
+     * @var string $recuid
      */
     protected $recuid;
     
     /**
-     * @var string
+     * Timestamp
+     * 
+     * @var string $tstamp
      */
     protected $tstamp;
     
     /**
-     * @var string
+     * Action
+     * 
+     * @var string $action
      */
     protected $action;
 
 
     /**
+     * Returns uid
+     * 
      * @return string
      */
     public function getUid() {
@@ -66,6 +82,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Sets uid
+     * 
      * @param string $uid
      */
     public function setUid($uid) {
@@ -73,6 +91,8 @@ class LogData extends AbstractModel{
     }
     
     /**
+     * Returns data
+     * 
      * @return string
      */
     public function getData() {
@@ -80,6 +100,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Sets data
+     * 
      * @param string $data
      */
     public function setData($data) {
@@ -87,6 +109,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Returns table
+     * 
      * @return string
      */
     public function getTable() {
@@ -94,6 +118,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Sets table
+     * 
      * @param string $table
      */
     public function setTable($table) {
@@ -101,6 +127,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Returns recuid
+     * 
      * @return string
      */
     public function getRecuid() {
@@ -108,6 +136,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Sets recuid
+     * 
      * @param string $recId
      */
     public function setRecuid($recuid) {
@@ -115,6 +145,8 @@ class LogData extends AbstractModel{
     }
     
     /**
+     * Returns timestamp
+     * 
      * @return string
      */
     public function getTstamp() {
@@ -122,6 +154,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Sets timestamp
+     * 
      * @param string $tstamp
      */
     public function setTstamp($tstamp) {
@@ -129,6 +163,8 @@ class LogData extends AbstractModel{
     }
     
     /**
+     * Returns action
+     * 
      * @return string
      */
     public function getAction() {
@@ -136,6 +172,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Set action
+     * 
      * @param string $action
      */
     public function setAction($action) {
@@ -143,6 +181,8 @@ class LogData extends AbstractModel{
     }
     
     /**
+     * Returns pid
+     * 
      * @return string
      */
     public function getPid() {
@@ -150,6 +190,8 @@ class LogData extends AbstractModel{
     }
 
     /**
+     * Sets pid
+     * 
      * @param string $pid
      */
     public function setPid($pid) {
