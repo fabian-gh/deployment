@@ -142,7 +142,8 @@ class CopyService extends AbstractDataService {
         // read user agent
         $userAgent = $_SERVER['HTTP_USER_AGENT'];
 
-        $path = $fileService->getFileadminPathWithoutTrailingSlash();
+        //$path = $fileService->getFileadminPathWithoutTrailingSlash();
+        GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') . 'fileadmin/deployment/resource';
         // get data from configuration
         $server = $configuration->getPullserver();
         $username = $configuration->getUsername();
