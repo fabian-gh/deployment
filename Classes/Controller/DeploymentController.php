@@ -32,73 +32,73 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 class DeploymentController extends ActionController {
 
     /**
-     * @var \TYPO3\Deployment\Domain\Repository\LogRepository LogRepository
+     * @var \TYPO3\Deployment\Domain\Repository\LogRepository
      * @inject
      */
     protected $logRepository;
 
     /**
-     * @var \TYPO3\Deployment\Domain\Repository\HistoryRepository HistoryRepository
+     * @var \TYPO3\Deployment\Domain\Repository\HistoryRepository
      * @inject
      */
     protected $historyRepository;
 
     /**
-     * @var \TYPO3\Deployment\Domain\Repository\FileRepository FileRepository
+     * @var \TYPO3\Deployment\Domain\Repository\FileRepository
      * @inject
      */
     protected $fileRepository;
 
     /**
-     * @var \TYPO3\Deployment\Service\XmlDatabaseService XmlDatabaseService
+     * @var \TYPO3\Deployment\Service\XmlDatabaseService
      * @inject
      */
     protected $xmlDatabaseService;
 
     /**
-     * @var \TYPO3\Deployment\Service\InsertDataService InsertDataService
+     * @var \TYPO3\Deployment\Service\InsertDataService
      * @inject
      */
     protected $insertDataService;
 
     /**
-     * @var \TYPO3\Deployment\Service\FailureService FailureService
+     * @var \TYPO3\Deployment\Service\FailureService
      * @inject
      */
     protected $failureService;
 
     /**
-     * @var \TYPO3\Deployment\Service\FileService FileService
+     * @var \TYPO3\Deployment\Service\FileService
      * @inject
      */
     protected $fileService;
 
     /**
-     * @var \TYPO3\Deployment\Service\RegistryService RegistryService
+     * @var \TYPO3\Deployment\Service\RegistryService
      * @inject
      */
     protected $registry;
 
     /**
-     * @var \TYPO3\Deployment\Service\XmlResourceService XmlResourceService
+     * @var \TYPO3\Deployment\Service\XmlResourceService
      * @inject
      */
     protected $xmlResourceService;
 
     /**
-     * @var \TYPO3\Deployment\Service\CopyService CopyService
+     * @var \TYPO3\Deployment\Service\CopyService
      * @inject
      */
     protected $copyService;
     
     /**
-     * @var \TYPO3\Deployment\Service\BoundlessBackdeploymentService BoundlessBackdeploymentService
+     * @var \TYPO3\Deployment\Service\BoundlessBackdeploymentService
      * @inject
      */
     protected $backdeployment;
     
     /**
-     * @var \TYPO3\Deployment\Scheduler\UuidTask UuidTask
+     * @var \TYPO3\Deployment\Scheduler\UuidTask
      * @inject
      */
     protected $scheduler;

@@ -143,9 +143,14 @@ class FileService extends AbstractDataService {
      */
     public function deleteXmlFileDirectory(){
         $fileArr = array();
+        $fileArr1 = array();
         
-        $path = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $this->getDeploymentDatabasePathWithTrailingSlash(), '', TRUE);
-        unset($path[0]);
+        $path0 = GeneralUtility::getAllFilesAndFoldersInPath($fileArr, $this->getDeploymentDatabasePathWithTrailingSlash(), '', TRUE);
+        $path1 = GeneralUtility::getAllFilesAndFoldersInPath($fileArr1, $this->getDeploymentMediaPathWithTrailingSlash(), '', TRUE);
+        unset($path0[0]);
+        unset($path1[0]);
+        
+        $path = array_merge($path0, $path1);
         
         foreach($path as $file){
             GeneralUtility::rmdir($file, true);
