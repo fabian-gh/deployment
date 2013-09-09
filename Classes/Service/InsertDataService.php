@@ -73,7 +73,7 @@ class InsertDataService extends AbstractDataService {
             if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
                 if ($entry['tablename'] == 'sys_file_reference') {
                     $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
-                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
+                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'sys_file');
                 } 
                 // case for tt_news
                 elseif ($entry['tablename'] == 'tt_news_cat_mm') {
@@ -130,7 +130,7 @@ class InsertDataService extends AbstractDataService {
             if (isset($entry['uid_foreign']) && isset($entry['uid_local'])) {
                 if ($entry['tablename'] == 'sys_file_reference') {
                     $entry['uid_foreign'] = $this->getUidByUuid($entry['uid_foreign'], 'tt_content');
-                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'tt_content');
+                    $entry['uid_local'] = $this->getUidByUuid($entry['uid_local'], 'sys_file');
                 } 
                 // case for tt_news
                 elseif ($entry['tablename'] == 'tt_news_cat_mm') {
